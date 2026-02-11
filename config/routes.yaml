@@ -9,3 +9,8 @@
 
 controllers:
     resource: routing.controllers
+
+tracking_index:
+    path: /tracking
+    controller: App\Controller\TrackingController::index
+    methods: [GET, POST]

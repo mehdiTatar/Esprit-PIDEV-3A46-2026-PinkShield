@@ -14,9 +14,19 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class AuthController extends AbstractController
 {
+    private string $recaptchaSiteKey;
+    private string $recaptchaSecretKey;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->recaptchaSiteKey = $params->get('recaptcha_site_key');
+        $this->recaptchaSecretKey = $params->get('recaptcha_secret_key');
+    }
+
     #[Route('/login', name: 'login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -32,6 +42,8 @@ class AuthController extends AbstractController
         return $this->render('auth/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'captcha_error' => null,
+            'recaptcha_site_key' => $this->recaptchaSiteKey,
         ]);
     }
 
@@ -44,13 +56,19 @@ class AuthController extends AbstractController
     #[Route('/register', name: 'register')]
     public function register(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator): Response
     {
-        if ($request->request->get('user_type') === 'patient') {
+        // Check for user_type from either query params (links) or POST data (forms)
+        $userType = $request->query->get('user_type') ?? $request->request->get('user_type');
+
+        if ($userType === 'patient') {
             $user = new User();
             $form = $this->createForm(UserFormType::class, $user);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $user->setRoles(['ROLE_USER']);
+                // Set full name by combining first and last name
+                $fullName = trim(($user->getFirstName() ?? '') . ' ' . ($user->getLastName() ?? ''));
+                $user->setFullName($fullName ?: 'User');
                 $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
 
                 $entityManager->persist($user);
@@ -62,7 +80,7 @@ class AuthController extends AbstractController
             return $this->render('auth/register_patient.html.twig', [
                 'form' => $form,
             ]);
-        } elseif ($request->request->get('user_type') === 'doctor') {
+        } elseif ($userType === 'doctor') {
             $doctor = new Doctor();
             $form = $this->createForm(DoctorFormType::class, $doctor);
             $form->handleRequest($request);

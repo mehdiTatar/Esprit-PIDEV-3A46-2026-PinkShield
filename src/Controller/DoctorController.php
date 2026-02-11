@@ -17,14 +17,31 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class DoctorController extends AbstractController
 {
     #[Route('/', name: 'doctor_index')]
-    public function index(DoctorRepository $doctorRepository): Response
+    public function index(Request $request, DoctorRepository $doctorRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
-        $doctors = $doctorRepository->findAll();
+        $searchId = $request->query->get('search_id');
+        $searchName = $request->query->get('search_name');
+
+        if ($searchId) {
+            $doctors = $doctorRepository->findById((int) $searchId);
+            if (!$doctors) {
+                $doctors = [];
+            }
+        } elseif ($searchName) {
+            $doctors = $doctorRepository->findByFullName($searchName);
+            if (!$doctors) {
+                $doctors = [];
+            }
+        } else {
+            $doctors = $doctorRepository->findAll();
+        }
 
         return $this->render('doctor/index.html.twig', [
             'doctors' => $doctors,
+            'searchId' => $searchId,
+            'searchName' => $searchName,
         ]);
     }
 
@@ -91,6 +108,30 @@ class DoctorController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'Doctor deleted successfully!');
+        return $this->redirectToRoute('doctor_index');
+    }
+
+    #[Route('/{id}/activate', name: 'doctor_activate', methods: ['POST'])]
+    public function activate(Doctor $doctor, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $doctor->setStatus('active');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Doctor account activated successfully!');
+        return $this->redirectToRoute('doctor_index');
+    }
+
+    #[Route('/{id}/deactivate', name: 'doctor_deactivate', methods: ['POST'])]
+    public function deactivate(Doctor $doctor, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $doctor->setStatus('inactive');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Doctor account deactivated successfully!');
         return $this->redirectToRoute('doctor_index');
     }
 

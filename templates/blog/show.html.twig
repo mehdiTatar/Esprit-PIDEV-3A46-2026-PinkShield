@@ -12,9 +12,12 @@
     </nav>
 
     <div class="card shadow-sm mb-5">
+        {% if post.imagePath %}
+            <img src="{{ post.imagePath }}" alt="{{ post.title }}" class="card-img-top" style="max-height: 400px; object-fit: cover;">
+        {% endif %}
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
-                <h1>{{ post.title }}</h1>
+                <h1 class="h2 text-danger fw-bold">{{ post.title }}</h1>
                 {% if app.user and (app.user.userIdentifier == post.authorEmail or is_granted('ROLE_ADMIN')) %}
                     <div>
                         <a href="{{ path('blog_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
@@ -37,15 +40,23 @@
 
             <hr>
 
-            <h3>Comments ({{ post.comments|length }})</h3>
+            <h3 class="h4 text-danger mb-4">Comments ({{ post.comments|length }})</h3>
             
             <div class="comments-list mt-4">
                 {% for comment in post.comments %}
                     <div class="card mb-3 bg-light">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <strong>{{ comment.authorName }}</strong>
-                                <small class="text-muted">{{ comment.createdAt|date('M d, Y H:i') }}</small>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ comment.authorName }}</strong>
+                                    <small class="text-muted d-block">{{ comment.createdAt|date('M d, Y H:i') }}</small>
+                                </div>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <div>
+                                        <a href="{{ path('comment_edit', {id: comment.id}) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <a href="{{ path('comment_delete', {id: comment.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this comment?')">Delete</a>
+                                    </div>
+                                {% endif %}
                             </div>
                             <p class="mb-0 mt-2">{{ comment.content }}</p>
                         </div>
@@ -57,12 +68,12 @@
 
             {% if app.user %}
                 <div class="add-comment mt-5">
-                    <h4>Add a Comment</h4>
+                    <h4 class="text-danger">Add a Comment</h4>
                     <form method="post">
                         <div class="mb-3">
                             <textarea name="comment" class="form-control" rows="3" required placeholder="Write your comment here..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit Comment</button>
+                        <button type="submit" class="btn btn-danger">Submit Comment</button>
                     </form>
                 </div>
             {% else %}

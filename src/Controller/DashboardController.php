@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+use App\Repository\AdminRepository;
+use App\Repository\AppointmentRepository;
+use App\Repository\DoctorRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,12 +36,15 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/admin/dashboard', name: 'admin_dashboard')]
-    public function adminDashboard(): Response
+    public function adminDashboard(UserRepository $userRepository, DoctorRepository $doctorRepository, AdminRepository $adminRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         return $this->render('dashboard/admin.html.twig', [
             'title' => 'Admin Dashboard',
+            'totalUsers' => count($userRepository->findAll()),
+            'totalDoctors' => count($doctorRepository->findAll()),
+            'totalAdmins' => count($adminRepository->findAll()),
         ]);
     }
 
@@ -52,12 +59,19 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/user/dashboard', name: 'user_dashboard')]
-    public function userDashboard(): Response
+    public function userDashboard(AppointmentRepository $appointmentRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
+        $user = $this->getUser();
+        $appointments = $appointmentRepository->findByPatient($user->getUserIdentifier());
+        
+        // Count confirmed appointments only (not cancelled)
+        $scheduledAppointments = count(array_filter($appointments, fn($apt) => $apt->getStatus() !== 'cancelled'));
+        
         return $this->render('dashboard/user.html.twig', [
             'title' => 'Patient Dashboard',
+            'scheduledAppointments' => $scheduledAppointments,
         ]);
     }
 }

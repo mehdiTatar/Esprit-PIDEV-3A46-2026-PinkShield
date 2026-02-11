@@ -2,22 +2,191 @@
 
 {% block title %}Register as Patient - PinkShield{% endblock %}
 
+{% block stylesheets %}
+<style>
+    .logo-svg {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+    }
+    body {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%) !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    aside.sidebar {
+        display: none !important;
+    }
+
+    main {
+        margin-left: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 !important;
+        min-height: calc(100vh - 70px);
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+    }
+
+    main > div:first-child {
+        width: 100%;
+    }
+
+    .row {
+        min-height: auto !important;
+        justify-content: center !important;
+    }
+
+    .card {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .card-body {
+        padding: 50px !important;
+    }
+
+    h2 {
+        color: #C41E3A !important;
+        font-weight: 800 !important;
+        margin-bottom: 30px !important;
+        text-align: center !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        border: 1.5px solid #e5e7eb !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        transition: all 0.3s ease;
+        background-color: #f9fafb !important;
+    }
+
+    .form-control::placeholder {
+        color: #d1d5db;
+    }
+
+    .form-control:focus {
+        border-color: #C41E3A !important;
+        box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1) !important;
+        background-color: white !important;
+    }
+
+    .btn-primary {
+        background-color: #C41E3A !important;
+        border-color: #C41E3A !important;
+        font-weight: 600;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #8B1428 !important;
+        border-color: #8B1428 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(196, 30, 58, 0.3) !important;
+    }
+
+    .btn-secondary {
+        background-color: #f3f4f6 !important;
+        border-color: #C41E3A !important;
+        color: #C41E3A !important;
+        font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+        background-color: #C41E3A !important;
+        color: white !important;
+    }
+
+    .alert {
+        border: none !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #ef4444 !important;
+    }
+
+    hr {
+        border-top: 1px solid #e5e7eb !important;
+    }
+
+    p > a {
+        color: #C41E3A !important;
+        font-weight: 600;
+    }
+
+    p > a:hover {
+        color: #8B1428 !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    .form-label {
+        margin-bottom: 5px !important;
+    }
+
+    .row .col-md-6 .mb-3 {
+        margin-bottom: 10px !important;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow-lg">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4" style="color: #e91e63;">Register as Patient</h2>
+        <div class="card">
+            <div class="card-body">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Shield shape with heart -->
+                        <defs>
+                            <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Outer shield -->
+                        <path d="M 100 20 C 100 20 60 40 60 90 C 60 130 100 170 100 170 C 100 170 140 130 140 90 C 140 40 100 20 100 20 Z" 
+                              fill="none" stroke="#C41E3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Inner shield -->
+                        <path d="M 100 25 C 100 25 65 42 65 90 C 65 127 100 162 100 162 C 100 162 135 127 135 90 C 135 42 100 25 100 25 Z" 
+                              fill="url(#shieldGradient)" opacity="0.8"/>
+                        <!-- Heart inside shield -->
+                        <path d="M 100 75 C 100 75 92 68 86 68 C 80 68 76 72 76 78 C 76 85 85 95 100 110 C 115 95 124 85 124 78 C 124 72 120 68 114 68 C 108 68 100 75 100 75 Z" 
+                              fill="white" stroke="white" stroke-width="1"/>
+                    </svg>
+                </div>
+                <h2 class="text-center"><i class="fas fa-user-heart me-2"></i>Register as Patient</h2>
 
                 {{ form_start(form) }}
                     {% if form.vars.errors|length > 0 %}
-                        <div class="alert alert-danger" role="alert">
-                            <strong>Please fix the following errors:</strong>
-                            <ul class="mb-0">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><i class="fas fa-exclamation-circle me-2"></i>Please fix the following errors:</strong>
+                            <ul class="mb-0 mt-2">
                                 {% for error in form.vars.errors %}
                                     <li>{{ error.message }}</li>
                                 {% endfor %}
                             </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     {% endif %}
 
@@ -33,16 +202,29 @@
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
-                        {{ form_label(form.fullName) }}
-                        {{ form_widget(form.fullName) }}
-                        {% if form.fullName.vars.errors|length > 0 %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.fullName.vars.errors %}
-                                    <small class="text-danger">{{ error.message }}</small><br>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.firstName) }}
+                            {{ form_widget(form.firstName) }}
+                            {% if form.firstName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.firstName.vars.errors %}
+                                        <small class="text-danger">{{ error.message }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.lastName) }}
+                            {{ form_widget(form.lastName) }}
+                            {% if form.lastName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.lastName.vars.errors %}
+                                        <small class="text-danger">{{ error.message }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -69,15 +251,19 @@
                         {% endif %}
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
-                        <a href="{{ path('register') }}" class="btn btn-secondary">Change Type</a>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-check me-2"></i> Complete Registration
+                        </button>
+                        <a href="{{ path('register') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Type Selection
+                        </a>
                     </div>
                 {{ form_end(form) }}
 
                 <hr class="my-4">
 
-                <p class="text-center">Already have an account? <a href="{{ path('login') }}" class="text-decoration-none">Login here</a></p>
+                <p class="text-center">Already have an account? <a href="{{ path('login') }}"><i class="fas fa-sign-in-alt me-1"></i>Sign In</a></p>
             </div>
         </div>
     </div>

@@ -4,61 +4,98 @@
 
 {% block stylesheets %}
 <style>
-    .register-container {
-        margin-top: -80px;
+    body {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%) !important;
+        background-attachment: fixed !important;
         min-height: 100vh;
-        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
-        background-attachment: fixed;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    aside.sidebar {
+        display: none !important;
+    }
+
+    main {
+        margin-left: 0 !important;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px 0;
+        padding: 0 !important;
+        min-height: calc(100vh - 70px);
     }
 
-    .register-card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+    }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+    }
+
+    .register-container {
+        max-width: 600px;
+        width: 100%;
         background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 50px 40px;
     }
 
     .register-header {
-        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
-        color: white;
-        padding: 40px 20px;
         text-align: center;
+        margin-bottom: 40px;
     }
 
-    .register-header .logo-large {
+    .register-header .logo-icon {
         font-size: 3rem;
         margin-bottom: 15px;
     }
 
+    .register-header .logo-svg {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        display: block;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+    }
+
     .register-header h1 {
         font-size: 2rem;
-        font-weight: 700;
-        margin: 0;
+        font-weight: 800;
+        color: #1f2937;
+        margin: 0 0 10px 0;
+        letter-spacing: -0.5px;
     }
 
     .register-header p {
-        margin: 10px 0 0 0;
-        font-size: 0.95rem;
-        opacity: 0.9;
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin: 0;
     }
 
-    .register-body {
-        padding: 40px 35px;
-    }
-
-    .register-body h5 {
-        color: #2C3E50;
-        margin-bottom: 10px;
+    .register-body h3 {
+        font-size: 1.3rem;
         font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .register-body p {
-        color: #666;
+    .register-body h3 i {
+        color: #C41E3A;
+    }
+
+    .register-body > p {
+        color: #6b7280;
         margin-bottom: 25px;
         font-size: 0.95rem;
     }
@@ -67,73 +104,89 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 15px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
     }
 
     .user-type-btn {
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 20px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 30px 20px;
         text-align: center;
         transition: all 0.3s ease;
         background: white;
         cursor: pointer;
-        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
     }
 
     .user-type-btn:hover {
         border-color: #C41E3A;
-        background-color: #fff5f5;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 20px rgba(196, 30, 58, 0.15);
+        background-color: rgba(196, 30, 58, 0.05);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(196, 30, 58, 0.15);
     }
 
     .user-type-btn i {
-        font-size: 2rem;
+        font-size: 2.8rem;
         color: #C41E3A;
-        display: block;
-        margin-bottom: 10px;
     }
 
-    .user-type-btn .btn {
-        width: 100%;
-        margin-top: 10px;
-        font-weight: 600;
+    .user-type-btn .title {
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 1.2rem;
+    }
+
+    .user-type-btn .label {
+        font-size: 0.85rem;
+        color: #6b7280;
     }
 
     .benefits-section {
-        background-color: #F5F5F5;
-        padding: 20px;
+        background-color: #f9fafb;
+        padding: 25px;
         border-radius: 10px;
-        margin: 25px 0;
+        margin: 30px 0;
+        border-left: 4px solid #C41E3A;
     }
 
     .benefits-section h6 {
-        color: #2C3E50;
+        color: #1f2937;
         font-weight: 700;
         margin-bottom: 15px;
-        font-size: 0.95rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .benefits-section h6 i {
+        color: #C41E3A;
     }
 
     .benefit-item {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 10px;
-        color: #555;
+        margin-bottom: 12px;
+        color: #4b5563;
         font-size: 0.9rem;
     }
 
     .benefit-item i {
         color: #C41E3A;
-        font-weight: bold;
+        font-weight: 600;
+        flex-shrink: 0;
     }
 
     .login-link {
         text-align: center;
         padding-top: 20px;
-        border-top: 1px solid #f0f0f0;
-        color: #666;
+        border-top: 1px solid #e5e7eb;
+        color: #6b7280;
     }
 
     .login-link a {
@@ -146,69 +199,91 @@
     .login-link a:hover {
         color: #8B1428;
     }
+
+    @media (max-width: 768px) {
+        .register-container {
+            padding: 30px 25px;
+        }
+
+        .user-type-options {
+            grid-template-columns: 1fr;
+        }
+
+        .register-header h1 {
+            font-size: 1.5rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="register-container">
-    <div class="col-md-6 col-lg-5">
-        <div class="register-card">
-            <div class="register-header">
-                <div class="logo-large">❤️</div>
-                <h1>PinkShield</h1>
-                <p>Join Our Healthcare Community</p>
+<div class="register-wrapper">
+    <div class="register-container">
+        <div class="register-header">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shield shape with heart -->
+                <defs>
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Outer shield -->
+                <path d="M 100 20 C 100 20 60 40 60 90 C 60 130 100 170 100 170 C 100 170 140 130 140 90 C 140 40 100 20 100 20 Z" 
+                      fill="none" stroke="#C41E3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner shield -->
+                <path d="M 100 25 C 100 25 65 42 65 90 C 65 127 100 162 100 162 C 100 162 135 127 135 90 C 135 42 100 25 100 25 Z" 
+                      fill="url(#shieldGradient)" opacity="0.8"/>
+                <!-- Heart inside shield -->
+                <path d="M 100 75 C 100 75 92 68 86 68 C 80 68 76 72 76 78 C 76 85 85 95 100 110 C 115 95 124 85 124 78 C 124 72 120 68 114 68 C 108 68 100 75 100 75 Z" 
+                      fill="white" stroke="white" stroke-width="1"/>
+            </svg>
+            <h1>Join PinkShield</h1>
+            <p>Healthcare Made Simple</p>
+        </div>
+
+        <div class="register-body">
+            <h3><i class="fas fa-user-check"></i> Choose Account Type</h3>
+            <p>Select the type of account that best suits your role:</p>
+
+            <div class="user-type-options">
+                <a href="{{ path('register', { user_type: 'patient' }) }}" class="user-type-btn">
+                    <i class="fas fa-user-heart"></i>
+                    <span class="title">Patient</span>
+                    <span class="label">Access your health records</span>
+                </a>
+                <a href="{{ path('register', { user_type: 'doctor' }) }}" class="user-type-btn">
+                    <i class="fas fa-stethoscope"></i>
+                    <span class="title">Doctor</span>
+                    <span class="label">Manage your patients</span>
+                </a>
             </div>
 
-            <div class="register-body">
-                <h5><i class="fas fa-user-check" style="color: #C41E3A; margin-right: 10px;"></i>Choose Account Type</h5>
-                <p>Select the type of account that best suits your role:</p>
-
-                <div class="user-type-options">
-                    <form method="post" action="{{ path('register') }}" class="w-100">
-                        <input type="hidden" name="user_type" value="patient">
-                        <button type="submit" class="user-type-btn w-100">
-                            <i class="fas fa-heartbeat"></i>
-                            Patient
-                            <div class="btn btn-sm btn-primary" style="pointer-events: none; font-size: 0.8rem;">Register</div>
-                        </button>
-                    </form>
-
-                    <form method="post" action="{{ path('register') }}" class="w-100">
-                        <input type="hidden" name="user_type" value="doctor">
-                        <button type="submit" class="user-type-btn w-100">
-                            <i class="fas fa-stethoscope"></i>
-                            Doctor
-                            <div class="btn btn-sm btn-primary" style="pointer-events: none; font-size: 0.8rem;">Register</div>
-                        </button>
-                    </form>
+            <div class="benefits-section">
+                <h6><i class="fas fa-star"></i>Why Join PinkShield?</h6>
+                <div class="benefit-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure & encrypted health records</span>
                 </div>
-
-                <div class="benefits-section">
-                    <h6><i class="fas fa-check-circle" style="margin-right: 8px;"></i>Why Join PinkShield?</h6>
-                    <div class="benefit-item">
-                        <i class="fas fa-lock"></i>
-                        <span>Secure & Encrypted Health Records</span>
-                    </div>
-                    <div class="benefit-item">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Easy Appointment Scheduling</span>
-                    </div>
-                    <div class="benefit-item">
-                        <i class="fas fa-comments"></i>
-                        <span>Professional Community Forum</span>
-                    </div>
-                    <div class="benefit-item">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Access Anywhere, Anytime</span>
-                    </div>
+                <div class="benefit-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Easy appointment scheduling</span>
                 </div>
-
-                <div class="login-link">
-                    Already have an account? 
-                    <a href="{{ path('login') }}">
-                        <i class="fas fa-sign-in-alt"></i> Sign In Here
-                    </a>
+                <div class="benefit-item">
+                    <i class="fas fa-users"></i>
+                    <span>Professional healthcare community</span>
                 </div>
+                <div class="benefit-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Access from any device, anytime</span>
+                </div>
+            </div>
+
+            <div class="login-link">
+                Already have an account? 
+                <a href="{{ path('login') }}">
+                    <i class="fas fa-sign-in-alt me-1"></i> Sign In
+                </a>
             </div>
         </div>
     </div>

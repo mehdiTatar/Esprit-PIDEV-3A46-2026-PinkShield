@@ -73,6 +73,10 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
         if (!in_array('ROLE_ADMIN', $roles)) {
             $roles[] = 'ROLE_ADMIN';
         }
+        // also grant ROLE_USER so admins can access user-level areas
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
 
         return array_unique($roles);
     }

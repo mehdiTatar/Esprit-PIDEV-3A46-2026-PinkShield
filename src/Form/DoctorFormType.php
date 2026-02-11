@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -45,20 +46,30 @@ class DoctorFormType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('speciality', TextType::class, [
+            ->add('speciality', ChoiceType::class, [
                 'label' => 'Speciality',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Enter medical speciality',
+                ],
+                'choices' => [
+                    'Cardiology' => 'Cardiology',
+                    'Dermatology' => 'Dermatology',
+                    'Orthopedics' => 'Orthopedics',
+                    'Neurology' => 'Neurology',
+                    'Psychiatry' => 'Psychiatry',
+                    'Pediatrics' => 'Pediatrics',
+                    'Oncology' => 'Oncology',
+                    'Ophthalmology' => 'Ophthalmology',
+                    'Gynecology' => 'Gynecology',
+                    'General Surgery' => 'General Surgery',
+                    'Urology' => 'Urology',
+                    'ENT (Otolaryngology)' => 'ENT (Otolaryngology)',
+                    'Gastroenterology' => 'Gastroenterology',
+                    'Pulmonology' => 'Pulmonology',
+                    'Dentistry' => 'Dentistry',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Speciality cannot be empty']),
-                    new Assert\Length([
-                        'min' => 2,
-                        'max' => 255,
-                        'minMessage' => 'Speciality must be at least 2 characters',
-                        'maxMessage' => 'Speciality must not exceed 255 characters',
-                    ]),
+                    new Assert\NotBlank(['message' => 'Please select a speciality']),
                 ],
             ])
             ->add('password', PasswordType::class, [

@@ -8,6 +8,7 @@ use App\Entity\Admin;
 use App\Entity\Doctor;
 use App\Entity\User;
 use App\Repository\BlogPostRepository;
+use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,9 +33,6 @@ class BlogController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $post = new BlogPost();
         
-        // Form handling could be done via a FormType, but for simplicity we'll do it manually here
-        // or create a simple form type later. Let's do it manually for speed.
-        
         if ($request->isMethod('POST')) {
             $title = $request->request->get('title');
             $content = $request->request->get('content');
@@ -56,6 +54,17 @@ class BlogController extends AbstractController
                 $post->setAuthorName($name);
                 $post->setAuthorRole($user->getRoles()[0]);
                 
+                // Handle image upload
+                $uploadedFile = $request->files->get('image');
+                if ($uploadedFile) {
+                    $filename = uniqid() . '_' . str_replace(' ', '_', $uploadedFile->getClientOriginalName());
+                    $uploadedFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/blog',
+                        $filename
+                    );
+                    $post->setImagePath('/uploads/blog/' . $filename);
+                }
+                
                 $entityManager->persist($post);
                 $entityManager->flush();
                 
@@ -70,9 +79,14 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'blog_show', methods: ['GET', 'POST'])]
-    public function show(BlogPost $post, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'blog_show', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function show(int $id, BlogPostRepository $blogPostRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
+        $post = $blogPostRepository->find($id);
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+
         if ($request->isMethod('POST') && $this->getUser()) {
             $commentContent = $request->request->get('comment');
             if ($commentContent) {
@@ -104,9 +118,14 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'blog_edit')]
-    public function edit(BlogPost $post, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'blog_edit', requirements: ['id' => '\d+'])]
+    public function edit(int $id, BlogPostRepository $blogPostRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
+        $post = $blogPostRepository->find($id);
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+
         // Check if user is author or admin
         $user = $this->getUser();
         if (!$user || ($user->getUserIdentifier() !== $post->getAuthorEmail() && !$this->isGranted('ROLE_ADMIN'))) {
@@ -120,6 +139,26 @@ class BlogController extends AbstractController
             if ($title && $content) {
                 $post->setTitle($title);
                 $post->setContent($content);
+                
+                // Handle image upload
+                $uploadedFile = $request->files->get('image');
+                if ($uploadedFile) {
+                    // Delete old image if exists
+                    if ($post->getImagePath()) {
+                        $oldImagePath = $this->getParameter('kernel.project_dir') . '/public' . $post->getImagePath();
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    
+                    $filename = uniqid() . '_' . str_replace(' ', '_', $uploadedFile->getClientOriginalName());
+                    $uploadedFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/blog',
+                        $filename
+                    );
+                    $post->setImagePath('/uploads/blog/' . $filename);
+                }
+                
                 $entityManager->flush();
                 
                 $this->addFlash('success', 'Post updated successfully!');
@@ -133,9 +172,14 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'blog_delete')]
-    public function delete(BlogPost $post, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'blog_delete', requirements: ['id' => '\d+'])]
+    public function delete(int $id, BlogPostRepository $blogPostRepository, EntityManagerInterface $entityManager): Response
     {
+        $post = $blogPostRepository->find($id);
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+
         $user = $this->getUser();
         if (!$user || ($user->getUserIdentifier() !== $post->getAuthorEmail() && !$this->isGranted('ROLE_ADMIN'))) {
             throw $this->createAccessDeniedException('You cannot delete this post.');
@@ -146,5 +190,49 @@ class BlogController extends AbstractController
         
         $this->addFlash('success', 'Post deleted!');
         return $this->redirectToRoute('blog_index');
+    }
+
+    #[Route('/comment/{id}/edit', name: 'comment_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function editComment(int $id, CommentRepository $commentRepository, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $comment = $commentRepository->find($id);
+        if (!$comment) {
+            throw $this->createNotFoundException('Comment not found');
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        if ($request->isMethod('POST')) {
+            $content = $request->request->get('content');
+            if ($content) {
+                $comment->setContent($content);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Comment updated successfully!');
+                return $this->redirectToRoute('blog_show', ['id' => $comment->getBlogPost()->getId()]);
+            }
+        }
+
+        return $this->render('blog/comment_edit.html.twig', [
+            'comment' => $comment,
+        ]);
+    }
+
+    #[Route('/comment/{id}/delete', name: 'comment_delete', requirements: ['id' => '\d+'])]
+    public function deleteComment(int $id, CommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+    {
+        $comment = $commentRepository->find($id);
+        if (!$comment) {
+            throw $this->createNotFoundException('Comment not found');
+        }
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $postId = $comment->getBlogPost()->getId();
+        $entityManager->remove($comment);
+        $entityManager->flush();
+        
+        $this->addFlash('success', 'Comment deleted successfully!');
+        return $this->redirectToRoute('blog_show', ['id' => $postId]);
     }
 }

@@ -1,0 +1,362 @@
+{% extends "base.html.twig" %}
+
+{% block title %}My Wishlist - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .wishlist-header {
+        margin-bottom: 40px;
+    }
+
+    .wishlist-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .wishlist-header h1 i {
+        color: var(--primary);
+    }
+
+    .wishlist-header p {
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    .wishlist-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .wishlist-table thead {
+        background: linear-gradient(135deg, rgba(196, 30, 58, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%);
+        border-bottom: 2px solid var(--border);
+    }
+
+    .wishlist-table th {
+        padding: 20px;
+        text-align: left;
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .wishlist-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background-color 0.2s;
+    }
+
+    .wishlist-table tbody tr:hover {
+        background-color: rgba(196, 30, 58, 0.05);
+    }
+
+    .wishlist-table td {
+        padding: 20px;
+        vertical-align: middle;
+    }
+
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .product-icon {
+        font-size: 2rem;
+        color: var(--primary);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(196, 30, 58, 0.1);
+        border-radius: 8px;
+    }
+
+    .product-details h4 {
+        margin: 0 0 5px 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .product-details p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .price {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .added-date {
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-primary-small {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary-small:hover {
+        background-color: #8B1428;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-danger-small {
+        background-color: #ef4444;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-danger-small:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-text {
+        color: #9ca3af;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .btn-browse {
+        background-color: var(--primary);
+        color: white;
+        padding: 10px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+    .btn-browse:hover {
+        background-color: #8B1428;
+        color: white;
+        text-decoration: none;
+    }
+
+    .summary-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .summary-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 15px;
+    }
+
+    .summary-items {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+        .wishlist-table {
+            font-size: 0.9rem;
+        }
+
+        .wishlist-table th,
+        .wishlist-table td {
+            padding: 12px;
+        }
+
+        .product-info {
+            gap: 8px;
+        }
+
+        .product-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+
+        .product-details h4 {
+            font-size: 0.95rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-primary-small,
+        .btn-danger-small {
+            width: 100%;
+            padding: 6px 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="wishlist-header">
+    <h1><i class="fas fa-heart"></i> My Wishlist</h1>
+    <p>Products you're interested in purchasing</p>
+</div>
+
+{% if wishlistItems|length > 0 %}
+    <!-- Wishlist Table -->
+    <div style="overflow-x: auto;">
+        <table class="wishlist-table">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Product</th>
+                    <th style="width: 15%;">Price</th>
+                    <th style="width: 20%;">Added Date</th>
+                    <th style="width: 25%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in wishlistItems %}
+                    <tr data-wishlist-id="{{ item.id }}">
+                        <td>
+                            <div class="product-info">
+                                <div class="product-icon">
+                                    <i class="fas fa-capsules"></i>
+                                </div>
+                                <div class="product-details">
+                                    <h4>{{ item.product.name }}</h4>
+                                    <p>{{ item.product.description|slice(0, 50) }}{{ item.product.description|length > 50 ? '...' : '' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="price">${{ item.product.price }}</td>
+                        <td class="added-date">{{ item.addedAt|date('M d, Y') }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-primary-small" onclick="buyProduct('{{ item.product.id }}', '{{ item.product.name }}')">
+                                    <i class="fas fa-shopping-cart"></i> Buy
+                                </button>
+                                <button class="btn-danger-small" onclick="removeFromWishlist(this, {{ item.id }})">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-card">
+        <div class="summary-title">Wishlist Summary</div>
+        <div class="summary-items">{{ wishlistItems|length }} {{ wishlistItems|length == 1 ? 'item' : 'items' }} in your wishlist</div>
+        <a href="{{ path('parapharmacy_index') }}" class="btn-browse">
+            <i class="fas fa-shopping-bag me-2"></i> Continue Shopping
+        </a>
+    </div>
+{% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-heart"></i>
+        </div>
+        <h3 class="empty-state-title">Your Wishlist is Empty</h3>
+        <p class="empty-state-text">Start adding products to your wishlist to keep track of items you'd like to purchase.</p>
+        <a href="{{ path('parapharmacy_index') }}" class="btn-browse">
+            <i class="fas fa-shopping-bag me-2"></i> Browse Products
+        </a>
+    </div>
+{% endif %}
+
+<script>
+    function removeFromWishlist(button, wishlistId) {
+        if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+            fetch(`{{ path('wishlist_remove', {wishlistId: 0}) }}`.replace('0', wishlistId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = button.closest('tr');
+                    row.style.opacity = '0.5';
+                    row.style.textDecoration = 'line-through';
+                    setTimeout(() => {
+                        row.remove();
+                        // Refresh page if empty
+                        if (document.querySelectorAll('tbody tr').length === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+            });
+        }
+    }
+
+    function buyProduct(productId, productName) {
+        alert('Thank you for your interest in ' + productName + '! Purchase feature coming soon.');
+        // Future: implement actual purchase functionality
+    }
+</script>
+{% endblock %}

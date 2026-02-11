@@ -45,7 +45,8 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/doctor, roles: ROLE_DOCTOR }
+        # Allow doctors, admins and regular users to access /doctor area per request
+        - { path: ^/doctor, roles: [ROLE_DOCTOR, ROLE_ADMIN, ROLE_USER] }
         - { path: ^/user, roles: ROLE_USER }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }

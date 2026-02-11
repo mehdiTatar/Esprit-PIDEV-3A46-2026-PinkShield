@@ -30,21 +30,34 @@ class UserFormType extends AbstractType
                     new Assert\Email(['message' => 'Invalid email format']),
                 ],
             ])
-            ->add('fullName', TextType::class, [
-                'label' => 'Full Name',
+            ->add('firstName', TextType::class, [
+                'label' => 'Prénom',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Enter full name',
+                    'placeholder' => 'Enter first name',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Full name cannot be empty']),
-                    new Assert\Length([
-                        'min' => 2,
-                        'max' => 255,
-                        'minMessage' => 'Full name must be at least 2 characters',
-                        'maxMessage' => 'Full name must not exceed 255 characters',
-                    ]),
+                    new Assert\NotBlank(['message' => 'First name cannot be empty']),
+                    new Assert\Length(['min' => 1, 'max' => 100]),
                 ],
+            ])
+            ->add('lastName', TextType::class, [
+                'label' => 'Nom',
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter last name',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Last name cannot be empty']),
+                    new Assert\Length(['min' => 1, 'max' => 100]),
+                ],
+            ])
+            ->add('address', TextType::class, [
+                'label' => 'Address',
+                'required' => false,
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Enter address (optional)'],
             ])
             ->add('phone', TelType::class, [
                 'label' => 'Phone Number',

@@ -17,14 +17,24 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class UserController extends AbstractController
 {
     #[Route('/', name: 'user_index')]
-    public function index(UserRepository $userRepository): Response
+    public function index(Request $request, UserRepository $userRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
-        $users = $userRepository->findAll();
+        $searchId = $request->query->get('search_id');
+
+        if ($searchId) {
+            $users = $userRepository->findById((int) $searchId);
+            if (!$users) {
+                $users = [];
+            }
+        } else {
+            $users = $userRepository->findAll();
+        }
 
         return $this->render('user/index.html.twig', [
             'users' => $users,
+            'searchId' => $searchId,
         ]);
     }
 
@@ -38,6 +48,9 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Build fullName from first and last name
+            $user->setFullName(trim(($user->getFirstName() ?? '') . ' ' . ($user->getLastName() ?? '')));
+
             $user->setRoles(['ROLE_USER']);
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
 
@@ -56,23 +69,31 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'user_edit')]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
     {
-        // User can only edit their own profile, Admin can edit any user
-        $currentUser = $tokenStorage->getToken()->getUser();
-        if ($currentUser !== $user && !$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException();
+        // Allow admin to edit any user; users can edit their own profile regardless of role
+        $currentUser = $this->getUser();
+        $currentUserId = is_object($currentUser) && method_exists($currentUser, 'getId') ? $currentUser->getId() : null;
+        if (!$this->isGranted('ROLE_ADMIN') && $currentUserId !== $user->getId()) {
+            throw $this->createAccessDeniedException('You do not have permission to edit this profile.');
         }
 
         $form = $this->createForm(UserFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('password')->getData()) {
+            // Update fullName from first/last
+            $user->setFullName(trim(($user->getFirstName() ?? '') . ' ' . ($user->getLastName() ?? '')));
+
+            if ($form->has('password') && $form->get('password')->getData()) {
                 $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
             }
 
             $entityManager->flush();
             $this->addFlash('success', 'Profile updated successfully!');
 
+            // Redirect back to appropriate dashboard if available
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('user_index');
+            }
             return $this->redirectToRoute('user_dashboard');
         }
 
@@ -91,6 +112,30 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'User deleted successfully!');
+        return $this->redirectToRoute('user_index');
+    }
+
+    #[Route('/{id}/activate', name: 'user_activate', methods: ['POST'])]
+    public function activate(User $user, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $user->setStatus('active');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'User account activated successfully!');
+        return $this->redirectToRoute('user_index');
+    }
+
+    #[Route('/{id}/deactivate', name: 'user_deactivate', methods: ['POST'])]
+    public function deactivate(User $user, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $user->setStatus('inactive');
+        $entityManager->flush();
+
+        $this->addFlash('success', 'User account deactivated successfully!');
         return $this->redirectToRoute('user_index');
     }
 

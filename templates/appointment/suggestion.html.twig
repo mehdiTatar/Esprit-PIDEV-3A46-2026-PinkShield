@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Appointment Suggestion</h1>
+
+    {% if doctor %}
+        <p>Based on your recent statistics, we suggest booking an appointment with a {{ doctor }}.</p>
+    {% else %}
+        <p>No appointments are suggested at the moment. Keep up the good work!</p>
+    {% endif %}
+
+    <a href="{{ path('appointment_index') }}">Back to Appointments</a>
+{% endblock %}

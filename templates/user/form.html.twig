@@ -33,12 +33,37 @@
                         {% endif %}
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.firstName) }}
+                            {{ form_widget(form.firstName) }}
+                            {% if form.firstName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.firstName.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.lastName) }}
+                            {{ form_widget(form.lastName) }}
+                            {% if form.lastName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.lastName.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <div class="mb-3">
-                        {{ form_label(form.fullName) }}
-                        {{ form_widget(form.fullName) }}
-                        {% if form.fullName.vars.errors|length > 0 %}
+                        {{ form_label(form.address) }}
+                        {{ form_widget(form.address) }}
+                        {% if form.address.vars.errors|length > 0 %}
                             <div class="invalid-feedback d-block">
-                                {% for error in form.fullName.vars.errors %}
+                                {% for error in form.address.vars.errors %}
                                     {{ error.message }}
                                 {% endfor %}
                             </div>

@@ -4,188 +4,414 @@
 
 {% block stylesheets %}
 <style>
-    .login-container {
-        margin-top: -80px;
+    body {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%) !important;
+        background-attachment: fixed !important;
         min-height: 100vh;
-        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
-        background-attachment: fixed;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    aside.sidebar {
+        display: none !important;
+    }
+
+    main {
+        margin-left: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 !important;
+        min-height: calc(100vh - 70px);
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .login-card {
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        background: white;
+    .login-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
     }
 
-    .login-header {
+    .login-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        max-width: 1100px;
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .login-branding {
         background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
         color: white;
-        padding: 40px 20px;
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
     }
 
-    .login-header .logo-large {
-        font-size: 3rem;
-        margin-bottom: 15px;
+    .login-branding h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 20px 0 10px;
+        letter-spacing: -0.5px;
     }
 
-    .login-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
+    .login-branding p {
+        font-size: 1.1rem;
+        opacity: 0.9;
         margin: 0;
     }
 
-    .login-header p {
-        margin: 10px 0 0 0;
-        font-size: 0.95rem;
-        opacity: 0.9;
+    .logo-icon {
+        font-size: 4rem;
+        margin-bottom: 10px;
     }
 
-    .login-body {
-        padding: 40px 35px;
+    .logo-svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+    }
+
+    .benefits {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+    }
+
+    .benefit-item i {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .login-form-wrapper {
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-form-wrapper h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-label {
+        margin-bottom: 5px !important;
     }
 
     .form-control {
-        border: 1px solid #e0e0e0;
+        border: 1.5px solid #e5e7eb;
         border-radius: 8px;
         padding: 12px 15px;
-        font-size: 1rem;
+        font-size: 0.95rem;
         transition: all 0.3s ease;
+        background-color: #f9fafb;
+    }
+
+    .form-control::placeholder {
+        color: #d1d5db;
     }
 
     .form-control:focus {
         border-color: #C41E3A;
-        box-shadow: 0 0 0 0.2rem rgba(196, 30, 58, 0.15);
+        box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        outline: none;
+        background-color: white;
     }
 
     .form-label {
         font-weight: 600;
-        color: #2C3E50;
+        color: #1f2937;
         margin-bottom: 8px;
-    }
-
-    .feature-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin: 20px 0;
-        padding: 15px 0;
-        border-top: 1px solid #f0f0f0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .feature-item {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.9rem;
-        color: #555;
+        font-size: 0.95rem;
     }
 
-    .feature-item i {
+    .form-label i {
         color: #C41E3A;
-        font-weight: bold;
+        font-size: 1rem;
+        width: 16px;
     }
 
-    .register-link {
-        background-color: #F5F5F5;
-        padding: 20px;
-        border-radius: 10px;
+    .btn-login {
+        background-color: #C41E3A;
+        border-color: #C41E3A;
+        color: white;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        font-size: 0.95rem;
+    }
+
+    .btn-login:hover {
+        background-color: #8B1428;
+        border-color: #8B1428;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(196, 30, 58, 0.35);
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin: 20px 0 10px 0;
+    }
+
+    .remember-me input {
+        accent-color: #C41E3A;
+        cursor: pointer;
+    }
+
+    .remember-me label {
+        margin: 0 0 0 8px;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .register-section {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e7eb;
         text-align: center;
-        margin-top: 20px;
     }
 
-    .register-link p {
-        margin: 0 0 10px 0;
-        color: #666;
+    .register-section p {
+        color: #6b7280;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
     }
 
-    .register-link a {
+    .btn-register {
+        background-color: #f3f4f6;
+        border: 2px solid #C41E3A;
         color: #C41E3A;
         text-decoration: none;
         font-weight: 600;
+        padding: 11px 25px;
+        border-radius: 8px;
         transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.95rem;
     }
 
-    .register-link a:hover {
-        color: #8B1428;
+    .btn-register:hover {
+        background-color: #C41E3A;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    }
+
+    .alert {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 8px;
+        border-left: 4px solid #ef4444;
+    }
+
+    .captcha-question {
+        background: #f9fafb;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .captcha-text {
+        color: #1f2937;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+        text-align: center;
+        font-family: 'Monaco', 'Courier New', monospace;
+        letter-spacing: 1px;
+    }
+
+    .g-recaptcha {
+        margin: 15px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .g-recaptcha iframe {
+        max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        main {
+            min-height: calc(100vh - 50px);
+        }
+
+        .login-container {
+            grid-template-columns: 1fr;
+        }
+
+        .login-branding {
+            padding: 35px 25px;
+            order: 2;
+        }
+
+        .login-form-wrapper {
+            padding: 35px 25px;
+            order: 1;
+        }
+
+        .login-branding h2 {
+            font-size: 1.8rem;
+        }
+
+        .benefits {
+            display: none;
+        }
+
+        .login-wrapper {
+            padding: 15px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="login-container">
-    <div class="col-md-5 col-lg-4">
-        <div class="login-card">
-            <div class="login-header">
-                <img src="{{ asset('images/logo.png') }}" alt="PinkShield" style="height: 80px; width: auto; margin-bottom: 20px;">
-                <h1>PinkShield</h1>
-                <p>Medical Care Management</p>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<div class="login-wrapper">
+    <div class="login-container">
+        <!-- Left Side - Branding -->
+        <div class="login-branding">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shield shape with heart -->
+                <defs>
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Outer shield -->
+                <path d="M 100 20 C 100 20 60 40 60 90 C 60 130 100 170 100 170 C 100 170 140 130 140 90 C 140 40 100 20 100 20 Z" 
+                      fill="none" stroke="#C41E3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner shield -->
+                <path d="M 100 25 C 100 25 65 42 65 90 C 65 127 100 162 100 162 C 100 162 135 127 135 90 C 135 42 100 25 100 25 Z" 
+                      fill="url(#shieldGradient)" opacity="0.8"/>
+                <!-- Heart inside shield -->
+                <path d="M 100 75 C 100 75 92 68 86 68 C 80 68 76 72 76 78 C 76 85 85 95 100 110 C 115 95 124 85 124 78 C 124 72 120 68 114 68 C 108 68 100 75 100 75 Z" 
+                      fill="white" stroke="white" stroke-width="1"/>
+            </svg>
+            <h2>PinkShield</h2>
+            <p>Medical Care Management System</p>
+            
+            <div class="benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure & Encrypted</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-lock"></i>
+                    <span>Privacy Protected</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Access</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-user-md"></i>
+                    <span>Expert Support</span>
+                </div>
             </div>
+        </div>
 
-            <div class="login-body">
-                {% if error %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Login Error!</strong>
-                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
+        <!-- Right Side - Login Form -->
+        <div class="login-form-wrapper">
+            <h3>Welcome Back</h3>
 
-                <h5 style="color: #2C3E50; margin-bottom: 25px; font-weight: 700;">Welcome Back</h5>
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><i class="fas fa-exclamation-circle me-2"></i>Login Error!</strong>
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
 
-                <form method="post" novalidate>
-                    <div class="mb-3">
-                        <label for="inputUsername" class="form-label">
-                            <i class="fas fa-envelope" style="color: #C41E3A;"></i> Email Address
-                        </label>
-                        <input type="email" name="_username" id="inputUsername" class="form-control" value="{{ last_username }}" placeholder="your@email.com" required autofocus>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="inputPassword" class="form-label">
-                            <i class="fas fa-lock" style="color: #C41E3A;"></i> Password
-                        </label>
-                        <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="Enter your password" required>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" name="_remember_me" id="remember" class="form-check-input">
-                        <label class="form-check-label" for="remember" style="color: #555; font-weight: 500;">
-                            Keep me logged in
-                        </label>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg" style="font-weight: 600;">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </button>
-                    </div>
-                </form>
-
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i> Secure
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-lock"></i> Encrypted
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-clock"></i> 24/7 Access
-                    </div>
+            <form method="post" name="login" novalidate>
+                <div class="form-group">
+                    <label for="inputUsername" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" name="_username" id="inputUsername" class="form-control" value="{{ last_username }}" placeholder="your@email.com" required autofocus>
                 </div>
 
-                <div class="register-link">
-                    <p>Don't have an account?</p>
-                    <a href="{{ path('register') }}" class="btn btn-outline-primary" style="border-color: #C41E3A; color: #C41E3A;">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </a>
+                <div class="form-group">
+                    <label for="inputPassword" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="Enter your password" required>
                 </div>
+
+                <div class="form-group">
+                    <!-- reCAPTCHA widget -->
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                    {% if captcha_error %}
+                        <small class="text-danger d-block mt-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ captcha_error }}
+                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" name="_remember_me" id="remember" class="form-check-input">
+                    <label for="remember">Keep me logged in</label>
+                </div>
+
+                <button type="submit" class="btn-login w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                </button>
+            </form>
+
+            <div class="register-section">
+                <p>Don't have an account yet?</p>
+                <a href="{{ path('register') }}" class="btn-register">
+                    <i class="fas fa-user-plus me-2"></i> Create Account
+                </a>
             </div>
         </div>
     </div>

@@ -23,4 +23,25 @@ class DoctorRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['email' => $email]);
     }
+
+    /**
+     * Find a doctor by ID
+     */
+    public function findById(int $id): ?Doctor
+    {
+        return $this->find($id);
+    }
+
+    /**
+     * Find doctors by full name (partial match)
+     */
+    public function findByFullName(string $name): array
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.fullName LIKE :name')
+            ->setParameter('name', '%' . $name . '%')
+            ->orderBy('d.fullName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -6,6 +6,8 @@ use App\Repository\AppointmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: AppointmentRepository::class)]
 class Appointment
@@ -41,9 +43,21 @@ class Appointment
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'appointment', targetEntity: \App\Entity\Parapharmacie::class, cascade: ['persist','remove'])]
+    private Collection $parapharmacies;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->parapharmacies = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection<int, \App\Entity\Parapharmacie>
+     */
+    public function getParapharmacies(): Collection
+    {
+        return $this->parapharmacies;
     }
 
     public function getId(): ?int

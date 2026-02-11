@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -32,19 +34,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Password cannot be empty')]
     #[Assert\Length(min: 6, minMessage: 'Password must be at least 6 characters')]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Full name cannot be empty')]
-    #[Assert\Length(min: 2, max: 255, minMessage: 'Full name must be at least 2 characters', maxMessage: 'Full name must not exceed 255 characters')]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $fullName = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Length(max: 100, maxMessage: 'First name must not exceed 100 characters')]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\Length(max: 100, maxMessage: 'Last name must not exceed 100 characters')]
+    private ?string $lastName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Assert\Length(max: 20, maxMessage: 'Phone must not exceed 20 characters')]
     #[Assert\Regex(pattern: '/^[\d\+\-\(\)\s]*$/', message: 'Invalid phone number format')]
     private ?string $phone = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $status = 'active'; // active, inactive, suspended
+
+    #[ORM\OneToMany(targetEntity: DailyTracking::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $dailyTrackings;
+
+    public function __construct()
+    {
+        $this->dailyTrackings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,6 +143,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(?string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -149,5 +206,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DailyTracking>
+     */
+    public function getDailyTrackings(): Collection
+    {
+        return $this->dailyTrackings;
+    }
+
+    public function addDailyTracking(DailyTracking $dailyTracking): self
+    {
+        if (!$this->dailyTrackings->contains($dailyTracking)) {
+            $this->dailyTrackings[] = $dailyTracking;
+            $dailyTracking->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDailyTracking(DailyTracking $dailyTracking): self
+    {
+        if ($this->dailyTrackings->removeElement($dailyTracking)) {
+            // set the owning side to null (unless already changed)
+            if ($dailyTracking->getUser() === $this) {
+                $dailyTracking->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

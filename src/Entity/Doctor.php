@@ -46,6 +46,9 @@ class Doctor implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 2, max: 255, minMessage: 'Speciality must be at least 2 characters', maxMessage: 'Speciality must not exceed 255 characters')]
     private ?string $speciality = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $status = 'active'; // active, inactive, suspended
+
     public function getId(): ?int
     {
         return $this->id;
@@ -132,6 +135,18 @@ class Doctor implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSpeciality(string $speciality): static
     {
         $this->speciality = $speciality;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
