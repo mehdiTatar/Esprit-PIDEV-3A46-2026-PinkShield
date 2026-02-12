@@ -1,0 +1,284 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Rate Doctors - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .doctors-container {
+        margin-top: 30px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2);
+    }
+
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .page-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.95;
+        font-size: 1rem;
+    }
+
+    .doctor-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background: white;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(196, 30, 58, 0.15);
+    }
+
+    .doctor-card-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 15px 20px;
+    }
+
+    .doctor-info {
+        padding: 20px;
+    }
+
+    .doctor-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 10px 0;
+    }
+
+    .doctor-detail {
+        font-size: 0.95rem;
+        color: #6b7280;
+        margin: 5px 0;
+    }
+
+    .doctor-detail span {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .rating-display {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 15px 0;
+    }
+
+    .rating-stars {
+        font-size: 1.1rem;
+    }
+
+    .rating-text {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .btn-rate {
+        background-color: #C41E3A;
+        border-color: #C41E3A;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-rate:hover {
+        background-color: #8B1428;
+        border-color: #8B1428;
+        text-decoration: none;
+    }
+
+    .btn-rate-update {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+        font-weight: 600;
+    }
+
+    .btn-rate-update:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+        text-decoration: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .doctor-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .no-doctors {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .no-doctors i {
+        font-size: 3rem;
+        color: #d1d5db;
+        margin-bottom: 15px;
+    }
+
+    .no-doctors p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 30px 20px;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .doctors-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="doctors-container">
+    <div class="page-header">
+        <h1><i class="fas fa-star"></i> Rate Our Doctors</h1>
+        <p>Share your experience and help other patients find the right doctor</p>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Success!</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% if doctors|length > 0 %}
+        <div class="doctors-grid">
+            {% for doctor in doctors %}
+                <div class="doctor-card">
+                    <div class="doctor-card-header">
+                        <div>
+                            <i class="fas fa-stethoscope me-2"></i>
+                            <strong>{{ doctor.fullName }}</strong>
+                        </div>
+                        <span class="status-badge status-{{ doctor.status|lower }}">
+                            {% if doctor.status == 'active' %}
+                                <i class="fas fa-check-circle me-1"></i>Active
+                            {% elseif doctor.status == 'inactive' %}
+                                <i class="fas fa-times-circle me-1"></i>Inactive
+                            {% else %}
+                                <i class="fas fa-ban me-1"></i>{{ doctor.status|capitalize }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="doctor-info">
+                        <p class="doctor-name">{{ doctor.speciality }}</p>
+                        <div class="doctor-detail">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span>{{ doctor.email }}</span>
+                        </div>
+                        {% if doctor.phone %}
+                            <div class="doctor-detail">
+                                <i class="fas fa-phone me-2"></i>
+                                <span>{{ doctor.phone }}</span>
+                            </div>
+                        {% endif %}
+                        {% if doctor.address %}
+                            <div class="doctor-detail">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <span>{{ doctor.address }}</span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Rating Display -->
+                        <div class="rating-display">
+                            {% set doctorRating = doctorRatings[doctor.id] %}
+                            {% if doctorRating.average %}
+                                <div class="rating-stars">
+                                    {% for i in 1..5 %}
+                                        {% if i <= doctorRating.average|round %}
+                                            <i class="fas fa-star" style="color: #ffc107;"></i>
+                                        {% else %}
+                                            <i class="fas fa-star" style="color: #ddd;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="rating-text">
+                                    {{ doctorRating.average|round(1) }}/5.0 ({{ doctorRating.count }} reviews)
+                                </div>
+                            {% else %}
+                                <div class="rating-text">
+                                    <i class="fas fa-star" style="color: #ddd;"></i> No ratings yet
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Rate Button -->
+                        <div style="margin-top: 20px;">
+                            {% if doctorRating.userRating %}
+                                <a href="{{ path('rating_rate_doctor', {id: doctor.id}) }}" class="btn btn-rate-update w-100">
+                                    <i class="fas fa-edit me-2"></i> Update Your Rating
+                                </a>
+                            {% else %}
+                                <a href="{{ path('rating_rate_doctor', {id: doctor.id}) }}" class="btn btn-rate w-100">
+                                    <i class="fas fa-star me-2"></i> Rate This Doctor
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-doctors">
+            <i class="fas fa-inbox"></i>
+            <p>No doctors available to rate at this time.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,522 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        background: white !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    aside.sidebar {
+        display: none !important;
+    }
+
+    main {
+        margin-left: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px !important;
+        padding-top: 100px !important;
+        min-height: 100vh;
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    .login-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        max-width: 1100px;
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .login-branding {
+        background: linear-gradient(135deg, rgba(196, 30, 58, 0.85) 0%, rgba(139, 20, 40, 0.85) 100%),
+                    url('{{ asset("images/doctor-woman.png") }}') center/cover no-repeat;
+        background-attachment: fixed;
+        color: white;
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        min-height: 500px;
+    }
+
+    .login-branding::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(196, 30, 58, 0.7) 0%, rgba(139, 20, 40, 0.7) 100%);
+        z-index: 1;
+    }
+
+    .login-branding > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .login-branding h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 20px 0 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .login-branding p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .logo-icon {
+        font-size: 4rem;
+        margin-bottom: 10px;
+    }
+
+    .logo-svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+    }
+
+    .benefits {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+    }
+
+    .benefit-item i {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .login-form-wrapper {
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-form-wrapper h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-label {
+        margin-bottom: 5px !important;
+    }
+
+    .form-control {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background-color: #f9fafb;
+    }
+
+    .form-control::placeholder {
+        color: #d1d5db;
+    }
+
+    .form-control:focus {
+        border-color: #C41E3A;
+        box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        outline: none;
+        background-color: white;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: #C41E3A;
+        font-size: 1rem;
+        width: 16px;
+    }
+
+    .form-group {
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .form-group:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .form-group:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .form-group:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-control {
+        animation: fieldHover 0.3s ease;
+    }
+
+    .form-control:hover {
+        border-color: #C41E3A;
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.1);
+    }
+
+    .remember-me {
+        animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .btn-login {
+        animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .register-section {
+        animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    @keyframes fieldHover {
+        0% {
+            box-shadow: 0 0 0 rgba(196, 30, 58, 0);
+        }
+        100% {
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.1);
+        }
+    }
+
+    .login-form-wrapper h3 {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .btn-login {
+        background-color: #C41E3A;
+        border-color: #C41E3A;
+        color: white;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        font-size: 0.95rem;
+    }
+
+    .btn-login:hover {
+        background-color: #8B1428;
+        border-color: #8B1428;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(196, 30, 58, 0.35);
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin: 20px 0 10px 0;
+    }
+
+    .remember-me input {
+        accent-color: #C41E3A;
+        cursor: pointer;
+    }
+
+    .remember-me label {
+        margin: 0 0 0 8px;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .register-section {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .register-section p {
+        color: #6b7280;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+    }
+
+    .btn-register {
+        background-color: #f3f4f6;
+        border: 2px solid #C41E3A;
+        color: #C41E3A;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 11px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.95rem;
+    }
+
+    .btn-register:hover {
+        background-color: #C41E3A;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    }
+
+    .alert {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 8px;
+        border-left: 4px solid #ef4444;
+    }
+
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff5f5;
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .captcha-question {
+        background: #f9fafb;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .captcha-text {
+        color: #1f2937;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+        text-align: center;
+        font-family: 'Monaco', 'Courier New', monospace;
+        letter-spacing: 1px;
+    }
+
+    .g-recaptcha {
+        margin: 15px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .g-recaptcha iframe {
+        max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        main {
+            min-height: calc(100vh - 50px);
+        }
+
+        .login-container {
+            grid-template-columns: 1fr;
+        }
+
+        .login-branding {
+            padding: 35px 25px;
+            order: 2;
+            min-height: auto;
+        }
+
+        .login-form-wrapper {
+            padding: 35px 25px;
+            order: 1;
+        }
+
+        .login-branding h2 {
+            font-size: 1.8rem;
+        }
+
+        .benefits {
+            display: none;
+        }
+
+        .login-wrapper {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<div class="login-wrapper">
+    <div class="login-container">
+        <!-- Left Side - Branding -->
+        <div class="login-branding">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shield shape with heart -->
+                <defs>
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Outer shield -->
+                <path d="M 100 20 C 100 20 60 40 60 90 C 60 130 100 170 100 170 C 100 170 140 130 140 90 C 140 40 100 20 100 20 Z" 
+                      fill="none" stroke="#C41E3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner shield -->
+                <path d="M 100 25 C 100 25 65 42 65 90 C 65 127 100 162 100 162 C 100 162 135 127 135 90 C 135 42 100 25 100 25 Z" 
+                      fill="url(#shieldGradient)" opacity="0.8"/>
+                <!-- Heart inside shield -->
+                <path d="M 100 75 C 100 75 92 68 86 68 C 80 68 76 72 76 78 C 76 85 85 95 100 110 C 115 95 124 85 124 78 C 124 72 120 68 114 68 C 108 68 100 75 100 75 Z" 
+                      fill="white" stroke="white" stroke-width="1"/>
+            </svg>
+            <h2>PinkShield</h2>
+            <p>Medical Care Management System</p>
+            
+            <div class="benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure & Encrypted</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-lock"></i>
+                    <span>Privacy Protected</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Access</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-user-md"></i>
+                    <span>Expert Support</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="login-form-wrapper">
+            <h3>Welcome Back</h3>
+
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><i class="fas fa-exclamation-circle me-2"></i>Login Error!</strong>
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+
+            <form method="post" name="login" novalidate>
+                <div class="form-group">
+                    <label for="inputUsername" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="text" name="_username" id="inputUsername" class="form-control" value="{{ last_username }}" placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPassword" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="Enter your password">
+                </div>
+
+                <div class="form-group">
+                    <!-- reCAPTCHA widget -->
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                    {% if captcha_error %}
+                        <small class="text-danger d-block mt-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ captcha_error }}
+                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" name="_remember_me" id="remember" class="form-check-input">
+                    <label for="remember">Keep me logged in</label>
+                </div>
+
+                <button type="submit" class="btn-login w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                </button>
+            </form>
+
+            <div class="register-section">
+                <p>Don't have an account yet?</p>
+                <a href="{{ path('register') }}" class="btn-register">
+                    <i class="fas fa-user-plus me-2"></i> Create Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

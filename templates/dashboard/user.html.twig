@@ -1,0 +1,360 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Patient Dashboard - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .dashboard-container {
+        margin-top: 20px;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2);
+    }
+
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .dashboard-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        background: white;
+        border-left: 5px solid #C41E3A;
+        margin-bottom: 20px;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(196, 30, 58, 0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 25px;
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+        color: #C41E3A;
+        margin-bottom: 15px;
+    }
+
+    .profile-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background: white;
+        overflow: hidden;
+    }
+
+    .profile-card-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 20px;
+    }
+
+    .profile-card-header i {
+        font-size: 2rem;
+        margin-right: 15px;
+    }
+
+    .profile-card .card-body {
+        padding: 25px;
+    }
+
+    .profile-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-item label {
+        color: #999;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .info-item span {
+        color: #2C3E50;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .feature-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background: white;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(196, 30, 58, 0.15);
+    }
+
+    .feature-card-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .feature-card-header i {
+        font-size: 2rem;
+    }
+
+    .feature-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .feature-card .card-body {
+        padding: 20px;
+    }
+
+    .feature-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .status-badge {
+        background-color: #FFF3CD;
+        color: #856404;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .btn-edit {
+        background-color: #C41E3A;
+        border-color: #C41E3A;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit:hover {
+        background-color: #8B1428;
+        border-color: #8B1428;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .grid-full {
+        grid-column: 1 / -1;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 30px 20px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .profile-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-circle"></i> Welcome back, {{ app.user.fullName }}!</h1>
+        <p><i class="fas fa-hospital-user"></i> Patient Dashboard - Manage your healthcare</p>
+    </div>
+
+    <div class="grid-2">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <i class="fas fa-id-card"></i>
+                <div>
+                    <h5 class="mb-0">Your Profile</h5>
+                    <small>Personal Information</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="profile-info">
+                    <div class="info-item">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <span>{{ app.user.fullName }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <span>{{ app.user.email }}</span>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="info-item" style="grid-column: 1 / -1;">
+                        <label><i class="fas fa-phone"></i> Phone</label>
+                        <span>{{ app.user.phone ?? 'Not provided' }}</span>
+                    </div>
+                </div>
+                <a href="{{ path('user_edit', {id: app.user.id}) }}" class="btn btn-edit w-100">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Blog & Forum Card -->
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-comments"></i>
+                <h5>Blog & Forum</h5>
+            </div>
+            <div class="card-body">
+                <div class="feature-status">
+                    <span class="status-badge bg-success text-white"><i class="fas fa-check-circle"></i> Live Now</span>
+                </div>
+                <p class="text-muted mb-3">
+                    Connect with healthcare professionals and patients. Share experiences and get advice from our community.
+                </p>
+                <ul class="list-unstyled text-muted" style="font-size: 0.9rem;">
+                    <li><i class="fas fa-check text-success"></i> Expert Medical Discussions</li>
+                    <li><i class="fas fa-check text-success"></i> Patient Support Groups</li>
+                    <li><i class="fas fa-check text-success"></i> Health Tips & Articles</li>
+                </ul>
+                <a href="{{ path('blog_index') }}" class="btn btn-primary w-100 mt-3">
+                    <i class="fas fa-eye"></i> View Forum
+                </a>
+            </div>
+        </div>
+
+        <!-- Appointments & Pharmacy Card -->
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-calendar-check"></i>
+                <h5>Appointments</h5>
+            </div>
+            <div class="card-body">
+                <div class="feature-status">
+                    <span class="status-badge bg-success text-white"><i class="fas fa-check-circle"></i> Live Now</span>
+                </div>
+                <p class="text-muted mb-3">
+                    Schedule doctor appointments and manage your medical consultations in one place.
+                </p>
+                <ul class="list-unstyled text-muted" style="font-size: 0.9rem;">
+                    <li><i class="fas fa-check text-success"></i> Book Appointments</li>
+                    <li><i class="fas fa-check text-success"></i> Manage Schedule</li>
+                    <li><i class="fas fa-check text-success"></i> Medical History</li>
+                </ul>
+                <a href="{{ path('appointment_index') }}" class="btn btn-primary w-100 mt-3">
+                    <i class="fas fa-calendar-alt"></i> Manage Appointments
+                </a>
+            </div>
+        </div>
+
+        <!-- Rate Doctors Card -->
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-star"></i>
+                <h5>Rate Doctors</h5>
+            </div>
+            <div class="card-body">
+                <div class="feature-status">
+                    <span class="status-badge bg-success text-white"><i class="fas fa-check-circle"></i> Live Now</span>
+                </div>
+                <p class="text-muted mb-3">
+                    Share your experience with doctors and help other patients make informed decisions.
+                </p>
+                <ul class="list-unstyled text-muted" style="font-size: 0.9rem;">
+                    <li><i class="fas fa-check text-success"></i> View Doctor Profiles</li>
+                    <li><i class="fas fa-check text-success"></i> Submit Ratings</li>
+                    <li><i class="fas fa-check text-success"></i> Edit Your Reviews</li>
+                </ul>
+                <a href="{{ path('rating_doctors_list') }}" class="btn btn-primary w-100 mt-3">
+                    <i class="fas fa-star"></i> Rate Doctors Now
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Features -->
+    <div class="row mt-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="card-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h5 style="color: #2C3E50; margin-bottom: 5px;">Medical Records</h5>
+                    <p class="text-muted mb-0">Access your health data</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h5 style="color: #2C3E50; margin-bottom: 5px;">Appointments</h5>
+                    <p class="text-muted mb-0">{{ scheduledAppointments }} Scheduled</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="card-icon">
+                        <i class="fas fa-prescription-bottle"></i>
+                    </div>
+                    <h5 style="color: #2C3E50; margin-bottom: 5px;">Prescriptions</h5>
+                    <p class="text-muted mb-0">0 Active</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="card-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h5 style="color: #2C3E50; margin-bottom: 5px;">Health Score</h5>
+                    <p class="text-muted mb-0">Good</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

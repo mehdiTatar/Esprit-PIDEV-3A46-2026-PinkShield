@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Medical Blog & Forum{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 text-danger fw-bold">Medical Blog & Forum</h1>
+        {% if app.user %}
+            <a href="{{ path('blog_new') }}" class="btn btn-danger">
+                <i class="fas fa-plus"></i> New Post
+            </a>
+        {% endif %}
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <!-- Search and Sort Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <form method="GET" class="d-flex gap-2" id="searchForm">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            class="form-control" 
+                            placeholder="Search by title, content, or author..." 
+                            value="{{ search }}"
+                        >
+                        <input type="hidden" name="sortBy" value="{{ sortBy }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        {% if search %}
+                            <a href="{{ path('blog_index', {'sortBy': sortBy}) }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <form method="GET" class="d-flex gap-2">
+                        <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                            <option value="date_newest" {% if sortBy == 'date_newest' %}selected{% endif %}>
+                                <i class="fas fa-clock"></i> Newest First
+                            </option>
+                            <option value="date_oldest" {% if sortBy == 'date_oldest' %}selected{% endif %}>
+                                <i class="fas fa-clock"></i> Oldest First
+                            </option>
+                            <option value="title_asc" {% if sortBy == 'title_asc' %}selected{% endif %}>
+                                <i class="fas fa-sort-alpha-down"></i> Title A-Z
+                            </option>
+                            <option value="title_desc" {% if sortBy == 'title_desc' %}selected{% endif %}>
+                                <i class="fas fa-sort-alpha-up"></i> Title Z-A
+                            </option>
+                            <option value="author" {% if sortBy == 'author' %}selected{% endif %}>
+                                <i class="fas fa-user"></i> Author
+                            </option>
+                        </select>
+                        <input type="hidden" name="search" value="{{ search }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="mb-3">
+        <span class="badge bg-info">{{ posts|length }} Post(s) Found</span>
+        {% if search %}
+            <span class="text-muted">Searching for: "<strong>{{ search }}</strong>"</span>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for post in posts %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm overflow-hidden">
+                    {% if post.imagePath %}
+                        <img src="{{ post.imagePath }}" alt="{{ post.title }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image text-secondary" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            By {{ post.authorName }} ({{ post.authorRole }}) 
+                            on {{ post.createdAt|date('M d, Y') }}
+                        </h6>
+                        <p class="card-text">{{ post.content|slice(0, 150) }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ path('blog_show', {'id': post.id}) }}" class="btn btn-outline-danger btn-sm">Read More</a>
+                            <span class="badge bg-secondary">{{ post.comments|length }} Comments</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    {% if search %}
+                        No posts found matching "{{ search }}"
+                    {% else %}
+                        No posts yet. Be the first to share something!
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .card {
+        border-color: #e0e0e0;
+    }
+    
+    .badge {
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}

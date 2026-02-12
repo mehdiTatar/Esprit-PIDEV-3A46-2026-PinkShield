@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Health Logs - Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .health-logs-container {
+        margin-top: 20px;
+    }
+
+    .health-logs-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2);
+    }
+
+    .health-logs-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+    }
+
+    .health-logs-header p {
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    .logs-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .logs-table table {
+        margin-bottom: 0;
+    }
+
+    .logs-table thead {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #C41E3A;
+    }
+
+    .logs-table thead th {
+        color: #2C3E50;
+        font-weight: 700;
+        padding: 15px;
+    }
+
+    .logs-table tbody td {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+
+    .logs-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .mood-badge, .stress-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-align: center;
+        width: 40px;
+    }
+
+    .mood-badge.high, .stress-badge.high {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .mood-badge.medium, .stress-badge.medium {
+        background-color: #ffc107;
+        color: #2C3E50;
+    }
+
+    .mood-badge.low, .stress-badge.low {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="health-logs-container">
+    <div class="health-logs-header">
+        <h2><i class="fas fa-heartbeat"></i> User Health Logs</h2>
+        <p>View and manage all patient health tracking entries</p>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="logs-table">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Email</th>
+                        <th>Mood</th>
+                        <th>Stress</th>
+                        <th>Activities</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td><strong>#{{ log.id }}</strong></td>
+                            <td>{{ log.userEmail }}</td>
+                            <td>
+                                <span class="mood-badge {% if log.mood >= 4 %}high{% elseif log.mood == 3 %}medium{% else %}low{% endif %}">
+                                    {{ log.mood }}/5
+                                </span>
+                            </td>
+                            <td>
+                                <span class="stress-badge {% if log.stress >= 4 %}high{% elseif log.stress == 3 %}medium{% else %}low{% endif %}">
+                                    {{ log.stress }}/5
+                                </span>
+                            </td>
+                            <td>
+                                <small>{{ log.activities|e|slice(0,50) }}{% if log.activities and log.activities|length > 50 %}...{% endif %}</small>
+                            </td>
+                            <td>{{ log.createdAt ? log.createdAt|date('M d, Y H:i') : 'N/A' }}</td>
+                            <td>
+                                <a href="{{ path('admin_health_log_delete', {'id': log.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this health log?');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox"></i> No health logs found in the database.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_health_stats') }}" class="btn btn-outline-primary">
+            <i class="fas fa-chart-bar"></i> View Statistics
+        </a>
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

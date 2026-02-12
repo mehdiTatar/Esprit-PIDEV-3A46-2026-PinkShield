@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Tracking Entry - PinkShield{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4"><i class="fas fa-edit me-2"></i>Edit Health Tracking Entry</h1>
+
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Modify Your Entry for {{ tracking.date|date('d M Y') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="mood" class="form-label">Mood (1-10):</label>
+                            <div class="input-group">
+                                <input type="range" class="form-range" id="mood" name="mood" min="1" max="10" value="{{ tracking.mood }}">
+                                <span class="input-group-text ms-2"><span id="moodValue">{{ tracking.mood }}</span>/10</span>
+                            </div>
+                            <small class="text-muted">1 = Very Bad, 10 = Excellent</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stress" class="form-label">Stress Level (1-10):</label>
+                            <div class="input-group">
+                                <input type="range" class="form-range" id="stress" name="stress" min="1" max="10" value="{{ tracking.stress }}">
+                                <span class="input-group-text ms-2"><span id="stressValue">{{ tracking.stress }}</span>/10</span>
+                            </div>
+                            <small class="text-muted">1 = Very Relaxed, 10 = Very Stressed</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="anxiety_level" class="form-label">Anxiety Level (1-10):</label>
+                                    <input type="range" class="form-range" id="anxiety_level" name="anxiety_level" min="1" max="10" value="{{ tracking.anxietyLevel ?? 5 }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="focus_level" class="form-label">Focus Level (1-10):</label>
+                                    <input type="range" class="form-range" id="focus_level" name="focus_level" min="1" max="10" value="{{ tracking.focusLevel ?? 5 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="motivation_level" class="form-label">Motivation Level (1-10):</label>
+                                    <input type="range" class="form-range" id="motivation_level" name="motivation_level" min="1" max="10" value="{{ tracking.motivationLevel ?? 5 }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="social_interaction_level" class="form-label">Social Interaction (1-10):</label>
+                                    <input type="range" class="form-range" id="social_interaction_level" name="social_interaction_level" min="1" max="10" value="{{ tracking.socialInteractionLevel ?? 5 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="sleep_hours" class="form-label">Sleep Hours (0-24):</label>
+                                    <input type="number" class="form-control" id="sleep_hours" name="sleep_hours" min="0" max="24" step="0.5" value="{{ tracking.sleepHours ?? '' }}" placeholder="Hours slept">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="energy_level" class="form-label">Energy Level (1-10):</label>
+                                    <input type="range" class="form-range" id="energy_level" name="energy_level" min="1" max="10" value="{{ tracking.energyLevel ?? 5 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appetite_level" class="form-label">Appetite Level (1-10):</label>
+                                    <input type="range" class="form-range" id="appetite_level" name="appetite_level" min="1" max="10" value="{{ tracking.appetiteLevel ?? 5 }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="physical_activity_level" class="form-label">Physical Activity (1-10):</label>
+                                    <input type="range" class="form-range" id="physical_activity_level" name="physical_activity_level" min="1" max="10" value="{{ tracking.physicalActivityLevel ?? 5 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="water_intake" class="form-label">Water Intake (%):</label>
+                            <input type="number" class="form-control" id="water_intake" name="water_intake" min="0" max="100" value="{{ tracking.waterIntake ?? '' }}" placeholder="Percentage of daily goal">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="activities" class="form-label">Activities:</label>
+                            <textarea class="form-control" id="activities" name="activities" rows="3" placeholder="Describe your activities">{{ tracking.activities ?? '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="symptoms" class="form-label">Symptoms:</label>
+                            <textarea class="form-control" id="symptoms" name="symptoms" rows="3" placeholder="Any symptoms or health concerns">{{ tracking.symptoms ?? '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="medication_taken" name="medication_taken" value="1" {% if tracking.medicationTaken %}checked{% endif %}>
+                                <label class="form-check-label" for="medication_taken">
+                                    Medication Taken
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ path('tracking_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update mood display
+    document.getElementById('mood').addEventListener('input', function() {
+        document.getElementById('moodValue').textContent = this.value;
+    });
+
+    // Update stress display
+    document.getElementById('stress').addEventListener('input', function() {
+        document.getElementById('stressValue').textContent = this.value;
+    });
+</script>
+{% endblock %}

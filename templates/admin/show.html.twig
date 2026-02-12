@@ -1,0 +1,30 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Admin Details - PinkShield{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="mb-4">Admin Details</h2>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID:</strong></label>
+                    <p>{{ admin.id }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Email:</strong></label>
+                    <p>{{ admin.email }}</p>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ path('admin_edit', {id: admin.id}) }}" class="btn btn-warning">Edit</a>
+                    <a href="{{ path('admin_index') }}" class="btn btn-secondary">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Health Statistics - Admin{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .health-stats-container {
+        margin-top: 20px;
+    }
+
+    .health-stats-header {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2);
+    }
+
+    .health-stats-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+    }
+
+    .health-stats-header p {
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        background: white;
+        border-left: 5px solid #C41E3A;
+        margin-bottom: 20px;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(196, 30, 58, 0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 25px;
+        text-align: center;
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+        color: #C41E3A;
+        margin-bottom: 15px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #C41E3A;
+        margin: 10px 0;
+    }
+
+    .stat-label {
+        color: #2C3E50;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .insight-box {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+    }
+
+    .insight-box h5 {
+        color: #2C3E50;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .insight-box p {
+        margin-bottom: 0;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 150px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="health-stats-container">
+    <div class="health-stats-header">
+        <h2><i class="fas fa-chart-bar"></i> Health Statistics & Insights</h2>
+        <p>Aggregate analytics from all user health tracking entries</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="card-body">
+                <div class="card-icon"><i class="fas fa-database"></i></div>
+                <div class="stat-label">Total Entries</div>
+                <div class="stat-number">{{ total }}</div>
+                <small class="text-muted">Health log entries recorded</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-body">
+                <div class="card-icon"><i class="fas fa-smile"></i></div>
+                <div class="stat-label">Average Mood</div>
+                <div class="stat-number">{{ avgMood }}<small style="font-size: 0.6em;">/5</small></div>
+                <small class="text-muted">Aggregate mood level</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="card-body">
+                <div class="card-icon"><i class="fas fa-gauge-high"></i></div>
+                <div class="stat-label">Average Stress</div>
+                <div class="stat-number">{{ avgStress }}<small style="font-size: 0.6em;">/5</small></div>
+                <small class="text-muted">Aggregate stress level</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="insight-box">
+        <h5><i class="fas fa-lightbulb me-2"></i>Key Insights</h5>
+        <p>
+            {% if total == 0 %}
+                No health data available yet. Users can start logging their mood and stress levels from their dashboard.
+            {% else %}
+                Based on {{ total }} recorded entries:
+                <br>
+                {% if avgMood >= 4 %}
+                    ✓ Users report <strong>positive mood levels</strong> ({{ avgMood }}/5)
+                {% elseif avgMood >= 3 %}
+                    • Users report <strong>neutral mood levels</strong> ({{ avgMood }}/5)
+                {% else %}
+                    ⚠ Users report <strong>lower mood levels</strong> ({{ avgMood }}/5) - Consider wellness outreach
+                {% endif %}
+                <br>
+                {% if avgStress >= 4 %}
+                    ⚠ Average stress level is <strong>high</strong> ({{ avgStress }}/5) - May benefit from wellness programs
+                {% elseif avgStress >= 3 %}
+                    • Users report <strong>moderate stress</strong> ({{ avgStress }}/5)
+                {% else %}
+                    ✓ Users report <strong>low stress levels</strong> ({{ avgStress }}/5)
+                {% endif %}
+            {% endif %}
+        </p>
+    </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ path('admin_health_logs') }}" class="btn btn-primary">
+            <i class="fas fa-list"></i> View All Health Logs
+        </a>
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
