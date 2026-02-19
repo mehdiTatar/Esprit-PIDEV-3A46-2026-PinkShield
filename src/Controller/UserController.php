@@ -3,10 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Notification;
 use App\Form\UserFormType;
 use App\Repository\UserRepository;
-use App\Repository\AdminRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +17,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 #[Route('/user')]
 class UserController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/', name: 'user_index')]
     public function index(Request $request, UserRepository $userRepository): Response
     {
@@ -69,7 +71,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'user_edit')]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage, AdminRepository $adminRepository): Response
+    public function edit(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
     {
         // Allow admin to edit any user; users can edit their own profile regardless of role
         $currentUser = $this->getUser();
@@ -91,18 +93,12 @@ class UserController extends AbstractController
 
             $entityManager->flush();
             
-            // Create notification for all admins
-            $admins = $adminRepository->findByRole('ROLE_ADMIN');
-            foreach ($admins as $admin) {
-                $notification = new Notification();
-                $notification->setAdmin($admin);
-                $notification->setTitle('User Profile Updated');
-                $notification->setMessage($user->getFullName() . ' updated their profile');
-                $notification->setType('info');
-                $notification->setIcon('fas fa-user-edit');
-                $entityManager->persist($notification);
-            }
-            $entityManager->flush();
+            $this->notificationService->notifyAdmins(
+                'User Profile Updated',
+                $user->getFullName() . ' updated their profile',
+                'info',
+                'fas fa-user-edit'
+            );
             
             $this->addFlash('success', 'Profile updated successfully!');
 

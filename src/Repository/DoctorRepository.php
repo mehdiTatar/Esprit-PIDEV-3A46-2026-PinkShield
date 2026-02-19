@@ -38,9 +38,10 @@ class DoctorRepository extends ServiceEntityRepository
     public function findByFullName(string $name): array
     {
         return $this->createQueryBuilder('d')
-            ->where('d.fullName LIKE :name')
+            ->where('d.firstName LIKE :name OR d.lastName LIKE :name')
             ->setParameter('name', '%' . $name . '%')
-            ->orderBy('d.fullName', 'ASC')
+            ->orderBy('d.lastName', 'ASC')
+            ->addOrderBy('d.firstName', 'ASC')
             ->getQuery()
             ->getResult();
     }

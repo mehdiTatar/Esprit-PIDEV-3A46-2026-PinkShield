@@ -7,6 +7,7 @@ use App\Entity\Rating;
 use App\Form\RatingFormType;
 use App\Repository\DoctorRepository;
 use App\Repository\RatingRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/rating')]
 class RatingController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/doctors', name: 'rating_doctors_list')]
     public function doctorsList(DoctorRepository $doctorRepository, RatingRepository $ratingRepository): Response
     {
@@ -76,6 +80,13 @@ class RatingController extends AbstractController
 
             $entityManager->persist($rating);
             $entityManager->flush();
+
+            $this->notificationService->notifyAdmins(
+                'Doctor Rated',
+                $user->getFullName() . ' rated Dr. ' . $doctor->getFullName() . ' (' . $rating->getScore() . '★)',
+                'info',
+                'fas fa-star'
+            );
 
             $this->addFlash('success', 'Your rating has been saved successfully!');
             return $this->redirectToRoute('rating_doctors_list');

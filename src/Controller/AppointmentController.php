@@ -5,12 +5,11 @@ namespace App\Controller;
 use App\Entity\Appointment;
 use App\Entity\User;
 use App\Entity\Doctor;
-use App\Entity\Notification;
 use App\Repository\AppointmentRepository;
 use App\Repository\DoctorRepository;
 use App\Repository\DailyTrackingRepository;
 use App\Repository\UserRepository;
-use App\Repository\AdminRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +23,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/appointment')]
 class AppointmentController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/', name: 'appointment_index')]
     public function index(AppointmentRepository $appointmentRepository): Response
     {
@@ -45,7 +47,7 @@ class AppointmentController extends AbstractController
     }
 
     #[Route('/new', name: 'appointment_new')]
-    public function new(Request $request, DoctorRepository $doctorRepository, AdminRepository $adminRepository, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, DoctorRepository $doctorRepository, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         // Only patients can book appointments
@@ -83,18 +85,12 @@ class AppointmentController extends AbstractController
             $entityManager->persist($appointment);
             $entityManager->flush();
 
-            // Create notification for all admins
-            $admins = $adminRepository->findByRole('ROLE_ADMIN');
-            foreach ($admins as $admin) {
-                $notification = new Notification();
-                $notification->setAdmin($admin);
-                $notification->setTitle('New Appointment Booking');
-                $notification->setMessage($appointment->getPatientName() . ' booked an appointment with ' . $appointment->getDoctorName() . ' on ' . $appointment->getAppointmentDate()->format('Y-m-d H:i'));
-                $notification->setType('info');
-                $notification->setIcon('fas fa-calendar-check');
-                $entityManager->persist($notification);
-            }
-            $entityManager->flush();
+            $this->notificationService->notifyAdmins(
+                'New Appointment Booking',
+                $appointment->getPatientName() . ' booked an appointment with ' . $appointment->getDoctorName() . ' on ' . $appointment->getAppointmentDate()->format('Y-m-d H:i'),
+                'info',
+                'fas fa-calendar-check'
+            );
 
             $this->addFlash('success', 'Appointment booked successfully! Waiting for doctor confirmation.');
             return $this->redirectToRoute('appointment_index');
@@ -110,7 +106,7 @@ class AppointmentController extends AbstractController
 
     #[Route('/{id}/confirm', name: 'appointment_confirm')]
     #[IsGranted('ROLE_DOCTOR')]
-    public function confirm(Appointment $appointment, EntityManagerInterface $entityManager, AdminRepository $adminRepository): Response
+    public function confirm(Appointment $appointment, EntityManagerInterface $entityManager): Response
     {
         if ($appointment->getDoctorEmail() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
@@ -119,25 +115,19 @@ class AppointmentController extends AbstractController
         $appointment->setStatus('confirmed');
         $entityManager->flush();
 
-        // Create notification for all admins
-        $admins = $adminRepository->findByRole('ROLE_ADMIN');
-        foreach ($admins as $admin) {
-            $notification = new Notification();
-            $notification->setAdmin($admin);
-            $notification->setTitle('Appointment Confirmed');
-            $notification->setMessage('Dr. ' . $appointment->getDoctorName() . ' confirmed appointment with ' . $appointment->getPatientName());
-            $notification->setType('success');
-            $notification->setIcon('fas fa-check-circle');
-            $entityManager->persist($notification);
-        }
-        $entityManager->flush();
+        $this->notificationService->notifyAdmins(
+            'Appointment Confirmed',
+            'Dr. ' . $appointment->getDoctorName() . ' confirmed appointment with ' . $appointment->getPatientName(),
+            'success',
+            'fas fa-check-circle'
+        );
 
         $this->addFlash('success', 'Appointment confirmed.');
         return $this->redirectToRoute('appointment_index');
     }
 
     #[Route('/{id}', name: 'appointment_show')]
-    public function show(Appointment $appointment, Request $request, EntityManagerInterface $entityManager, AdminRepository $adminRepository): Response
+    public function show(Appointment $appointment, Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -156,18 +146,12 @@ class AppointmentController extends AbstractController
             $entityManager->persist($paraph);
             $entityManager->flush();
 
-            // Create notification for all admins
-            $admins = $adminRepository->findByRole('ROLE_ADMIN');
-            foreach ($admins as $admin) {
-                $notification = new Notification();
-                $notification->setAdmin($admin);
-                $notification->setTitle('Parapharmacy Item Added to Appointment');
-                $notification->setMessage('A parapharmacy item was added to appointment #' . $appointment->getId() . ' by ' . $this->getUser()->getUserIdentifier());
-                $notification->setType('info');
-                $notification->setIcon('fas fa-pills');
-                $entityManager->persist($notification);
-            }
-            $entityManager->flush();
+            $this->notificationService->notifyAdmins(
+                'Parapharmacy Item Added to Appointment',
+                'A parapharmacy item was added to appointment #' . $appointment->getId() . ' by ' . $this->getUser()->getUserIdentifier(),
+                'info',
+                'fas fa-pills'
+            );
 
             $this->addFlash('success', 'Parapharmacie item added.');
             return $this->redirectToRoute('appointment_show', ['id' => $appointment->getId()]);
@@ -180,7 +164,7 @@ class AppointmentController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'appointment_edit')]
-    public function edit(Appointment $appointment, Request $request, EntityManagerInterface $entityManager, AdminRepository $adminRepository): Response
+    public function edit(Appointment $appointment, Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $userEmail = $this->getUser()->getUserIdentifier();
@@ -206,17 +190,12 @@ class AppointmentController extends AbstractController
             
             // Create notification for all admins if status changed to cancelled
             if ($oldStatus !== $status && $status === 'cancelled') {
-                $admins = $adminRepository->findByRole('ROLE_ADMIN');
-                foreach ($admins as $admin) {
-                    $notification = new Notification();
-                    $notification->setAdmin($admin);
-                    $notification->setTitle('Appointment Cancelled');
-                    $notification->setMessage('Appointment between ' . $appointment->getPatientName() . ' and ' . $appointment->getDoctorName() . ' was cancelled');
-                    $notification->setType('warning');
-                    $notification->setIcon('fas fa-times-circle');
-                    $entityManager->persist($notification);
-                }
-                $entityManager->flush();
+                $this->notificationService->notifyAdmins(
+                    'Appointment Cancelled',
+                    'Appointment between ' . $appointment->getPatientName() . ' and ' . $appointment->getDoctorName() . ' was cancelled',
+                    'warning',
+                    'fas fa-times-circle'
+                );
             }
             
             $this->addFlash('success', 'Appointment updated.');

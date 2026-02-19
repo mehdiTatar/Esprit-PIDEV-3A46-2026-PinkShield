@@ -4,11 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Wishlist;
 use App\Entity\Parapharmacie;
-use App\Entity\Notification;
 use App\Repository\WishlistRepository;
 use App\Repository\ParapharmacieRepository;
 use App\Repository\UserRepository;
-use App\Repository\AdminRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +17,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/wishlist')]
 class WishlistController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/', name: 'wishlist_index')]
     public function index(WishlistRepository $wishlistRepository): Response
     {
@@ -36,7 +38,6 @@ class WishlistController extends AbstractController
         int $productId,
         ParapharmacieRepository $productRepository,
         WishlistRepository $wishlistRepository,
-        AdminRepository $adminRepository,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -61,18 +62,12 @@ class WishlistController extends AbstractController
         $entityManager->persist($wishlist);
         $entityManager->flush();
 
-        // Create notification for all admins
-        $admins = $adminRepository->findByRole('ROLE_ADMIN');
-        foreach ($admins as $admin) {
-            $notification = new Notification();
-            $notification->setAdmin($admin);
-            $notification->setTitle('New Wishlist Addition');
-            $notification->setMessage($user->getFullName() . ' added "' . $product->getName() . '" to their wishlist');
-            $notification->setType('info');
-            $notification->setIcon('fas fa-heart');
-            $entityManager->persist($notification);
-        }
-        $entityManager->flush();
+        $this->notificationService->notifyAdmins(
+            'New Wishlist Addition',
+            $user->getFullName() . ' added "' . $product->getName() . '" to their wishlist',
+            'info',
+            'fas fa-heart'
+        );
 
         return new JsonResponse(['success' => true, 'message' => 'Added to wishlist']);
     }

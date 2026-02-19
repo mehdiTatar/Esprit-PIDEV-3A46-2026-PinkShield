@@ -7,10 +7,9 @@ use App\Entity\Comment;
 use App\Entity\Admin;
 use App\Entity\Doctor;
 use App\Entity\User;
-use App\Entity\Notification;
 use App\Repository\BlogPostRepository;
 use App\Repository\CommentRepository;
-use App\Repository\AdminRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +20,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/blog')]
 class BlogController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/', name: 'blog_index')]
     public function index(Request $request, BlogPostRepository $blogPostRepository): Response
     {
@@ -37,7 +39,7 @@ class BlogController extends AbstractController
     }
 
     #[Route('/new', name: 'blog_new')]
-    public function new(Request $request, EntityManagerInterface $entityManager, AdminRepository $adminRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $post = new BlogPost();
@@ -77,18 +79,12 @@ class BlogController extends AbstractController
                 $entityManager->persist($post);
                 $entityManager->flush();
 
-                // Create notification for all admins
-                $admins = $adminRepository->findByRole('ROLE_ADMIN');
-                foreach ($admins as $admin) {
-                    $notification = new Notification();
-                    $notification->setAdmin($admin);
-                    $notification->setTitle('New Blog Post Created');
-                    $notification->setMessage($post->getAuthorName() . ' published a new blog post: "' . $post->getTitle() . '"');
-                    $notification->setType('info');
-                    $notification->setIcon('fas fa-newspaper');
-                    $entityManager->persist($notification);
-                }
-                $entityManager->flush();
+                $this->notificationService->notifyAdmins(
+                    'New Blog Post Created',
+                    $post->getAuthorName() . ' published a new blog post: "' . $post->getTitle() . '"',
+                    'info',
+                    'fas fa-newspaper'
+                );
                 
                 $this->addFlash('success', 'Post created successfully!');
                 return $this->redirectToRoute('blog_index');
@@ -129,6 +125,13 @@ class BlogController extends AbstractController
                 
                 $entityManager->persist($comment);
                 $entityManager->flush();
+
+                $this->notificationService->notifyAdmins(
+                    'New Blog Comment',
+                    $name . ' commented on "' . $post->getTitle() . '"',
+                    'info',
+                    'fas fa-comment'
+                );
                 
                 $this->addFlash('success', 'Comment added!');
                 return $this->redirectToRoute('blog_show', ['id' => $post->getId()]);
@@ -182,6 +185,13 @@ class BlogController extends AbstractController
                 }
                 
                 $entityManager->flush();
+
+                $this->notificationService->notifyAdmins(
+                    'Blog Post Edited',
+                    $user->getUserIdentifier() . ' edited blog post: "' . $post->getTitle() . '"',
+                    'info',
+                    'fas fa-edit'
+                );
                 
                 $this->addFlash('success', 'Post updated successfully!');
                 return $this->redirectToRoute('blog_show', ['id' => $post->getId()]);
@@ -207,8 +217,17 @@ class BlogController extends AbstractController
             throw $this->createAccessDeniedException('You cannot delete this post.');
         }
 
+        $title = $post->getTitle();
+        $authorEmail = $post->getAuthorEmail();
         $entityManager->remove($post);
         $entityManager->flush();
+
+        $this->notificationService->notifyAdmins(
+            'Blog Post Deleted',
+            $user->getUserIdentifier() . ' deleted blog post: "' . $title . '"',
+            'warning',
+            'fas fa-trash'
+        );
         
         $this->addFlash('success', 'Post deleted!');
         return $this->redirectToRoute('blog_index');

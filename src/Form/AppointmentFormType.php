@@ -37,7 +37,8 @@ class AppointmentFormType extends AbstractType
                 ],
                 'query_builder' => function (DoctorRepository $repo) {
                     return $repo->createQueryBuilder('d')
-                        ->orderBy('d.fullName', 'ASC');
+                        ->orderBy('d.lastName', 'ASC')
+                        ->addOrderBy('d.firstName', 'ASC');
                 },
                 'constraints' => [
                     new Assert\NotBlank([

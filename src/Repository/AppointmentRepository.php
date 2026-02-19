@@ -67,4 +67,32 @@ class AppointmentRepository extends ServiceEntityRepository
             ->setParameter('email', $email)
             ->getQuery()
             ->getSingleScalarResult();
-    }}
+    }
+
+    /**
+     * Return unique patients for a doctor with aggregated stats.
+     * Each row: patientEmail, patientName, totalAppointments, lastAppointment, statuses
+     */
+    public function findPatientsByDoctor(string $doctorEmail): array
+    {
+        $rows = $this->createQueryBuilder('a')
+            ->select(
+                'a.patientEmail',
+                'a.patientName',
+                'COUNT(a.id) AS totalAppointments',
+                'MAX(a.appointmentDate) AS lastAppointment',
+                "SUM(CASE WHEN a.status = 'confirmed' THEN 1 ELSE 0 END) AS confirmed",
+                "SUM(CASE WHEN a.status = 'pending'   THEN 1 ELSE 0 END) AS pending",
+                "SUM(CASE WHEN a.status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled"
+            )
+            ->andWhere('a.doctorEmail = :email')
+            ->setParameter('email', $doctorEmail)
+            ->groupBy('a.patientEmail')
+            ->addGroupBy('a.patientName')
+            ->orderBy('lastAppointment', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $rows;
+    }
+}

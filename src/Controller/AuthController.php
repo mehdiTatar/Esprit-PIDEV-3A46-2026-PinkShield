@@ -7,8 +7,10 @@ use App\Entity\Doctor;
 use App\Form\UserFormType;
 use App\Form\DoctorFormType;
 use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -25,8 +27,10 @@ class AuthController extends AbstractController
     private string $recaptchaSiteKey;
     private string $recaptchaSecretKey;
 
-    public function __construct(ParameterBagInterface $params)
-    {
+    public function __construct(
+        ParameterBagInterface $params,
+        private NotificationService $notificationService
+    ) {
         $this->recaptchaSiteKey = $params->get('recaptcha_site_key');
         $this->recaptchaSecretKey = $params->get('recaptcha_secret_key');
     }
@@ -55,6 +59,100 @@ class AuthController extends AbstractController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  AJAX FIELD VALIDATION
+    // ─────────────────────────────────────────────────────────────
+
+    #[Route('/validate-field', name: 'ajax_validate_field', methods: ['POST'])]
+    public function validateField(Request $request): JsonResponse
+    {
+        $data  = json_decode($request->getContent(), true) ?? [];
+        $field = $data['field']  ?? '';
+        $value = trim($data['value'] ?? '');
+        $extra = $data['extra']  ?? '';
+
+        $error = match ($field) {
+            'email' => $this->validateEmail($value),
+            'firstName', 'lastName' => $this->validateName($value),
+            'password'              => $this->validatePassword($value),
+            'confirm_password'      => $this->validateConfirmPassword($value, $extra),
+            'phone'                 => $this->validatePhone($value),
+            'address'               => $this->validateAddress($value),
+            'doctorEmail'           => $this->validateRequired($value, 'Please select a doctor.'),
+            'appointmentDate'       => $this->validateFutureDate($value),
+            'notes'                 => $this->validateNotes($value),
+            default                 => null,
+        };
+
+        return new JsonResponse(['valid' => $error === null, 'error' => $error]);
+    }
+
+    private function validateEmail(string $value): ?string
+    {
+        if ($value === '') return 'Email address is required.';
+        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) return 'Please enter a valid email address.';
+        return null;
+    }
+
+    private function validateName(string $value): ?string
+    {
+        if ($value === '') return 'This field is required.';
+        if (mb_strlen($value) < 2) return 'Must be at least 2 characters.';
+        if (!preg_match('/^[\p{L}\s\-\']+$/u', $value)) return 'Only letters, spaces, hyphens, and apostrophes are allowed.';
+        return null;
+    }
+
+    private function validatePassword(string $value): ?string
+    {
+        if ($value === '') return 'Password is required.';
+        if (mb_strlen($value) < 8) return 'Password must be at least 8 characters.';
+        return null;
+    }
+
+    private function validateConfirmPassword(string $value, string $password): ?string
+    {
+        if ($value === '') return 'Please confirm your password.';
+        if ($value !== $password) return 'Passwords do not match.';
+        return null;
+    }
+
+    private function validatePhone(string $value): ?string
+    {
+        if ($value === '') return null; // optional
+        if (!preg_match('/^[\+\d][\d\s\-\.]{6,19}$/', $value)) return 'Please enter a valid phone number.';
+        return null;
+    }
+
+    private function validateAddress(string $value): ?string
+    {
+        if ($value === '') return null; // optional
+        if (mb_strlen($value) < 5) return 'Address must be at least 5 characters.';
+        return null;
+    }
+
+    private function validateRequired(string $value, string $msg): ?string
+    {
+        return $value === '' ? $msg : null;
+    }
+
+    private function validateFutureDate(string $value): ?string
+    {
+        if ($value === '') return 'Please select an appointment date.';
+        try {
+            $dt = new \DateTimeImmutable($value);
+            if ($dt <= new \DateTimeImmutable()) return 'The appointment date must be in the future.';
+        } catch (\Exception) {
+            return 'Invalid date format.';
+        }
+        return null;
+    }
+
+    private function validateNotes(string $value): ?string
+    {
+        if (mb_strlen($value) > 500) return 'Notes must be 500 characters or fewer.';
+        return null;
     }
 
     #[Route('/register', name: 'register')]
@@ -89,6 +187,13 @@ class AuthController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            $this->notificationService->notifyAdmins(
+                'New Patient Registration',
+                $user->getFullName() . ' registered as a new patient',
+                'info',
+                'fas fa-user-plus'
+            );
+
             return $this->redirectToRoute('login');
         }
 
@@ -110,6 +215,13 @@ class AuthController extends AbstractController
 
             $entityManager->persist($doctor);
             $entityManager->flush();
+
+            $this->notificationService->notifyAdmins(
+                'New Doctor Registration',
+                $doctor->getFullName() . ' registered as a new doctor',
+                'info',
+                'fas fa-user-md'
+            );
 
             return $this->redirectToRoute('login');
         }
@@ -157,6 +269,13 @@ class AuthController extends AbstractController
                     ]));
 
                 $mailer->send($email);
+
+                $this->notificationService->notifyAdmins(
+                    'Password Reset Requested',
+                    $user->getEmail() . ' requested a password reset',
+                    'warning',
+                    'fas fa-key'
+                );
             }
 
             $this->addFlash('success', 'Si cet email existe, un lien de réinitialisation vous a été envoyé.');
@@ -203,6 +322,13 @@ class AuthController extends AbstractController
             $user->setResetToken(null);
             $user->setResetTokenExpiresAt(null);
             $entityManager->flush();
+
+            $this->notificationService->notifyAdmins(
+                'Password Reset Completed',
+                $user->getFullName() . ' (' . $user->getEmail() . ') reset their password',
+                'success',
+                'fas fa-lock-open'
+            );
 
             $this->addFlash('success', 'Mot de passe mis à jour avec succès ! Vous pouvez maintenant vous connecter.');
             return $this->redirectToRoute('login');

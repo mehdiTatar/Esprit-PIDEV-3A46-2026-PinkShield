@@ -392,7 +392,7 @@
                 </div>
             {% endif %}
 
-            <form method="post" name="login" novalidate>
+            <form method="post" name="login" novalidate id="loginForm">
                 <div class="form-group">
                     <label for="inputUsername" class="form-label">
                         <i class="fas fa-envelope"></i> Email Address
@@ -404,6 +404,7 @@
                            value="{{ last_username }}"
                            placeholder="your@email.com"
                            autocomplete="email"
+                           data-ajax-validate="email"
                            required>
                 </div>
 
@@ -454,4 +455,20 @@
 
     </div>
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('loginForm');
+    if (!form) return;
+    AjaxValidator.attachBlur(form);
+    AjaxValidator.attachSubmit(form, null, function () {
+        // Let Symfony handle actual auth — just submit normally
+        form.removeEventListener('submit', null);
+        form.submit();
+    });
+});
+</script>
 {% endblock %}

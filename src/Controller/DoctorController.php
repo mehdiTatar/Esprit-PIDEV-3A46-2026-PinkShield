@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Doctor;
-use App\Entity\Notification;
 use App\Entity\User;
 use App\Form\DoctorFormType;
+use App\Repository\AppointmentRepository;
 use App\Repository\DoctorRepository;
-use App\Repository\AdminRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +19,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 #[Route('/doctor')]
 class DoctorController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
     #[Route('/', name: 'doctor_index')]
     public function index(Request $request, DoctorRepository $doctorRepository): Response
     {
@@ -48,6 +51,21 @@ class DoctorController extends AbstractController
         ]);
     }
 
+    #[Route('/patients', name: 'doctor_patients')]
+    public function patients(AppointmentRepository $appointmentRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_DOCTOR');
+
+        /** @var \App\Entity\Doctor $doctor */
+        $doctor  = $this->getUser();
+        $patients = $appointmentRepository->findPatientsByDoctor($doctor->getEmail());
+
+        return $this->render('doctor/patients.html.twig', [
+            'patients'     => $patients,
+            'patientCount' => count($patients),
+        ]);
+    }
+
     #[Route('/new', name: 'doctor_new')]
     public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -74,7 +92,7 @@ class DoctorController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'doctor_edit')]
-    public function edit(Request $request, Doctor $doctor, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage, AdminRepository $adminRepository): Response
+    public function edit(Request $request, Doctor $doctor, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
     {
         // Doctor can only edit their own profile, Admin can edit any doctor
         $currentUser = $tokenStorage->getToken()->getUser();
@@ -92,18 +110,12 @@ class DoctorController extends AbstractController
 
             $entityManager->flush();
             
-            // Create notification for all admins
-            $admins = $adminRepository->findByRole('ROLE_ADMIN');
-            foreach ($admins as $admin) {
-                $notification = new Notification();
-                $notification->setAdmin($admin);
-                $notification->setTitle('Doctor Profile Updated');
-                $notification->setMessage($doctor->getFullName() . ' updated their profile');
-                $notification->setType('info');
-                $notification->setIcon('fas fa-user-md');
-                $entityManager->persist($notification);
-            }
-            $entityManager->flush();
+            $this->notificationService->notifyAdmins(
+                'Doctor Profile Updated',
+                $doctor->getFullName() . ' updated their profile',
+                'info',
+                'fas fa-user-md'
+            );
             
             $this->addFlash('success', 'Profile updated successfully!');
 

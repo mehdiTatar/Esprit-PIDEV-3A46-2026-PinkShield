@@ -708,6 +708,28 @@
         {# Notification loader #}
         {% if app.user %}
         <script>
+            /* ── Time Ago helper ─────────────────────────────── */
+            function notifTimeAgo(ts) {
+                const secs = Math.floor((Date.now() / 1000) - ts);
+                const intervals = [
+                    { l: 'y',  s: 31536000 }, { l: 'mo', s: 2592000 },
+                    { l: 'w',  s: 604800 },   { l: 'd',  s: 86400 },
+                    { l: 'h',  s: 3600 },     { l: 'm',  s: 60 },
+                ];
+                for (const i of intervals) {
+                    const c = Math.floor(secs / i.s);
+                    if (c >= 1) return `${c}${i.l} ago`;
+                }
+                return 'now';
+            }
+
+            const typeColors = {
+                info:    { bg: '#dbeafe', color: '#2563eb' },
+                success: { bg: '#dcfce7', color: '#16a34a' },
+                warning: { bg: '#fef3c7', color: '#d97706' },
+                danger:  { bg: '#fee2e2', color: '#dc2626' },
+            };
+
             function loadNotifications() {
                 const badgeEl = document.getElementById('notificationBadge');
                 if (!badgeEl) return;
@@ -721,37 +743,51 @@
                         const containerEl = document.getElementById('notificationsContainer');
                         const count       = data.unreadCount ?? 0;
 
-                        // Only show badge when there are unread notifications
+                        // Badge
                         if (count > 0) {
-                            badgeEl.textContent = count;
+                            badgeEl.textContent = count > 9 ? '9+' : count;
                             badgeEl.style.display = 'block';
                         } else {
                             badgeEl.style.display = 'none';
                         }
 
                         if (unreadEl) {
-                            unreadEl.textContent = count > 0 ? `${count} New` : '';
+                            unreadEl.textContent = count > 0 ? `${count} new` : '';
                         }
 
                         if (containerEl) {
                             if (data.notifications.length === 0) {
-                                containerEl.innerHTML = '<li class="dropdown-item text-center text-muted"><small><i class="fas fa-check-circle me-1"></i>No new notifications</small></li>';
+                                containerEl.innerHTML = `
+                                    <li class="text-center py-4 text-muted">
+                                        <i class="fas fa-check-circle d-block mb-2" style="font-size:1.5rem;color:#d1d5db;"></i>
+                                        <small>All caught up!</small>
+                                    </li>`;
                             } else {
-                                containerEl.innerHTML = data.notifications.slice(0, 5).map(n => `
-                                    <li class="dropdown-item ${n.isRead ? '' : 'fw-semibold'}">
-                                        <div class="notification-item">
-                                            <div class="notification-icon"><i class="${n.icon}"></i></div>
-                                            <div class="notification-content">
-                                                <small><strong>${n.title}</strong></small>
-                                                <small class="text-muted d-block">${n.createdAt}</small>
+                                const showUrlTpl = '{{ path('notification_show', {id: 0}) }}';
+                                containerEl.innerHTML = data.notifications.slice(0, 5).map(n => {
+                                    const url  = showUrlTpl.replace('0', n.id);
+                                    const tc   = typeColors[n.type] || typeColors.info;
+                                    const time = n.timestamp ? notifTimeAgo(n.timestamp) : n.createdAt;
+                                    return `<li>
+                                        <a href="${url}" class="dropdown-item px-3 py-2" style="white-space:normal;border-left:3px solid ${tc.color};${n.isRead?'':'background:rgba(76,175,135,0.04);'}">
+                                            <div style="display:flex;gap:10px;align-items:flex-start;">
+                                                <span style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;background:${tc.bg};color:${tc.color};">
+                                                    <i class="${n.icon}"></i>
+                                                </span>
+                                                <div style="min-width:0;">
+                                                    <div style="font-size:0.82rem;font-weight:${n.isRead?'500':'700'};color:#1f2937;line-height:1.3;">${n.title}</div>
+                                                    <div style="font-size:0.76rem;color:#6b7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${n.message}</div>
+                                                    <div style="font-size:0.7rem;color:#9ca3af;margin-top:3px;"><i class="far fa-clock me-1"></i>${time}</div>
+                                                </div>
+                                                ${!n.isRead ? '<span style="width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:4px;"></span>' : ''}
                                             </div>
-                                        </div>
-                                    </li>
-                                `).join('');
+                                        </a>
+                                    </li>`;
+                                }).join('');
                             }
                         }
                     })
-                    .catch(() => {}); // Silently fail — non-critical
+                    .catch(() => {});
             }
 
             document.addEventListener('DOMContentLoaded', loadNotifications);
@@ -759,7 +795,7 @@
         </script>
         {% endif %}
 
-        {# Form Validation Script #}
+        {# Form Validation — loaded before {% block javascripts %} so AjaxValidator is available #}
         <script src="{{ asset('js/form-validation.js') }}"></script>
 
         {% block javascripts %}{% endblock %}
