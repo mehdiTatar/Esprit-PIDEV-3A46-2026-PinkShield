@@ -250,17 +250,12 @@ class AppointmentController extends AbstractController
         // Analyze appointment notes for AI suggestions
         $aiSuggestions = null;
         $aiError = null;
-        if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
-            try {
-                $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
-                if ($aiResult['success'] && isset($aiResult['suggestions'])) {
-                    $aiSuggestions = $aiResult['suggestions'];
-                } else {
-                    $aiError = $aiResult['error'] ?? 'Failed to get AI suggestions';
-                }
-            } catch (\Exception $e) {
-                $aiError = 'AI analysis error: ' . $e->getMessage();
-                error_log("Appointment AI analysis error: " . $e->getMessage());
+        if ($appointment->getNotes()) {
+            $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
+            if ($aiResult['success']) {
+                $aiSuggestions = $aiResult['suggestions'];
+            } else {
+                $aiError = $aiResult['error'] ?? 'Failed to get AI suggestions';
             }
         }
 

@@ -52,20 +52,13 @@ class AppointmentController extends AbstractController
             $appointments = $appointmentRepository->findByPatient($user->getUserIdentifier());
         }
 
-        // Analyze appointments with notes for AI suggestions (only for doctors/admins)
+        // Analyze all appointments with notes for AI suggestions
         $aiSuggestions = [];
-        if ($this->isGranted('ROLE_DOCTOR') || $this->isGranted('ROLE_ADMIN')) {
-            foreach ($appointments as $appointment) {
-                if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
-                    try {
-                        $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
-                        if ($aiResult['success'] && isset($aiResult['suggestions'])) {
-                            $aiSuggestions[$appointment->getId()] = $aiResult['suggestions'];
-                        }
-                    } catch (\Exception $e) {
-                        // Silently handle AI errors - don't break the page
-                        error_log("AI analysis error for appointment {$appointment->getId()}: " . $e->getMessage());
-                    }
+        foreach ($appointments as $appointment) {
+            if ($appointment->getNotes()) {
+                $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
+                if ($aiResult['success']) {
+                    $aiSuggestions[$appointment->getId()] = $aiResult['suggestions'];
                 }
             }
         }
@@ -250,17 +243,12 @@ class AppointmentController extends AbstractController
         // Analyze appointment notes for AI suggestions
         $aiSuggestions = null;
         $aiError = null;
-        if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
-            try {
-                $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
-                if ($aiResult['success'] && isset($aiResult['suggestions'])) {
-                    $aiSuggestions = $aiResult['suggestions'];
-                } else {
-                    $aiError = $aiResult['error'] ?? 'Failed to get AI suggestions';
-                }
-            } catch (\Exception $e) {
-                $aiError = 'AI analysis error: ' . $e->getMessage();
-                error_log("Appointment AI analysis error: " . $e->getMessage());
+        if ($appointment->getNotes()) {
+            $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
+            if ($aiResult['success']) {
+                $aiSuggestions = $aiResult['suggestions'];
+            } else {
+                $aiError = $aiResult['error'] ?? 'Failed to get AI suggestions';
             }
         }
 

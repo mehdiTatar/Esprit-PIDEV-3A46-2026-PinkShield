@@ -27,17 +27,9 @@ services:
     App\EventListener\LoginCaptchaListener:
         arguments:
             $recaptchaSecretKey: '%recaptcha_secret_key%'
-
     App\Service\SmsNotificationService:
         arguments:
             $httpClient: '@http_client'
             $twilioAccountSid: '%env(TWILIO_ACCOUNT_SID)%'
             $twilioAuthToken: '%env(TWILIO_AUTH_TOKEN)%'
             $twilioPhoneNumber: '%env(TWILIO_PHONE_NUMBER)%'
-
-    App\Service\AiSymptomAnalyzerService:
-        arguments:
-            $httpClient: '@http_client'
-            $aiApiKey: '%env(AI_API_KEY)%'
-            $aiProvider: '%env(AI_PROVIDER)%'
-            $aiModel: '%env(AI_MODEL)%'

@@ -41,6 +41,7 @@
     </div>
 
     <!-- AI Suggestions Section -->
+    {% if aiSuggestions|length > 0 %}
     <div class="row mb-5">
         <div class="col-12">
             <div class="card shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
@@ -50,48 +51,43 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if aiSuggestions|length > 0 %}
-                        <p class="mb-3" style="color: rgba(255,255,255,0.9);">
-                            Based on consultation notes, here are AI-suggested parapharmacy products for your appointments:
-                        </p>
-                        <div class="row">
-                            {% for appointment in appointments %}
-                                {% if aiSuggestions[appointment.id] is defined %}
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="card" style="background: rgba(255,255,255,0.95); border: none;">
-                                        <div class="card-body">
-                                            <h6 class="card-title text-dark">
-                                                <i class="fas fa-user-md"></i> {{ appointment.doctorName }}
-                                            </h6>
-                                            <p class="card-text text-muted small mb-2">
-                                                {{ appointment.appointmentDate|date('M d, Y H:i') }}
-                                            </p>
-                                            <div class="mb-2">
-                                                {% set suggestions = aiSuggestions[appointment.id]|split(',') %}
-                                                {% for suggestion in suggestions %}
-                                                    <span class="badge bg-primary me-1 mb-1">
-                                                        <i class="fas fa-prescription-bottle-alt"></i> {{ suggestion|trim }}
-                                                    </span>
-                                                {% endfor %}
-                                            </div>
-                                            <a href="{{ path('appointment_show', {'id': appointment.id}) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-arrow-right"></i> View Details
-                                            </a>
+                    <p class="mb-3" style="color: rgba(255,255,255,0.9);">
+                        Based on consultation notes, here are AI-suggested parapharmacy products for your appointments:
+                    </p>
+                    <div class="row">
+                        {% for appointment in appointments %}
+                            {% if aiSuggestions[appointment.id] is defined %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card" style="background: rgba(255,255,255,0.95); border: none;">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-dark">
+                                            <i class="fas fa-user-md"></i> {{ appointment.doctorName }}
+                                        </h6>
+                                        <p class="card-text text-muted small mb-2">
+                                            {{ appointment.appointmentDate|date('M d, Y H:i') }}
+                                        </p>
+                                        <div class="mb-2">
+                                            {% set suggestions = aiSuggestions[appointment.id]|split(',') %}
+                                            {% for suggestion in suggestions %}
+                                                <span class="badge bg-primary me-1 mb-1">
+                                                    <i class="fas fa-prescription-bottle-alt"></i> {{ suggestion|trim }}
+                                                </span>
+                                            {% endfor %}
                                         </div>
+                                        <a href="{{ path('appointment_show', {'id': appointment.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-arrow-right"></i> View Details
+                                        </a>
                                     </div>
                                 </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p style="color: rgba(255,255,255,0.9); margin: 0;">
-                            <i class="fas fa-info-circle"></i> No AI suggestions yet. Create appointments with consultation notes to get AI-powered parapharmacy recommendations!
-                        </p>
-                    {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Appointments List Section -->
     <div class="row">

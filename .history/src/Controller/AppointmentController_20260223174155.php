@@ -21,22 +21,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use TCPDF;
-use App\Service\AppointmentMailer;
-use App\Service\SmsNotificationService;
-use App\Service\AiSymptomAnalyzerService;
+use Twig\Environment;
 
 #[Route('/appointment')]
 class AppointmentController extends AbstractController
 {
-    private SmsNotificationService $smsNotificationService;
-    private AiSymptomAnalyzerService $aiSymptomAnalyzer;
-
-    public function __construct(SmsNotificationService $smsNotificationService, AiSymptomAnalyzerService $aiSymptomAnalyzer)
-    {
-        $this->smsNotificationService = $smsNotificationService;
-        $this->aiSymptomAnalyzer = $aiSymptomAnalyzer;
-    }
-
     #[Route('/', name: 'appointment_index')]
     public function index(AppointmentRepository $appointmentRepository): Response
     {
@@ -52,27 +41,8 @@ class AppointmentController extends AbstractController
             $appointments = $appointmentRepository->findByPatient($user->getUserIdentifier());
         }
 
-        // Analyze appointments with notes for AI suggestions (only for doctors/admins)
-        $aiSuggestions = [];
-        if ($this->isGranted('ROLE_DOCTOR') || $this->isGranted('ROLE_ADMIN')) {
-            foreach ($appointments as $appointment) {
-                if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
-                    try {
-                        $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
-                        if ($aiResult['success'] && isset($aiResult['suggestions'])) {
-                            $aiSuggestions[$appointment->getId()] = $aiResult['suggestions'];
-                        }
-                    } catch (\Exception $e) {
-                        // Silently handle AI errors - don't break the page
-                        error_log("AI analysis error for appointment {$appointment->getId()}: " . $e->getMessage());
-                    }
-                }
-            }
-        }
-
         return $this->render('appointment/index.html.twig', [
             'appointments' => $appointments,
-            'aiSuggestions' => $aiSuggestions,
         ]);
     }
 
@@ -138,10 +108,8 @@ class AppointmentController extends AbstractController
         $doctors = $doctorRepository->findAll();
 
         $appointment = new Appointment();
-        $currentUser = $this->getUser();
-        $appointment->setPatientEmail($currentUser->getUserIdentifier());
-        $patientName = ($currentUser instanceof User) ? $currentUser->getFullName() : 'Patient';
-        $appointment->setPatientName($patientName);
+        $appointment->setPatientEmail($this->getUser()->getUserIdentifier());
+        $appointment->setPatientName($this->getUser() instanceof User ? $this->getUser()->getFullName() : 'Patient');
         $appointment->setStatus('pending');
 
         $form = $this->createForm(AppointmentFormType::class, $appointment);
@@ -168,21 +136,6 @@ class AppointmentController extends AbstractController
             $entityManager->persist($appointment);
             $entityManager->flush();
 
-            // Send SMS confirmation to patient
-            try {
-                $patientUser = $userRepository->findOneBy(['email' => $appointment->getPatientEmail()]);
-                if ($patientUser && $patientUser->getPhone()) {
-                    $this->smsNotificationService->sendAppointmentConfirmation(
-                        $patientUser->getPhone(),
-                        $appointment->getAppointmentDate(),
-                        $appointment->getDoctorName()
-                    );
-                }
-            } catch (\Exception $e) {
-                // Log SMS error but don't fail the appointment creation
-                error_log("SMS notification failed: " . $e->getMessage());
-            }
-
             // Create notification for all admins
             $admins = $userRepository->findByRole('ROLE_ADMIN');
             foreach ($admins as $admin) {
@@ -208,7 +161,7 @@ class AppointmentController extends AbstractController
 
     #[Route('/{id}/confirm', name: 'appointment_confirm')]
     #[IsGranted('ROLE_DOCTOR')]
-    public function confirm(Appointment $appointment, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function confirm(Appointment $appointment, EntityManagerInterface $entityManager): Response
     {
         if ($appointment->getDoctorEmail() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
@@ -216,21 +169,6 @@ class AppointmentController extends AbstractController
 
         $appointment->setStatus('confirmed');
         $entityManager->flush();
-
-        // Send SMS confirmation to patient when doctor confirms
-        try {
-            $patientUser = $userRepository->findOneBy(['email' => $appointment->getPatientEmail()]);
-            if ($patientUser && $patientUser->getPhone()) {
-                $this->smsNotificationService->sendAppointmentConfirmation(
-                    $patientUser->getPhone(),
-                    $appointment->getAppointmentDate(),
-                    $appointment->getDoctorName()
-                );
-            }
-        } catch (\Exception $e) {
-            // Log SMS error but don't fail the confirmation
-            error_log("SMS notification failed: " . $e->getMessage());
-        }
 
         $this->addFlash('success', 'Appointment confirmed.');
         return $this->redirectToRoute('appointment_index');
@@ -245,23 +183,6 @@ class AppointmentController extends AbstractController
         $userEmail = $this->getUser()->getUserIdentifier();
         if ($appointment->getPatientEmail() !== $userEmail && $appointment->getDoctorEmail() !== $userEmail && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
-        }
-
-        // Analyze appointment notes for AI suggestions
-        $aiSuggestions = null;
-        $aiError = null;
-        if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
-            try {
-                $aiResult = $this->aiSymptomAnalyzer->analyzeNotes($appointment->getNotes());
-                if ($aiResult['success'] && isset($aiResult['suggestions'])) {
-                    $aiSuggestions = $aiResult['suggestions'];
-                } else {
-                    $aiError = $aiResult['error'] ?? 'Failed to get AI suggestions';
-                }
-            } catch (\Exception $e) {
-                $aiError = 'AI analysis error: ' . $e->getMessage();
-                error_log("Appointment AI analysis error: " . $e->getMessage());
-            }
         }
 
         // Handle Parapharmacie add form (doctors/admin)
@@ -279,13 +200,11 @@ class AppointmentController extends AbstractController
         return $this->render('appointment/show.html.twig', [
             'appointment' => $appointment,
             'paraphForm' => $form->createView(),
-            'aiSuggestions' => $aiSuggestions,
-            'aiError' => $aiError,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'appointment_edit')]
-    public function edit(Appointment $appointment, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function edit(Appointment $appointment, Request $request, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $userEmail = $this->getUser()->getUserIdentifier();
@@ -298,8 +217,6 @@ class AppointmentController extends AbstractController
             $dateStr = $request->request->get('date');
             $notes = $request->request->get('notes');
             $status = $request->request->get('status');
-            $oldStatus = $appointment->getStatus();
-            
             if ($dateStr) {
                 $appointment->setAppointmentDate(new \DateTime($dateStr));
             }
@@ -308,23 +225,6 @@ class AppointmentController extends AbstractController
                 $appointment->setStatus($status);
             }
             $entityManager->flush();
-
-            // Send SMS notification if status changed to completed
-            if ($oldStatus !== 'completed' && $status === 'completed') {
-                try {
-                    $patientUser = $userRepository->findOneBy(['email' => $appointment->getPatientEmail()]);
-                    if ($patientUser && $patientUser->getPhone()) {
-                        $this->smsNotificationService->sendAppointmentCompletion(
-                            $patientUser->getPhone(),
-                            $appointment->getDoctorName()
-                        );
-                    }
-                } catch (\Exception $e) {
-                    // Log SMS error but don't fail the appointment update
-                    error_log("SMS notification failed: " . $e->getMessage());
-                }
-            }
-
             $this->addFlash('success', 'Appointment updated.');
             return $this->redirectToRoute('appointment_show', ['id' => $appointment->getId()]);
         }
@@ -354,7 +254,7 @@ class AppointmentController extends AbstractController
     }
 
     #[Route('/{id}/invoice', name: 'appointment_invoice')]
-    public function generateInvoice(Appointment $appointment): Response
+    public function generateInvoice(Appointment $appointment, Environment $twig): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $userEmail = $this->getUser()->getUserIdentifier();
@@ -405,29 +305,21 @@ class AppointmentController extends AbstractController
         $pdf->Line(15, $pdf->GetY() + 3, 195, $pdf->GetY() + 3);
         $pdf->Ln(8);
 
-        // Bill To / Service Provider - Fixed Layout
-        $startBillToY = $pdf->GetY();
-        
-        // BILL TO column
+        // Bill To / Service Provider
         $pdf->SetFont('helvetica', 'B', 11);
         $pdf->SetTextColor(0, 0, 0);
-        $pdf->SetX(15);
-        $pdf->Cell(0, 5, 'BILL TO:', 0, 1, 'L');
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetX(15);
-        $pdf->MultiCell(90, 4, "Patient:\n" . $appointment->getPatientName() . "\n\nEmail:\n" . $appointment->getPatientEmail(), 0, 'L');
-        
-        // SERVICE PROVIDER column (positioned at original Y + offset)
-        $pdf->SetY($startBillToY);
-        $pdf->SetFont('helvetica', 'B', 11);
-        $pdf->SetTextColor(0, 0, 0);
+        $pdf->MultiCell(90, 5, 'BILL TO:', 0, 'L');
+        $pdf->SetY($pdf->GetY() - 10);
         $pdf->SetX(120);
-        $pdf->Cell(0, 5, 'SERVICE PROVIDER:', 0, 1, 'R');
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->SetX(120);
-        $pdf->MultiCell(75, 4, "Doctor:\n" . $appointment->getDoctorName() . "\n\nEmail:\n" . $appointment->getDoctorEmail(), 0, 'R');
+        $pdf->MultiCell(75, 5, 'SERVICE PROVIDER:', 0, 'L');
 
-        $pdf->Ln(8);
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->MultiCell(90, 4, "Patient: " . $appointment->getPatientName() . "\nEmail: " . $appointment->getPatientEmail(), 0, 'L');
+        $pdf->SetY($pdf->GetY() - 13);
+        $pdf->SetX(120);
+        $pdf->MultiCell(75, 4, "Doctor: " . $appointment->getDoctorName() . "\nEmail: " . $appointment->getDoctorEmail(), 0, 'L');
+
+        $pdf->Ln(5);
 
         // Appointment Details
         $pdf->SetFont('helvetica', 'B', 11);
@@ -505,34 +397,6 @@ class AppointmentController extends AbstractController
                 'Content-Disposition' => 'attachment; filename="' . $invoiceNumber . '.pdf"'
             ]
         );
-    }
-
-    #[Route('/{id}/email-doctor', name: 'appointment_email_doctor', methods: ['POST'])]
-    public function emailDoctor(Request $request, Appointment $appointment, AppointmentMailer $mailer): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        // Only for completed appointments
-        if ($appointment->getStatus() !== 'completed') {
-            $this->addFlash('error', 'Email can only be sent for completed appointments.');
-            return $this->redirectToRoute('appointment_show', ['id' => $appointment->getId()]);
-        }
-
-        // CSRF validation
-        $token = $request->request->get('_csrf_token');
-        if (!$this->isCsrfTokenValid('email_doctor' . $appointment->getId(), $token)) {
-            $this->addFlash('error', 'Invalid CSRF token.');
-            return $this->redirectToRoute('appointment_show', ['id' => $appointment->getId()]);
-        }
-
-        try {
-            $mailer->sendAppointmentCompletedEmail($appointment);
-            $this->addFlash('success', 'Email sent to the doctor.');
-        } catch (\Throwable $e) {
-            $this->addFlash('error', 'Failed to send email: ' . $e->getMessage());
-        }
-
-        return $this->redirectToRoute('appointment_show', ['id' => $appointment->getId()]);
     }
 
     private function calculateTotal(Appointment $appointment): float

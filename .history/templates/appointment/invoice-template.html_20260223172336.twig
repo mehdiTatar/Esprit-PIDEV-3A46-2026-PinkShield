@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {{ invoiceNumber }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+        }
+        .company-info h1 {
+            color: #007bff;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .company-info p {
+            color: #666;
+            font-size: 12px;
+        }
+        .invoice-info {
+            text-align: right;
+        }
+        .invoice-info h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .invoice-info p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .patient-doctor-info {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .info-block {
+            flex: 1;
+        }
+        .info-block p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .info-block strong {
+            display: block;
+            margin-top: 10px;
+            color: #007bff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table thead {
+            background-color: #007bff;
+            color: white;
+        }
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #007bff;
+        }
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 40px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        .total-label {
+            width: 150px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .total-value {
+            width: 100px;
+            text-align: right;
+        }
+        .grand-total {
+            display: flex;
+            justify-content: flex-end;
+            gap: 40px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+        .grand-total-label {
+            width: 150px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 14px;
+            color: #007bff;
+        }
+        .grand-total-value {
+            width: 100px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 14px;
+            color: #007bff;
+        }
+        .appointment-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .appointment-details p {
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <h1>PinkShield</h1>
+                <p>Medical & Consulting Services</p>
+            </div>
+            <div class="invoice-info">
+                <h3>INVOICE</h3>
+                <p><strong>Invoice #:</strong> {{ invoiceNumber }}</p>
+                <p><strong>Date:</strong> {{ invoiceDate|date('M d, Y') }}</p>
+            </div>
+        </div>
+
+        <!-- Patient & Doctor Info -->
+        <div class="patient-doctor-info">
+            <div class="info-block">
+                <strong>BILL TO:</strong>
+                <p><strong>Patient:</strong> {{ appointment.patientName }}</p>
+                <p><strong>Email:</strong> {{ appointment.patientEmail }}</p>
+            </div>
+            <div class="info-block">
+                <strong>SERVICE PROVIDER:</strong>
+                <p><strong>Doctor:</strong> {{ appointment.doctorName }}</p>
+                <p><strong>Email:</strong> {{ appointment.doctorEmail }}</p>
+            </div>
+        </div>
+
+        <!-- Appointment Details -->
+        <div class="section">
+            <div class="section-title">APPOINTMENT DETAILS</div>
+            <div class="appointment-details">
+                <p><strong>Date & Time:</strong> {{ appointment.appointmentDate|date('M d, Y H:i') }}</p>
+                <p><strong>Status:</strong> <span style="text-transform: capitalize; font-weight: bold; color: {% if appointment.status == 'confirmed' %}#28a745{% elseif appointment.status == 'pending' %}#ffc107{% else %}#dc3545{% endif %};">{{ appointment.status }}</span></p>
+                {% if appointment.notes %}
+                    <p><strong>Notes:</strong> {{ appointment.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Products/Items -->
+        <div class="section">
+            <div class="section-title">PARAPHARMACIE ITEMS</div>
+            {% if appointment.parapharmacies|length > 0 %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Description</th>
+                            <th style="text-align: right;">Unit Price</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in appointment.parapharmacies %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.description|default('-') }}</td>
+                                <td style="text-align: right;">${{ item.price|number_format(2, '.', ',') }}</td>
+                                <td style="text-align: right;">${{ item.price|number_format(2, '.', ',') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-message">No parapharmacie items for this appointment.</div>
+            {% endif %}
+        </div>
+
+        <!-- Total Section -->
+        <div class="total-section">
+            <div class="grand-total">
+                <div class="grand-total-label">TOTAL AMOUNT:</div>
+                <div class="grand-total-value">${{ total|number_format(2, '.', ',') }}</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for choosing PinkShield Medical Services.</p>
+            <p>This invoice is valid and officially issued for the appointment service provided.</p>
+            <p>Generated on {{ "now"|date('M d, Y H:i') }}</p>
+        </div>
+    </div>
+</body>
+</html>
