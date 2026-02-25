@@ -8,10 +8,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
+
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_ADMIN', fields: ['email'])]
-class Admin implements UserInterface, PasswordAuthenticatedUserInterface
+class Admin implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $authCode = null;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -109,5 +113,25 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // nothing sensitive stored in plain text
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {
+        return true;
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        return (string) $this->authCode;
+    }
+
+    public function setEmailAuthCode(?string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

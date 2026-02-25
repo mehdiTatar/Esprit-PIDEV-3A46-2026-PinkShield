@@ -41,9 +41,16 @@ security:
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
+            two_factor:
+                check_path: 2fa_login_check
+                default_target_path: home
+                always_use_default_target_path: true
+                prepare_on_login: true
+                prepare_on_access_denied: true
 
     # Note: Only the *first* matching rule is applied
     access_control:
+        - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
         # Allow doctors, admins and regular users to access /doctor area per request
         - { path: ^/doctor, roles: [ROLE_DOCTOR, ROLE_ADMIN, ROLE_USER] }

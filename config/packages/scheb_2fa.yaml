@@ -1,0 +1,9 @@
+scheb_two_factor:
+    email:
+        enabled: true
+        sender_email: no-reply@pinkshield.com
+        sender_name: PinkShield Security
+        template: security/2fa_login.html.twig
+        digits: 6
+    # The persistence layer
+    persister: scheb_two_factor.persister.doctrine

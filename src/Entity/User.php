@@ -10,10 +10,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $authCode = null;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -304,5 +308,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->faceImagePath = $faceImagePath;
 
         return $this;
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {
+        return true; // Always enabled for now
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        return (string) $this->authCode;
+    }
+
+    public function setEmailAuthCode(?string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

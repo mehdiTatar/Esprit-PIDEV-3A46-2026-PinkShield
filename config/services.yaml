@@ -11,6 +11,7 @@ parameters:
     recaptcha_secret_key: '%env(RECAPTCHA_SECRET_KEY)%'
     face_api_key: '%env(FACE_API_KEY)%'
     face_api_secret: '%env(FACE_API_SECRET)%'
+    stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
 
 services:
     # default configuration for services in *this* file
