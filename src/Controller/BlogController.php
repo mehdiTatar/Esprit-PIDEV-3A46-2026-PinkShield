@@ -9,6 +9,8 @@ use App\Entity\Doctor;
 use App\Entity\User;
 use App\Repository\BlogPostRepository;
 use App\Repository\CommentRepository;
+use App\Service\CommentModerationService;
+use App\Service\EmailNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,7 +89,14 @@ class BlogController extends AbstractController
     }
 
     #[Route('/{id}', name: 'blog_show', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
-    public function show(int $id, BlogPostRepository $blogPostRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function show(
+        int $id, 
+        BlogPostRepository $blogPostRepository, 
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        CommentModerationService $commentModerationService,
+        ?EmailNotificationService $emailNotificationService = null
+    ): Response
     {
         $post = $blogPostRepository->find($id);
         if (!$post) {
@@ -97,6 +106,12 @@ class BlogController extends AbstractController
         if ($request->isMethod('POST') && $this->getUser()) {
             $commentContent = $request->request->get('comment');
             if ($commentContent) {
+                // Moderate comment using AI before saving
+                if (!$commentModerationService->isApproved($commentContent)) {
+                    $this->addFlash('error', 'Your comment was flagged as inappropriate and cannot be posted.');
+                    return $this->redirectToRoute('blog_show', ['id' => $post->getId()]);
+                }
+
                 $comment = new Comment();
                 $comment->setContent($commentContent);
                 $comment->setBlogPost($post);
@@ -112,8 +127,20 @@ class BlogController extends AbstractController
                 }
                 $comment->setAuthorName($name);
                 
+                // Check if this is a reply to an existing comment
+                $parentCommentId = $request->request->get('parent_comment_id');
+                $parentComment = null;
+                if ($parentCommentId) {
+                    $parentComment = $entityManager->getRepository(Comment::class)->find($parentCommentId);
+                }
+
                 $entityManager->persist($comment);
                 $entityManager->flush();
+                
+                // Send email notification if this is a reply and email service is available
+                if ($parentComment && $emailNotificationService && $parentComment->getAuthorEmail() !== $user->getUserIdentifier()) {
+                    $emailNotificationService->notifyCommentReply($parentComment, $comment);
+                }
                 
                 $this->addFlash('success', 'Comment added!');
                 return $this->redirectToRoute('blog_show', ['id' => $post->getId()]);

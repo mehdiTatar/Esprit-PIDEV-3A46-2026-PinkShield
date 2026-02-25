@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Moderation Test{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">🛡️ Comment Moderation Test</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Test the comment moderation service by entering text below.</p>
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="test_text" class="form-label">Enter text to test:</label>
+                            <textarea 
+                                class="form-control" 
+                                id="test_text" 
+                                name="test_text" 
+                                rows="4" 
+                                placeholder="Type a comment to test moderation..."
+                                required>{{ test_text }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Test Moderation
+                        </button>
+                    </form>
+
+                    {% if result %}
+                        <div class="mt-4">
+                            <div class="alert {{ result.approved ? 'alert-success' : 'alert-danger' }}" role="alert">
+                                <h5 class="alert-heading">
+                                    {% if result.approved %}
+                                        ✓ Approved
+                                    {% else %}
+                                        ✗ Blocked
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-0">{{ result.message }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if error %}
+                        <div class="mt-4">
+                            <div class="alert alert-warning" role="alert">
+                                <h5 class="alert-heading">⚠️ Error</h5>
+                                <p class="mb-0">{{ error }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Test Examples:</h5>
+                            <p class="mb-2"><strong>Should PASS:</strong></p>
+                            <ul class="small">
+                                <li>"This is a great article!"</li>
+                                <li>"Thanks for sharing this information"</li>
+                                <li>"I love this content"</li>
+                            </ul>
+                            <p class="mb-2 mt-3"><strong>Should FAIL:</strong></p>
+                            <ul class="small text-danger">
+                                <li>"This is fucking terrible"</li>
+                                <li>"You are stupid"</li>
+                                <li>"What a shit post"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>How it works:</h6>
+                        <ol class="small">
+                            <li><strong>Local Filter:</strong> Checks against a list of bad words (always active)</li>
+                            <li><strong>Hugging Face API:</strong> Uses AI hate speech detection if API key is configured</li>
+                            <li><strong>Fallback:</strong> If API fails, relies on local filter</li>
+                        </ol>
+                        <p class="small text-muted mt-2">
+                            <strong>Model:</strong> facebook/roberta-hate-speech-dynabench-r4-target
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{{ path('blog_index') }}" class="btn btn-secondary">
+                    ← Back to Blog
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

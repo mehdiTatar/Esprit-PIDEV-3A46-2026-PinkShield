@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Appointment Details{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Appointment Details</h3>
+            <div>
+                <a href="{{ path('appointment_edit', {'id': appointment.id}) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a href="{{ path('appointment_index') }}" class="btn btn-sm btn-secondary">Back</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p><strong>Date:</strong> {{ appointment.appointmentDate|date('M d, Y H:i') }}</p>
+            <p><strong>Patient:</strong> {{ appointment.patientName }} ({{ appointment.patientEmail }})</p>
+            <p><strong>Doctor:</strong> {{ appointment.doctorName }} ({{ appointment.doctorEmail }})</p>
+            <p><strong>Status:</strong> {{ appointment.status|capitalize }}</p>
+            <p><strong>Notes:</strong> {{ appointment.notes|default('-') }}</p>
+
+            <hr>
+            <h5>Parapharmacie Items</h5>
+            <div class="mb-3">
+                {% for item in appointment.parapharmacies is defined ? appointment.parapharmacies : [] %}
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
+                        <div>
+                            <strong>{{ item.name }}</strong>
+                            <div class="text-muted">{{ item.description }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div>{{ item.price }} USD</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-muted">No parapharmacie items.</div>
+                {% endfor %}
+            </div>
+
+            {% if is_granted('ROLE_DOCTOR') or is_granted('ROLE_ADMIN') %}
+                <hr>
+                <h5>Add Parapharmacie Item</h5>
+                {{ form_start(paraphForm) }}
+                    {{ form_row(paraphForm.name) }}
+                    {{ form_row(paraphForm.description) }}
+                    {{ form_row(paraphForm.price) }}
+                    <div class="d-grid mt-2">
+                        <button class="btn btn-primary">Add Item</button>
+                    </div>
+                {{ form_end(paraphForm) }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

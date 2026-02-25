@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ action }} Post{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0 h4">{{ action }} Blog Post</h2>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}, 'method': 'POST', 'multipart': true}) }}
+                        {{ form_row(form.title) }}
+                        {{ form_row(form.content) }}
+                        {{ form_row(form.image) }}
+                        {% if post.imagePath %}
+                            <div class="mb-3">
+                                <label class="form-label">Current image</label>
+                                <div>
+                                    <img src="{{ post.imagePath }}" alt="Current image" style="max-height: 150px; border-radius: 5px;">
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ path('blog_index') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-danger">{{ action }} Post</button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

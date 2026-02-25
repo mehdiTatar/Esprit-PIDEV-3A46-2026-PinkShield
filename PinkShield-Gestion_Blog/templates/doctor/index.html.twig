@@ -1,0 +1,79 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Doctors - PinkShield{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Doctors Management</h1>
+        <a href="{{ path('doctor_new') }}" class="btn btn-primary mb-3">Add New Doctor</a>
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Search Doctors</h5>
+        <form method="GET" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search_id" class="form-control" placeholder="Search by ID" value="{{ searchId ?? '' }}">
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="search_name" class="form-control" placeholder="Search by Name" value="{{ searchName ?? '' }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+                <a href="{{ path('doctor_index') }}" class="btn btn-secondary w-100 mt-2">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Speciality</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+                <tr>
+                    <td>{{ doctor.id }}</td>
+                    <td>{{ doctor.email }}</td>
+                    <td>{{ doctor.fullName }}</td>
+                    <td>{{ doctor.speciality }}</td>
+                    <td>
+                        <span class="badge bg-{{ doctor.status == 'active' ? 'success' : 'danger' }}">
+                            {{ doctor.status ? doctor.status|capitalize : 'Active' }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ path('doctor_show', {id: doctor.id}) }}" class="btn btn-sm btn-info">View</a>
+                        <a href="{{ path('doctor_edit', {id: doctor.id}) }}" class="btn btn-sm btn-warning">Edit</a>
+                        {% if doctor.status == 'active' %}
+                            <form action="{{ path('doctor_deactivate', {id: doctor.id}) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Deactivate this doctor?')">Deactivate</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ path('doctor_activate', {id: doctor.id}) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                            </form>
+                        {% endif %}
+                        <a href="{{ path('doctor_delete', {id: doctor.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to permanently delete this doctor?')">Delete</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">No doctors found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

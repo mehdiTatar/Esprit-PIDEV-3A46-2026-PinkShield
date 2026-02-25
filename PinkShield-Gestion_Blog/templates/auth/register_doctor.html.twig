@@ -1,0 +1,495 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Register as Doctor - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        background: white !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    aside.sidebar {
+        display: none !important;
+    }
+
+    main {
+        margin-left: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px !important;
+        padding-top: 100px !important;
+        min-height: 100vh;
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-doctor-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    .register-doctor-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        max-width: 1100px;
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .register-doctor-branding {
+        background: linear-gradient(135deg, #C41E3A 0%, #8B1428 100%);
+        color: white;
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .register-doctor-branding h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 20px 0 10px;
+        letter-spacing: -0.5px;
+    }
+
+    .register-doctor-branding p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .logo-svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+    }
+
+    .benefits {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+    }
+
+    .benefit-item i {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .register-doctor-form-wrapper {
+        padding: 50px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        max-height: auto;
+        overflow-y: visible;
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .register-doctor-form-wrapper h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-label {
+        margin-bottom: 5px !important;
+    }
+
+    .form-control, .form-select {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background-color: #f9fafb;
+        width: 100%;
+    }
+
+    .form-control::placeholder {
+        color: #d1d5db;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #C41E3A;
+        box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        outline: none;
+        background-color: white;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: #C41E3A;
+        font-size: 1rem;
+        width: 16px;
+    }
+
+    .btn-register-doctor {
+        background-color: #C41E3A;
+        border-color: #C41E3A;
+        color: white;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-top: 25px;
+        font-size: 0.95rem;
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-register-doctor:hover {
+        background-color: #8B1428;
+        border-color: #8B1428;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(196, 30, 58, 0.35);
+        text-decoration: none;
+    }
+
+    .btn-back {
+        background-color: #f3f4f6;
+        border: 2px solid #C41E3A;
+        color: #C41E3A;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 11px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.95rem;
+        width: 100%;
+        text-align: center;
+        margin-top: 12px;
+    }
+
+    .btn-back:hover {
+        background-color: #C41E3A;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    }
+
+    .login-section {
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .login-section p {
+        color: #6b7280;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+    }
+
+    .btn-login {
+        background-color: #f3f4f6;
+        border: 2px solid #C41E3A;
+        color: #C41E3A;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 11px 25px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.95rem;
+    }
+
+    .btn-login:hover {
+        background-color: #C41E3A;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    }
+
+    .alert {
+        margin-bottom: 20px;
+        border: none;
+        border-radius: 8px;
+        border-left: 4px solid #ef4444;
+        background-color: #fee2e2;
+        color: #7f1d1d;
+        padding: 12px 15px;
+    }
+
+    .alert-dismissible .btn-close {
+        padding: 0.5rem;
+    }
+
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff5f5;
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        background-color: #fff5f5;
+    }
+
+    .form-select.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        main {
+            min-height: calc(100vh - 50px);
+        }
+
+        .register-doctor-container {
+            grid-template-columns: 1fr;
+        }
+
+        .register-doctor-branding {
+            padding: 35px 25px;
+            order: 2;
+        }
+
+        .register-doctor-form-wrapper {
+            padding: 35px 25px;
+            order: 1;
+        }
+
+        .register-doctor-branding h2 {
+            font-size: 1.8rem;
+        }
+
+        .benefits {
+            display: none;
+        }
+
+        .register-doctor-wrapper {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="register-doctor-wrapper">
+    <div class="register-doctor-container">
+        <!-- Left Side - Branding -->
+        <div class="register-doctor-branding">
+            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shield shape with heart -->
+                <defs>
+                    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <!-- Outer shield -->
+                <path d="M 100 20 C 100 20 60 40 60 90 C 60 130 100 170 100 170 C 100 170 140 130 140 90 C 140 40 100 20 100 20 Z" 
+                      fill="none" stroke="#C41E3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner shield -->
+                <path d="M 100 25 C 100 25 65 42 65 90 C 65 127 100 162 100 162 C 100 162 135 127 135 90 C 135 42 100 25 100 25 Z" 
+                      fill="url(#shieldGradient)" opacity="0.8"/>
+                <!-- Heart inside shield -->
+                <path d="M 100 75 C 100 75 92 68 86 68 C 80 68 76 72 76 78 C 76 85 85 95 100 110 C 115 95 124 85 124 78 C 124 72 120 68 114 68 C 108 68 100 75 100 75 Z" 
+                      fill="white" stroke="white" stroke-width="1"/>
+            </svg>
+            <h2>PinkShield</h2>
+            <p>Medical Care Management System</p>
+            
+            <div class="benefits">
+                <div class="benefit-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure & Encrypted</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-lock"></i>
+                    <span>Privacy Protected</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-clock"></i>
+                    <span>24/7 Access</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Doctor Network</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Doctor Registration Form -->
+        <div class="register-doctor-form-wrapper">
+            <h3><i class="fas fa-stethoscope me-2"></i> Doctor Registration</h3>
+
+            {{ form_start(form) }}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><i class="fas fa-exclamation-circle me-2"></i> Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for error in form.vars.errors %}
+                                <li>{{ error.message }}</li>
+                            {% endfor %}
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.email, {'attr': {'class': form.email.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'placeholder': 'your@email.com'}}) }}
+                    {% if form.email.vars.errors|length > 0 %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.vars.errors %}
+                                <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.fullName, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.fullName, {'attr': {'class': form.fullName.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'placeholder': 'Dr. Full Name'}}) }}
+                    {% if form.fullName.vars.errors|length > 0 %}
+                        <div class="invalid-feedback">
+                            {% for error in form.fullName.vars.errors %}
+                                <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.speciality, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.speciality, {'attr': {'class': form.speciality.vars.errors|length > 0 ? 'form-select is-invalid' : 'form-select'}}) }}
+                    {% if form.speciality.vars.errors|length > 0 %}
+                        <div class="invalid-feedback">
+                            {% for error in form.speciality.vars.errors %}
+                                <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.address is defined %}
+                    <div class="form-group">
+                        {{ form_label(form.address, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.address, {'attr': {'class': form.address.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'placeholder': 'Your address (optional)'}}) }}
+                        {% if form.address.vars.errors|length > 0 %}
+                            <div class="invalid-feedback">
+                                {% for error in form.address.vars.errors %}
+                                    <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if form.phone is defined %}
+                    <div class="form-group">
+                        {{ form_label(form.phone, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.phone, {'attr': {'class': form.phone.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'placeholder': '+1 (555) 000-0000'}}) }}
+                        {% if form.phone.vars.errors|length > 0 %}
+                            <div class="invalid-feedback">
+                                {% for error in form.phone.vars.errors %}
+                                    <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    {{ form_label(form.password, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.password, {'attr': {'class': form.password.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'placeholder': 'Enter your password'}}) }}
+                    {% if form.password.vars.errors|length > 0 %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.vars.errors %}
+                                <i class="fas fa-times-circle me-1"></i>{{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-register-doctor">
+                        <i class="fas fa-user-check me-2"></i> Complete Registration
+                    </button>
+                    <a href="{{ path('register') }}" class="btn-back">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Type Selection
+                    </a>
+                </div>
+            {{ form_end(form) }}
+
+            <div class="login-section">
+                <p>Already have an account?</p>
+                <a href="{{ path('login') }}" class="btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,263 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Notifications - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .notifications-header {
+        margin-bottom: 40px;
+    }
+
+    .notifications-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .notifications-header h1 i {
+        color: var(--primary);
+    }
+
+    .notifications-header p {
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    .notification-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 100%;
+    }
+
+    .notification-item {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .notification-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+
+    .notification-item.unread {
+        background-color: rgba(196, 30, 58, 0.05);
+        border-left: 4px solid var(--primary);
+    }
+
+    .notification-icon {
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(196, 30, 58, 0.1);
+        border-radius: 8px;
+        flex-shrink: 0;
+        color: var(--primary);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 5px 0;
+    }
+
+    .notification-message {
+        color: #6b7280;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0 0 8px 0;
+    }
+
+    .notification-time {
+        font-size: 0.85rem;
+        color: #9ca3af;
+    }
+
+    .notification-type {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 10px;
+        text-transform: capitalize;
+    }
+
+    .notification-type.info {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    .notification-type.success {
+        background-color: #dcfce7;
+        color: #16a34a;
+    }
+
+    .notification-type.warning {
+        background-color: #fef3c7;
+        color: #b45309;
+    }
+
+    .notification-type.danger {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-text {
+        color: #9ca3af;
+        font-size: 1rem;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-mark-read {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-mark-read:hover {
+        background-color: #8B1428;
+    }
+
+    .btn-mark-read.disabled {
+        background-color: #d1d5db;
+        cursor: default;
+    }
+
+    @media (max-width: 768px) {
+        .notification-item {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification-actions {
+            width: 100%;
+        }
+
+        .btn-small {
+            flex: 1;
+        }
+
+        .notifications-header h1 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="notifications-header">
+    <h1><i class="fas fa-bell"></i> Notifications</h1>
+    <p>Stay updated with your latest notifications</p>
+</div>
+
+{% if notifications|length > 0 %}
+    <div class="notification-list" id="notificationsList">
+        {% for notification in notifications %}
+            <div class="notification-item {% if not notification.isRead %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="notification-icon">
+                    <i class="{{ notification.icon }}"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">
+                        {{ notification.title }}
+                        <span class="notification-type {{ notification.type }}">{{ notification.type }}</span>
+                    </h3>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">{{ notification.createdAt|date('M d, Y H:i') }}</span>
+                </div>
+                {% if not notification.isRead %}
+                    <div class="notification-actions">
+                        <button class="btn-small btn-mark-read" onclick="markAsRead(this, {{ notification.id }})">
+                            <i class="fas fa-check"></i> Mark as read
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-bell-slash"></i>
+        </div>
+        <h3 class="empty-state-title">No Notifications</h3>
+        <p class="empty-state-text">You're all caught up! You don't have any notifications at the moment.</p>
+    </div>
+{% endif %}
+
+<script>
+    function markAsRead(button, notificationId) {
+        fetch(`{{ path('notification_mark_read', {id: 0}) }}`.replace('0', notificationId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const item = button.closest('.notification-item');
+                item.classList.remove('unread');
+                button.disabled = true;
+                button.classList.add('disabled');
+                button.innerHTML = '<i class="fas fa-check-circle"></i> Read';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}
