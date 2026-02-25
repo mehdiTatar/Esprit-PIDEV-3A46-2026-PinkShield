@@ -1880,6 +1880,31 @@
         </script>
 
         {% endif %}
+        {# Global Hidden form for POST actions (Deactivate, Delete, etc.) #}
+        <form id="globalPostActionForm" method="POST" style="display:none;">
+            <input type="hidden" name="_token" id="globalPostActionToken" value="">
+        </form>
+
+        <script>
+        function postAction(url, message, csrfToken = null) {
+            if (confirm(message)) {
+                const form = document.getElementById('globalPostActionForm');
+                const tokenInput = document.getElementById('globalPostActionToken');
+                
+                form.action = url;
+                if (csrfToken) {
+                    tokenInput.value = csrfToken;
+                } else {
+                    // Fallback to meta token if available
+                    const metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) {
+                        tokenInput.value = metaToken.getAttribute('content');
+                    }
+                }
+                form.submit();
+            }
+        }
+        </script>
     </body>
 </html>
 

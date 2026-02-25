@@ -57,15 +57,14 @@
                         <a href="{{ path('doctor_show', {id: doctor.id}) }}" class="btn btn-sm btn-info">View</a>
                         <a href="{{ path('doctor_edit', {id: doctor.id}) }}" class="btn btn-sm btn-warning">Edit</a>
                         {% if doctor.status == 'active' %}
-                            <form action="{{ path('doctor_deactivate', {id: doctor.id}) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Deactivate this doctor?')">Deactivate</button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-warning"
+                                    onclick="postAction('{{ path('doctor_deactivate', {id: doctor.id}) }}', 'Deactivate this doctor?', '{{ csrf_token('deactivate' ~ doctor.id) }}')">Deactivate</button>
                         {% else %}
-                            <form action="{{ path('doctor_activate', {id: doctor.id}) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-success">Activate</button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-success"
+                                    onclick="postAction('{{ path('doctor_activate', {id: doctor.id}) }}', 'Activate this doctor?', '{{ csrf_token('activate' ~ doctor.id) }}')">Activate</button>
                         {% endif %}
-                        <a href="{{ path('doctor_delete', {id: doctor.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to permanently delete this doctor?')">Delete</a>
+                        <button type="button" class="btn btn-sm btn-danger"
+                                onclick="postAction('{{ path('doctor_delete', {id: doctor.id}) }}', 'Are you sure you want to permanently delete this doctor?', '{{ csrf_token('delete' ~ doctor.id) }}')">Delete</button>
                     </td>
                 </tr>
             {% else %}

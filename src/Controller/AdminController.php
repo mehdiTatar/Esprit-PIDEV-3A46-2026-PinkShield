@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -33,14 +34,18 @@ class AdminController extends AbstractController
     }
 
     #[Route('/health-logs', name: 'admin_health_logs')]
-    public function healthLogs(Request $request, HealthLogRepository $healthLogRepository): Response
+    public function healthLogs(Request $request, HealthLogRepository $healthLogRepository, PaginatorInterface $paginator): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $logs = $healthLogRepository->createQueryBuilder('h')
-            ->orderBy('h.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $queryBuilder = $healthLogRepository->createQueryBuilder('h')
+            ->orderBy('h.createdAt', 'DESC');
+
+        $logs = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
 
         return $this->render('dashboard/admin_health_logs.html.twig', [
             'logs' => $logs,

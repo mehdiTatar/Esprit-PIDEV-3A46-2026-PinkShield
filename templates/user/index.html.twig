@@ -291,24 +291,21 @@
                                 </a>
 
                                 {% if user.status != 'active' %}
-                                    <form method="POST" action="{{ path('user_activate', {id: user.id}) }}" style="display:inline;">
-                                        <button type="submit" class="action-btn btn-on" onclick="return confirm('Activate this account?')">
-                                            <i class="fas fa-check"></i> Activate
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn btn-on"
+                                            onclick="postAction('{{ path('user_activate', {id: user.id}) }}', 'Activate this account?', '{{ csrf_token('activate' ~ user.id) }}')">
+                                        <i class="fas fa-check"></i> Activate
+                                    </button>
                                 {% else %}
-                                    <form method="POST" action="{{ path('user_deactivate', {id: user.id}) }}" style="display:inline;">
-                                        <button type="submit" class="action-btn btn-off" onclick="return confirm('Deactivate this account?')">
-                                            <i class="fas fa-ban"></i> Deactivate
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn btn-off"
+                                            onclick="postAction('{{ path('user_deactivate', {id: user.id}) }}', 'Deactivate this account?', '{{ csrf_token('deactivate' ~ user.id) }}')">
+                                        <i class="fas fa-ban"></i> Deactivate
+                                    </button>
                                 {% endif %}
 
-                                <form method="POST" action="{{ path('user_delete', {id: user.id}) }}" style="display:inline;">
-                                    <button type="submit" class="action-btn btn-del" onclick="return confirm('Delete patient #{{ user.id }}? This cannot be undone.')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <button type="button" class="action-btn btn-del"
+                                        onclick="postAction('{{ path('user_delete', {id: user.id}) }}', 'Delete patient #{{ user.id }}? This cannot be undone.', '{{ csrf_token('delete' ~ user.id) }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>

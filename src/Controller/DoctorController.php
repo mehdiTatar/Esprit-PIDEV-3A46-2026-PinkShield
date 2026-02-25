@@ -128,7 +128,7 @@ class DoctorController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'doctor_delete')]
+    #[Route('/{id}/delete', name: 'doctor_delete', methods: ['POST'])]
     public function delete(Request $request, Doctor $doctor, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

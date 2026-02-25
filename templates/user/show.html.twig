@@ -198,21 +198,17 @@
         <div class="info-card-body" style="display:flex; gap:10px; flex-wrap:wrap;">
 
             {% if user.status != 'active' %}
-                <form method="POST" action="{{ path('user_activate', {id: user.id}) }}">
-                    <button type="submit" class="action-btn"
-                        style="padding:9px 18px; background:rgba(34,197,94,0.1); color:#16a34a; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
-                        onclick="return confirm('Activate this account?')">
-                        <i class="fas fa-check me-1"></i> Activate Account
-                    </button>
-                </form>
+                <button type="button" class="action-btn"
+                    style="padding:9px 18px; background:rgba(34,197,94,0.1); color:#16a34a; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
+                    onclick="postAction('{{ path('user_activate', {id: user.id}) }}', 'Activate this account?', '{{ csrf_token('activate' ~ user.id) }}')">
+                    <i class="fas fa-check me-1"></i> Activate Account
+                </button>
             {% else %}
-                <form method="POST" action="{{ path('user_deactivate', {id: user.id}) }}">
-                    <button type="submit"
-                        style="padding:9px 18px; background:rgba(245,158,11,0.1); color:#d97706; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
-                        onclick="return confirm('Deactivate this account?')">
-                        <i class="fas fa-ban me-1"></i> Deactivate Account
-                    </button>
-                </form>
+                <button type="button"
+                    style="padding:9px 18px; background:rgba(245,158,11,0.1); color:#d97706; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
+                    onclick="postAction('{{ path('user_deactivate', {id: user.id}) }}', 'Deactivate this account?', '{{ csrf_token('deactivate' ~ user.id) }}')">
+                    <i class="fas fa-ban me-1"></i> Deactivate Account
+                </button>
             {% endif %}
 
             <a href="{{ path('user_edit', {id: user.id}) }}"
@@ -228,12 +224,10 @@
             <h3><i class="fas fa-exclamation-triangle me-1"></i> Danger Zone</h3>
             <p>Permanently delete this patient account and all associated data. This action cannot be undone.</p>
         </div>
-        <form method="POST" action="{{ path('user_delete', {id: user.id}) }}">
-            <button type="submit" class="btn-danger-del"
-                onclick="return confirm('Permanently delete patient {{ user.firstName ?? user.email }}? This CANNOT be undone.')">
-                <i class="fas fa-trash"></i> Delete Patient
-            </button>
-        </form>
+        <button type="button" class="btn-danger-del"
+            onclick="postAction('{{ path('user_delete', {id: user.id}) }}', 'Permanently delete patient {{ user.firstName ?? user.email }}? This CANNOT be undone.', '{{ csrf_token('delete' ~ user.id) }}')">
+            <i class="fas fa-trash"></i> Delete Patient
+        </button>
     </div>
 
 </div>
