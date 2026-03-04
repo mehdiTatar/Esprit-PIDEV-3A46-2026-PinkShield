@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "ahmed-bhs/doctrine-doctor": {
         "version": "1.0",
         "recipe": {
@@ -12,8 +11,6 @@
             "./config/packages/doctrine_doctor.yaml"
         ]
     },
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
     "doctrine/deprecations": {
         "version": "1.1",
         "recipe": {
@@ -53,7 +50,6 @@
     "knplabs/knp-paginator-bundle": {
         "version": "v6.10.0"
     },
-<<<<<<< HEAD
     "phpstan/phpstan": {
         "version": "2.1",
         "recipe": {
@@ -77,8 +73,6 @@
             "./tests/bootstrap.php"
         ]
     },
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
     "scheb/2fa-bundle": {
         "version": "6.13",
         "recipe": {
@@ -92,7 +86,6 @@
             "./config/routes/scheb_2fa.yaml"
         ]
     },
-<<<<<<< HEAD
     "stripe/stripe-php": {
         "version": "19.4",
         "recipe": {
@@ -102,8 +95,6 @@
             "ref": "d6829c693e3927a8972c7671d74a1a5c505712b0"
         }
     },
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
     "symfony/console": {
         "version": "7.4",
         "recipe": {

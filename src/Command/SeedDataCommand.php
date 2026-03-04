@@ -80,12 +80,7 @@ class SeedDataCommand extends Command
             for ($i = 1; $i <= 10; $i++) {
                 $doctor = new Doctor();
                 $doctor->setEmail("doctor{$i}@pinkshield.com");
-<<<<<<< HEAD
-                $doctor->setFirstName("Doctor");
-                $doctor->setLastName(" {$i}");
-=======
                 $doctor->setFullName("Dr. Doctor {$i}");
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
                 $doctor->setSpeciality($specialties[$i - 1]);
                 $doctor->setRoles(['ROLE_DOCTOR']);
                 $doctor->setStatus('active');
@@ -112,11 +107,7 @@ class SeedDataCommand extends Command
                 $user->setFirstName("Patient");
                 $user->setLastName("User {$i}");
                 $user->setFullName("Patient User {$i}");
-<<<<<<< HEAD
                 $user->setPhone("+1-555-000-" . str_pad((string)$i, 4, '0', STR_PAD_LEFT));
-=======
-                $user->setPhone("+1-555-000-" . str_pad($i, 4, '0', STR_PAD_LEFT));
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
                 $user->setAddress("123 Main Street, City {$i}, State");
                 $user->setRoles(['ROLE_USER']);
                 $user->setStatus('active');

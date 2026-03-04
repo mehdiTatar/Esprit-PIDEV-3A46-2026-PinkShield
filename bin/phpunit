@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+if (!file_exists(dirname(__DIR__).'/vendor/autoload.php')) {
+    throw new LogicException('The bin/phpunit file can only be run after composer install.');
+}
+
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+// The PHPUnit binary is usually here
+$phpunitFile = dirname(__DIR__).'/vendor/phpunit/phpunit/phpunit';
+
+if (file_exists($phpunitFile)) {
+    // Some versions of PHPUnit need this to be the first file loaded
+    require_once $phpunitFile;
+} else {
+    fwrite(STDERR, "PHPUnit binary was not found in vendor.\nTry running 'composer install --dev'.\n");
+    exit(1);
+}

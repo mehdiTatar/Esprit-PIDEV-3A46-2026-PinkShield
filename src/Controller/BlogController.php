@@ -178,11 +178,8 @@ class BlogController extends AbstractController
 
         // Get only top-level comments (no parent) for pagination
         $queryBuilder = $commentRepository->createQueryBuilder('c')
-<<<<<<< HEAD
             ->leftJoin('c.replies', 'r')
             ->addSelect('r')
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
             ->where('c.blogPost = :post')
             ->andWhere('c.parentComment IS NULL')
             ->setParameter('post', $post)

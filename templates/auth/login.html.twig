@@ -4,671 +4,900 @@
 
 {% block stylesheets %}
 <style>
-    /* ── Override base layout for auth pages ── */
-    .navbar { position: static !important; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap');
 
-    body {
-        background: linear-gradient(135deg, #fce4ec 0%, #f8d0df 100%) !important;
-        min-height: 100vh;
-    }
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    aside.sidebar,
-    .sidebar-toggle-btn { display: none !important; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: #050d1a;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #fff;
+}
 
-    main {
-        margin-left: 0 !important;
-        margin-top: 0 !important;
-        width: 100% !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: calc(100vh - var(--navbar-height, 64px));
-        padding: 60px 24px; /* Increased vertical padding */
-        background: radial-gradient(circle at 10% 20%, rgba(192, 57, 107, 0.05) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(192, 57, 107, 0.05) 0%, transparent 40%);
-    }
+.navbar { display: none !important; }
+aside.sidebar, .sidebar-toggle-btn { display: none !important; }
+footer, .site-footer { display: none !important; }
+main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+.container-desktop { max-width: 100% !important; padding: 0 !important; }
 
-    footer, .site-footer {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
+/* ── Animated starfield background ── */
+#starfield {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 20% 50%, #0a1628 0%, #050d1a 60%, #000 100%);
+}
 
-    .container-desktop {
-        max-width: 100% !important;
-        padding: 0 !important;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        flex-grow: 1; /* Allow container to take space for centering */
-    }
+.particle {
+    position: absolute; border-radius: 50%;
+    animation: floatParticle linear infinite;
+    opacity: 0;
+}
 
-    /* ── Login card ── */
-    .login-wrapper {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding-bottom: 20px;
-        margin: auto; /* Robust centering */
-    }
+@keyframes floatParticle {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}
 
-    .login-container {
-        display: grid;
-        grid-template-columns: 1.1fr 1fr;
-        max-width: 1040px; /* Slightly reduced */
-        width: 100%;
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
-    }
+/* ── Grid lines overlay ── */
+.grid-overlay {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+        linear-gradient(rgba(192,57,107,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192,57,107,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridPulse 4s ease-in-out infinite;
+}
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+}
 
-    /* ── Branding panel ── */
-    .login-branding {
-        background: linear-gradient(145deg, var(--primary, #c0396b) 0%, #9b2553 100%);
-        color: #fff;
-        padding: 56px 48px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        min-height: 480px;
-    }
+/* ── Main layout ── */
+.login-page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+}
 
-    /* Decorative circles */
-    .login-branding::before,
-    .login-branding::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        opacity: 0.12;
-        background: #fff;
-    }
-    .login-branding::before { width: 320px; height: 320px; top: -80px; right: -80px; }
-    .login-branding::after  { width: 200px; height: 200px; bottom: -60px; left: -60px; }
+.login-layout {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 60px;
+    max-width: 1200px;
+    width: 100%;
+    align-items: center;
+}
 
-    .login-branding > * { position: relative; z-index: 1; }
+/* ── Hero / SVG side ── */
+.hero-side {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+}
 
-    .logo-svg {
-        width: 90px;
-        height: 90px;
-        margin-bottom: 24px;
-        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
-    }
+.brand-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff4b8d, #c0396b, #ff6ba8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(192,57,107,0.6)); }
+    50%       { filter: drop-shadow(0 0 28px rgba(255,75,141,0.9)); }
+}
 
-    .login-branding h2 {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin: 0 0 8px;
-        letter-spacing: -0.5px;
-    }
+.brand-tagline {
+    font-size: 1rem; color: #7ca3c8; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 40px;
+    animation: fadeSlideUp 1s ease 0.3s both;
+}
 
-    .login-branding .tagline {
-        font-size: 1rem;
-        opacity: 0.88;
-        margin: 0 0 40px;
-    }
+/* ── Animated Heart SVG Container ── */
+.heart-container {
+    position: relative;
+    width: 420px; height: 420px;
+    animation: floatHeart 6s ease-in-out infinite;
+}
+@keyframes floatHeart {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    25%       { transform: translateY(-18px) rotate(1deg); }
+    75%       { transform: translateY(10px) rotate(-3deg); }
+}
 
-    .benefits {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        width: 100%;
-        text-align: left;
-    }
+/* Orbiting rings */
+.orbit-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(192,57,107,0.25);
+    top: 50%; left: 50%;
+    transform-origin: center center;
+}
+.orbit-ring-1 { width: 380px; height: 380px; margin: -190px 0 0 -190px; animation: orbitSpin 12s linear infinite; }
+.orbit-ring-2 { width: 460px; height: 460px; margin: -230px 0 0 -230px; animation: orbitSpin 20s linear infinite reverse; border-color: rgba(100,200,255,0.15); border-style: dashed; }
+.orbit-ring-3 { width: 320px; height: 320px; margin: -160px 0 0 -160px; animation: orbitSpin 8s linear infinite; border-color: rgba(192,57,107,0.15); }
 
-    .benefit-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 0.92rem;
-        background: rgba(255,255,255,0.12);
-        padding: 10px 14px;
-        border-radius: 10px;
-        backdrop-filter: blur(4px);
-    }
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
 
-    .benefit-item i { font-size: 1.1rem; flex-shrink: 0; }
+/* Orbiting dots */
+.orbit-dot {
+    position: absolute; border-radius: 50%;
+    top: 50%; left: 50%;
+    transform-origin: 0 0;
+}
+.orbit-dot::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #c0396b;
+    box-shadow: 0 0 14px #ff4b8d;
+    top: -5px; left: -5px;
+}
+.orbit-dot-1 { animation: dotOrbit1 5s linear infinite; }
+.orbit-dot-2 { animation: dotOrbit2 8s linear infinite; }
+.orbit-dot-2::after { background: #64c8ff; box-shadow: 0 0 14px #64c8ff; width: 7px; height: 7px; }
 
-    /* ── Form panel ── */
-    .login-form-wrapper {
-        padding: 56px 48px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start; /* Consistent flow */
-    }
+@keyframes dotOrbit1 {
+    from { transform: rotate(0deg) translateX(190px); }
+    to   { transform: rotate(360deg) translateX(190px); }
+}
+@keyframes dotOrbit2 {
+    from { transform: rotate(90deg) translateX(230px); }
+    to   { transform: rotate(450deg) translateX(230px); }
+}
 
-    .login-form-wrapper h3 {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--text-dark, #1a2332);
-        margin-bottom: 6px;
-    }
+/* ── The actual SVG heart ── */
+.heart-svg-wrap {
+    position: absolute;
+    inset: 0; display: flex; align-items: center; justify-content: center;
+}
+#heartSvg {
+    width: 280px; height: 280px;
+    filter: drop-shadow(0 0 30px rgba(192,57,107,0.7)) drop-shadow(0 0 60px rgba(255,75,141,0.4));
+}
 
-    .login-form-wrapper .subtitle {
-        color: var(--text-gray, #6b7280);
-        font-size: 0.9rem;
-        margin-bottom: 28px;
-    }
+/* Heart beat animation */
+.heart-main {
+    animation: heartBeat 1.2s ease-in-out infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes heartBeat {
+    0%   { transform: scale(1); }
+    14%  { transform: scale(1.08); }
+    28%  { transform: scale(1); }
+    42%  { transform: scale(1.05); }
+    70%  { transform: scale(1); }
+    100% { transform: scale(1); }
+}
 
-    /* ── Form fields ── */
-    .form-group { margin-bottom: 16px; }
+/* Vein pulse */
+.vein-path {
+    stroke-dashoffset: 0;
+    animation: veinFlow 2s ease-in-out infinite;
+}
+@keyframes veinFlow {
+    0%   { opacity: 0.4; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.4; }
+}
 
-    .form-label {
-        font-weight: 600;
-        color: var(--text-dark, #1a2332);
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 0.88rem;
-    }
+/* EKG line */
+.ekg-container {
+    position: absolute;
+    bottom: -20px; left: 50%; transform: translateX(-50%);
+    width: 340px;
+}
+.ekg-svg { width: 100%; height: 60px; }
+.ekg-path {
+    stroke-dasharray: 800;
+    stroke-dashoffset: 800;
+    animation: ekgDraw 2s ease-in-out infinite;
+}
+@keyframes ekgDraw {
+    0%   { stroke-dashoffset: 800; opacity: 0; }
+    10%  { opacity: 1; }
+    60%  { stroke-dashoffset: 0; }
+    90%  { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+}
 
-    .form-label i { color: var(--primary, #c0396b); font-size: 0.9rem; width: 14px; }
+/* Floating health pills */
+.floating-pills {
+    position: absolute; inset: 0; pointer-events: none;
+}
+.pill {
+    position: absolute;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(192,57,107,0.3);
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #c0396b;
+    display: flex; align-items: center; gap: 6px;
+    backdrop-filter: blur(8px);
+    animation: pillFloat linear infinite;
+    white-space: nowrap;
+}
+.pill i { font-size: 0.8rem; }
 
-    .form-control {
-        border: 1.5px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 11px 14px;
-        font-size: 0.93rem;
-        transition: all 0.2s ease;
-        background: #f9fafb;
-        width: 100%;
-    }
+.pill-1 { top: 10%; left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
+.pill-2 { top: 20%; right: 0%; animation-duration: 9s;  animation-delay: 1s; }
+.pill-3 { top: 70%; left: 0%;  animation-duration: 8s;  animation-delay: 2s; }
+.pill-4 { top: 80%; right: 5%; animation-duration: 10s; animation-delay: 0.5s; }
+.pill-5 { top: 50%; left: -2%; animation-duration: 6s;  animation-delay: 3s; }
 
-    .form-control::placeholder { color: #c4c9d4; }
+@keyframes pillFloat {
+    0%   { transform: translateY(0) rotate(-2deg); }
+    33%  { transform: translateY(-12px) rotate(2deg); }
+    66%  { transform: translateY(6px) rotate(-1deg); }
+    100% { transform: translateY(0) rotate(-2deg); }
+}
 
-    .form-control:hover { border-color: #f3c6d8; }
+/* ── Form side ── */
+.form-side {
+    position: relative;
+    animation: fadeSlideUp 0.8s ease 0.2s both;
+}
 
-    .form-control:focus {
-        border-color: var(--primary, #c0396b);
-        box-shadow: 0 0 0 3px rgba(192, 57, 107, 0.12);
-        outline: none;
-        background: #fff;
-    }
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 
-    .form-control.is-invalid {
-        border-color: #dc3545;
-        background: #fff5f5;
-    }
+.glass-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(192,57,107,0.2);
+    border-radius: 28px;
+    padding: 48px 44px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+        0 0 0 1px rgba(192,57,107,0.1),
+        0 30px 80px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative; overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 0 0 1px rgba(192,57,107,0.25),
+        0 40px 100px rgba(0,0,0,0.6),
+        0 0 60px rgba(192,57,107,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
-    /* ── Remember me ── */
-    .remember-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 18px 0 6px;
-    }
+/* Glow corners */
+.glass-card::before {
+    content: '';
+    position: absolute; top: -1px; left: -1px; right: -1px; height: 1px;
+    background: linear-gradient(90deg, transparent, #c0396b, transparent);
+    animation: borderGlow 3s ease-in-out infinite;
+}
+@keyframes borderGlow {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+}
 
-    .remember-row label {
-        color: var(--text-gray, #6b7280);
-        font-size: 0.88rem;
-        font-weight: 500;
-        cursor: pointer;
-        margin: 0 0 0 7px;
-    }
+.card-header-row {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 8px;
+}
+.card-icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: linear-gradient(135deg, #c0396b, #9b2553);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #fff;
+    box-shadow: 0 8px 20px rgba(192,57,107,0.4);
+    animation: iconPulse 2s ease-in-out infinite;
+}
+@keyframes iconPulse {
+    0%, 100% { box-shadow: 0 8px 20px rgba(192,57,107,0.4); }
+    50%       { box-shadow: 0 8px 32px rgba(192,57,107,0.7); }
+}
 
-    .remember-row input { accent-color: var(--primary, #c0396b); cursor: pointer; }
+.card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    background: linear-gradient(135deg, #fff, #f3a0c0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.card-subtitle {
+    color: #526a82; font-size: 0.85rem;
+    margin-bottom: 34px; letter-spacing: 0.3px;
+}
 
-    .forgot-link {
-        font-size: 0.85rem;
-        color: var(--primary, #c0396b);
-        text-decoration: none;
-        font-weight: 600;
-    }
+/* Status line */
+.status-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px; padding: 10px 14px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+}
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: statusBlink 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+.status-text { font-size: 0.78rem; color: #10b981; font-weight: 500; }
 
-    .forgot-link:hover { text-decoration: underline; }
+/* ── Alert ── */
+.alert-danger-custom {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(220,53,69,0.08);
+    border: 1px solid rgba(220,53,69,0.3);
+    border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 24px; color: #ff6b6b; font-size: 0.85rem;
+}
+.alert-dismiss {
+    margin-left: auto; background: none; border: none;
+    color: #ff6b6b; cursor: pointer; font-size: 1rem; opacity: 0.7;
+}
+.alert-dismiss:hover { opacity: 1; }
 
-    /* ── Submit button ── */
-    .btn-login {
-        background: linear-gradient(135deg, var(--primary, #c0396b) 0%, #e8557a 100%);
-        border: none;
-        color: #fff;
-        font-weight: 700;
-        padding: 13px 24px;
-        border-radius: 10px;
-        transition: all 0.25s ease;
-        margin-top: 18px;
-        font-size: 0.95rem;
-        width: 100%;
-        cursor: pointer;
-        letter-spacing: 0.2px;
-    }
+/* ── Form fields ── */
+.field-group { margin-bottom: 18px; position: relative; }
 
-    .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(192, 57, 107, 0.35);
-        filter: brightness(1.05);
-    }
+.field-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 600;
+    color: #7ca3c8; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+.field-label i { color: #c0396b; font-size: 0.75rem; }
 
-    .btn-login:active { transform: translateY(0); }
+.field-input-wrap { position: relative; }
 
-    /* ── Register section ── */
-    .register-section {
-        margin-top: 28px;
-        padding-top: 22px;
-        border-top: 1px solid #e5e7eb;
-        text-align: center;
-    }
+.field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 48px 14px 18px;
+    font-size: 0.92rem; color: #fff;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+}
+.field-input::placeholder { color: rgba(255,255,255,0.2); }
+.field-input:hover { border-color: rgba(192,57,107,0.3); background: rgba(255,255,255,0.04); }
+.field-input:focus {
+    border-color: #c0396b;
+    background: rgba(192,57,107,0.05);
+    box-shadow: 0 0 0 3px rgba(192,57,107,0.12), 0 0 20px rgba(192,57,107,0.08);
+}
+.field-input.is-invalid { border-color: #ff4444; }
 
-    .register-section p {
-        color: var(--text-gray, #6b7280);
-        margin-bottom: 12px;
-        font-size: 0.9rem;
-    }
+.field-icon {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.2); font-size: 0.9rem; pointer-events: none;
+    transition: color 0.3s ease;
+}
+.field-input:focus ~ .field-icon { color: #c0396b; }
 
-    .btn-register {
-        background: transparent;
-        border: 2px solid var(--primary, #c0396b);
-        color: var(--primary, #c0396b);
-        text-decoration: none;
-        font-weight: 700;
-        padding: 10px 24px;
-        border-radius: 10px;
-        transition: all 0.25s ease;
-        display: inline-block;
-        font-size: 0.9rem;
-    }
+.toggle-pw {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(255,255,255,0.2);
+    cursor: pointer; font-size: 0.9rem; padding: 0;
+    transition: color 0.3s ease;
+}
+.toggle-pw:hover { color: #c0396b; }
 
-    .btn-register:hover {
-        background: var(--primary, #c0396b);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(192, 57, 107, 0.3);
-    }
+/* Captcha wrapper */
+.captcha-wrap {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; justify-content: center;
+}
 
-    /* ── Alert ── */
-    .alert {
-        margin-bottom: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #ef4444;
-    }
+/* ── Actions row ── */
+.actions-row {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin: 4px 0 24px;
+}
+.forgot-link {
+    font-size: 0.82rem; color: #c0396b; font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.forgot-link:hover { color: #ff6ba8; text-shadow: 0 0 12px rgba(255,107,168,0.5); }
 
-    /* ── CAPTCHA ── */
-    .captcha-wrapper {
-        background: #f9fafb;
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid #e5e7eb;
-    }
+/* ── Submit button ── */
+.btn-signin {
+    width: 100%;
+    background: linear-gradient(135deg, #c0396b 0%, #9b2553 60%, #c0396b 100%);
+    background-size: 200% 100%;
+    border: none; border-radius: 14px;
+    color: #fff; font-size: 1rem; font-weight: 700;
+    padding: 16px 24px;
+    cursor: pointer; letter-spacing: 0.5px;
+    font-family: 'Inter', sans-serif;
+    position: relative; overflow: hidden;
+    transition: all 0.35s ease;
+    box-shadow: 0 8px 28px rgba(192,57,107,0.4);
+}
+.btn-signin:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(192,57,107,0.55);
+}
+.btn-signin:active { transform: translateY(0); }
 
-    .g-recaptcha { display: flex; justify-content: center; }
-    .g-recaptcha iframe { max-width: 100%; transform: scale(0.9); transform-origin: center; }
+/* Shimmer on button */
+.btn-signin::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+    background-size: 200% 100%;
+    animation: btnShimmer 2.5s ease infinite;
+}
+@keyframes btnShimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
 
-    /* ── OR divider ── */
-    .or-divider {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 22px 0 18px;
-        color: #9ca3af;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-    }
-    .or-divider::before, .or-divider::after {
-        content: ''; flex: 1;
-        height: 1px; background: #e5e7eb;
-    }
+/* ── OR divider ── */
+.or-divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 24px 0 20px;
+    color: rgba(255,255,255,0.2); font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+.or-divider::before, .or-divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,57,107,0.2), transparent);
+}
 
-    /* ── Face login panel ── */
-    .face-login-section {
-        background: linear-gradient(135deg, #fffafa 0%, #fff0f5 100%);
-        border: 2px dashed #f3c6d8;
-        border-radius: 16px;
-        padding: 24px;
-        margin-top: 10px;
-        position: relative;
-    }
+/* ── Face login section ── */
+.face-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(192,57,107,0.15);
+    border-radius: 18px; padding: 20px;
+    position: relative; overflow: hidden;
+}
+.face-section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,57,107,0.5), transparent);
+}
+.face-header {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.88rem; font-weight: 700; color: #c0396b;
+    margin-bottom: 16px;
+}
+.face-badge {
+    margin-left: auto;
+    background: rgba(192,57,107,0.15);
+    border: 1px solid rgba(192,57,107,0.3);
+    color: #ff6ba8; font-size: 0.62rem; font-weight: 800;
+    padding: 3px 10px; border-radius: 30px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.face-preview-row { display: flex; gap: 14px; }
 
-    .face-login-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--primary, #c0396b);
-        margin-bottom: 18px;
-    }
-    .face-login-header i { font-size: 1.2rem; }
-    
-    .face-badge {
-        background: #c0396b;
-        color: #fff;
-        font-size: 0.65rem;
-        font-weight: 800;
-        padding: 3px 10px;
-        border-radius: 30px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-left: auto;
-    }
+.webcam-box {
+    flex: 1; border-radius: 12px; overflow: hidden;
+    background: #000; aspect-ratio: 4/3;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+}
+#loginWebcamVideo, #loginCapturedCanvas {
+    width: 100%; display: block; object-fit: cover;
+}
+#loginCapturedCanvas { display: none; }
 
-    .face-preview-row {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-    
-    @media (min-width: 500px) {
-        .face-preview-row { flex-direction: row; align-items: flex-start; }
-    }
+.face-controls { display: flex; flex-direction: column; gap: 8px; width: 130px; flex-shrink: 0; }
 
-    .webcam-box { 
-        flex: 1; 
-        min-width: 0;
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        background: #000;
-    }
+.btn-face {
+    padding: 9px 12px; border-radius: 10px; border: none;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s ease; width: 100%; font-family: 'Inter', sans-serif;
+}
+.btn-face-open    { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+.btn-face-open:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+.btn-face-capture { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.btn-face-capture:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-face-capture:not(:disabled):hover { background: rgba(34,197,94,0.25); transform: translateY(-1px); }
+.btn-face-retake  { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.btn-face-retake:hover { background: rgba(245,158,11,0.25); }
+.btn-face-upload  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
+.btn-face-upload:hover { border-color: rgba(192,57,107,0.4); color: #c0396b; }
 
-    #loginWebcamVideo, #loginCapturedCanvas {
-        width: 100%;
-        display: block;
-        max-height: 200px;
-        object-fit: cover;
-        aspect-ratio: 4/3;
-    }
-    #loginCapturedCanvas { display: none; }
+.face-feedback {
+    margin-top: 12px; font-size: 0.8rem; font-weight: 600;
+    padding: 10px 14px; border-radius: 10px; display: none;
+    animation: fadeSlideUp 0.3s ease;
+}
+.face-feedback.captured { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.face-feedback.scanning { display: flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.1); color: #60a5fa; border: 1px solid rgba(37,99,235,0.2); }
+.face-feedback.error    { display: flex; align-items: center; gap: 8px; background: rgba(220,53,69,0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.2); }
+.face-feedback.success  { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
 
-    .face-controls-col {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-    }
-    
-    @media (min-width: 500px) {
-        .face-controls-col { width: 160px; flex-shrink: 0; }
-    }
+.btn-face-login {
+    width: 100%; margin-top: 14px; padding: 13px;
+    background: linear-gradient(135deg, rgba(192,57,107,0.2), rgba(155,37,83,0.2));
+    color: #ff6ba8; border: 1px solid rgba(192,57,107,0.3); border-radius: 12px;
+    font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+}
+.btn-face-login:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(192,57,107,0.35), rgba(155,37,83,0.35));
+    box-shadow: 0 8px 24px rgba(192,57,107,0.3);
+    transform: translateY(-2px);
+}
+.btn-face-login:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    .btn-face {
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: none;
-        font-size: 0.85rem;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.2s ease;
-        width: 100%;
-    }
-    
-    .btn-face-open    { background: #1e1b34; color: #fff; }
-    .btn-face-open:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,27,52,0.3); }
-    .btn-face-capture { background: #22c55e; color: #fff; }
-    .btn-face-capture:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
-    .btn-face-capture:not(:disabled):hover { background: #16a34a; transform: translateY(-1px); }
-    .btn-face-retake  { background: #f59e0b; color: #fff; }
-    .btn-face-retake:hover { background: #d97706; }
-    .btn-face-upload  { background: #fff; color: #4b5563; border: 1.5px solid #e5e7eb; }
-    .btn-face-upload:hover { border-color: var(--primary,#c0396b); color: var(--primary,#c0396b); }
+/* ── Register section ── */
+.register-row {
+    margin-top: 28px; text-align: center;
+    font-size: 0.85rem; color: rgba(255,255,255,0.3);
+}
+.register-row a {
+    color: #c0396b; font-weight: 700; text-decoration: none;
+    margin-left: 6px; transition: all 0.2s ease;
+}
+.register-row a:hover { color: #ff6ba8; text-shadow: 0 0 10px rgba(255,107,168,0.4); }
 
-    .btn-face-login {
-        width: 100%;
-        margin-top: 18px;
-        padding: 14px;
-        background: linear-gradient(135deg, var(--primary, #c0396b), #9b2553);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 800;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    .btn-face-login:hover:not(:disabled) {
-        transform: scale(1.02);
-        box-shadow: 0 10px 25px rgba(192,57,107,0.4);
-    }
-    .btn-face-login:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+/* ── AJAX error ── */
+.ajax-error { display: none; color: #ff6b6b; font-size: 0.78rem; margin-top: 5px; font-weight: 500; }
+.ajax-error.d-block { display: block !important; }
+.invalid-feedback { display: none !important; }
 
-    .face-feedback {
-        margin-top: 12px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        padding: 10px 14px;
-        border-radius: 10px;
-        display: none;
-        animation: fadeUp 0.3s ease;
-    }
-    .face-feedback.captured  { display: flex; align-items: center; gap: 8px; background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
-    .face-feedback.scanning  { display: flex; align-items: center; gap: 8px; background: #eff6ff; color: #2563eb; border: 1px solid #3b82f6; }
-    .face-feedback.error     { display: flex; align-items: center; gap: 8px; background: #fef2f2; color: #dc2626; border: 1px solid #ef4444; }
-    .face-feedback.success   { display: flex; align-items: center; gap: 8px; background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
-
-    /* ── Animations ── */
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(16px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-form-wrapper h3,
-    .login-form-wrapper .subtitle { animation: fadeUp 0.5s ease both; }
-    .form-group:nth-child(1) { animation: fadeUp 0.5s ease 0.08s both; }
-    .form-group:nth-child(2) { animation: fadeUp 0.5s ease 0.16s both; }
-    .form-group:nth-child(3) { animation: fadeUp 0.5s ease 0.24s both; }
-    .remember-row            { animation: fadeUp 0.5s ease 0.32s both; }
-    .btn-login               { animation: fadeUp 0.5s ease 0.38s both; }
-    .register-section        { animation: fadeUp 0.5s ease 0.44s both; }
-
-    /* ── Responsive ── */
-    @media (max-width: 991px) {
-        .login-container { max-width: 500px; grid-template-columns: 1fr; }
-        .login-branding { min-height: 200px; padding: 40px 30px; }
-        .benefits { display: none; }
-    }
-
-    @media (max-width: 576px) {
-        main { padding: 24px 15px; }
-        .login-form-wrapper { padding: 40px 24px; }
-        .login-branding h2 { font-size: 1.8rem; }
-    }
-
-    /* Error messages via AJAX only */
-    .invalid-feedback { display: none !important; }
-
-    .ajax-error {
-        display: none;
-        color: #dc3545;
-        font-size: 0.82rem;
-        margin-top: 5px;
-        font-weight: 500;
-    }
-
-    .ajax-error.d-block { display: block !important; }
-
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .login-layout { grid-template-columns: 1fr; }
+    .hero-side { display: none; }
+    .glass-card { padding: 36px 28px; }
+}
+@media (max-width: 480px) {
+    .glass-card { padding: 28px 20px; border-radius: 20px; }
+    .card-title { font-size: 1.25rem; }
+    .face-preview-row { flex-direction: column; }
+    .face-controls { width: 100%; flex-direction: row; flex-wrap: wrap; }
+    .btn-face { width: calc(50% - 4px); }
+}
 </style>
 {% endblock %}
 
 {% block body %}
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-<div class="login-wrapper">
-    <div class="login-container">
+<!-- Background -->
+<div id="starfield"></div>
+<div class="grid-overlay"></div>
 
-        {# ── Left: Branding ── #}
-        <div class="login-branding">
-            <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <defs>
-                    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%"   style="stop-color:#ffffff;stop-opacity:0.95"/>
-                        <stop offset="100%" style="stop-color:#fce4ec;stop-opacity:0.95"/>
-                    </linearGradient>
-                </defs>
-                <path d="M100 20 C100 20 60 40 60 90 C60 130 100 170 100 170 C100 170 140 130 140 90 C140 40 100 20 100 20Z"
-                      fill="url(#shieldGrad)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
-                <path d="M100 75 C100 75 92 68 86 68 C80 68 76 72 76 78 C76 85 85 95 100 110 C115 95 124 85 124 78 C124 72 120 68 114 68 C108 68 100 75 100 75Z"
-                      fill="#e8557a"/>
-            </svg>
+<div class="login-page">
+    <div class="login-layout">
 
-            <h2>PinkShield</h2>
-            <p class="tagline">Your Wellness Journey Starts Here</p>
+        <!-- ── LEFT: Animated Hero ── -->
+        <div class="hero-side" data-aos="fade-right">
+            <div class="brand-title">PinkShield</div>
+            <p class="brand-tagline">Advanced Health Intelligence</p>
 
-            <div class="benefits">
-                <div class="benefit-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Secure &amp; Encrypted Data</span>
+            <div class="heart-container">
+                <!-- Orbit rings -->
+                <div class="orbit-ring orbit-ring-1"></div>
+                <div class="orbit-ring orbit-ring-2"></div>
+                <div class="orbit-ring orbit-ring-3"></div>
+
+                <!-- Orbiting energy dots -->
+                <div class="orbit-dot orbit-dot-1"></div>
+                <div class="orbit-dot orbit-dot-2"></div>
+
+                <!-- Heart SVG -->
+                <div class="heart-svg-wrap">
+                    <svg id="heartSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="heartGrad" cx="40%" cy="35%" r="65%">
+                                <stop offset="0%"   stop-color="#ff6ba8"/>
+                                <stop offset="45%"  stop-color="#c0396b"/>
+                                <stop offset="100%" stop-color="#7b1137"/>
+                            </radialGradient>
+                            <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%"   stop-color="#ff4b8d" stop-opacity="0.6"/>
+                                <stop offset="100%" stop-color="#c0396b" stop-opacity="0"/>
+                            </radialGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="softGlow">
+                                <feGaussianBlur stdDeviation="6" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Glow halo -->
+                        <ellipse cx="100" cy="105" rx="70" ry="60" fill="url(#heartGlow)" opacity="0.5"/>
+
+                        <!-- Main heart shape -->
+                        <g class="heart-main" filter="url(#glow)">
+                            <path d="M100 160
+                                     C100 160 35 115 35 72
+                                     C35 50 50 38 65 38
+                                     C78 38 90 47 100 60
+                                     C110 47 122 38 135 38
+                                     C150 38 165 50 165 72
+                                     C165 115 100 160 100 160Z"
+                                  fill="url(#heartGrad)" />
+
+                            <!-- Highlight -->
+                            <path d="M68 50 C62 60 60 72 64 82 C67 68 74 58 84 52 C78 50 73 50 68 50Z"
+                                  fill="rgba(255,255,255,0.18)" />
+                        </g>
+
+                        <!-- Veins / arteries on left -->
+                        <g filter="url(#glow)">
+                            <!-- Aorta up -->
+                            <path class="vein-path" d="M100 38 C100 38 102 20 108 12 C114 4 118 2 122 6"
+                                  stroke="#ff6ba8" stroke-width="3.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0s"/>
+                            <!-- Left branch from aorta -->
+                            <path class="vein-path" d="M106 22 C100 18 90 16 82 18 C74 20 68 26 66 34"
+                                  stroke="#ff4b8d" stroke-width="2.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.2s"/>
+                            <!-- Right branch -->
+                            <path class="vein-path" d="M110 16 C116 14 124 14 130 18 C136 22 138 28 136 36"
+                                  stroke="#ff4b8d" stroke-width="2.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.3s"/>
+                            <!-- Pulmonary left -->
+                            <path class="vein-path" d="M60 55 C48 50 38 46 28 48 C18 50 12 56 14 64 C16 70 24 72 32 70"
+                                  stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.4s"/>
+                            <!-- Pulmonary right -->
+                            <path class="vein-path" d="M140 55 C152 50 162 46 172 48 C182 50 188 56 186 64 C184 70 176 72 168 70"
+                                  stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.5s"/>
+                            <!-- Bottom vena cava -->
+                            <path class="vein-path" d="M95 158 C90 168 88 178 90 186 C92 192 96 196 100 196"
+                                  stroke="#60a5fa" stroke-width="3" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.1s"/>
+                            <!-- Left side vessel -->
+                            <path class="vein-path" d="M44 100 C30 105 18 112 12 122 C8 130 10 138 18 142"
+                                  stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.6s"/>
+                            <!-- Right side vessel -->
+                            <path class="vein-path" d="M156 100 C170 105 182 112 188 122 C192 130 190 138 182 142"
+                                  stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.7s"/>
+
+                            <!-- Blood flow particles on aorta -->
+                            <circle r="3" fill="#ff6ba8" opacity="0.9">
+                                <animateMotion dur="1.5s" repeatCount="indefinite"
+                                    path="M100 38 C100 38 102 20 108 12 C114 4 118 2 122 6"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle r="2.5" fill="#60a5fa" opacity="0.9">
+                                <animateMotion dur="2s" repeatCount="indefinite"
+                                    path="M95 158 C90 168 88 178 90 186 C92 192 96 196 100 196"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle r="2" fill="#c084fc" opacity="0.9">
+                                <animateMotion dur="2.5s" repeatCount="indefinite"
+                                    path="M60 55 C48 50 38 46 28 48 C18 50 12 56 14 64 C16 70 24 72 32 70"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite"/>
+                            </circle>
+                        </g>
+                    </svg>
                 </div>
-                <div class="benefit-item">
-                    <i class="fas fa-user-md"></i>
-                    <span>Expert Medical Support</span>
+
+                <!-- EKG / heartbeat line below heart -->
+                <div class="ekg-container">
+                    <svg class="ekg-svg" viewBox="0 0 340 60" xmlns="http://www.w3.org/2000/svg">
+                        <path class="ekg-path"
+                              d="M0 30 L60 30 L70 30 L82 5 L90 55 L98 15 L106 30 L200 30 L210 30 L222 5 L230 55 L238 15 L246 30 L340 30"
+                              stroke="#c0396b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Glow duplicate -->
+                        <path d="M0 30 L60 30 L70 30 L82 5 L90 55 L98 15 L106 30 L200 30 L210 30 L222 5 L230 55 L238 15 L246 30 L340 30"
+                              stroke="#ff4b8d" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.2"/>
+                    </svg>
                 </div>
-                <div class="benefit-item">
-                    <i class="fas fa-clock"></i>
-                    <span>24/7 Access to Your Records</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-heartbeat"></i>
-                    <span>Personalised Health Tracking</span>
+
+                <!-- Floating health pills -->
+                <div class="floating-pills">
+                    <div class="pill pill-1"><i class="fas fa-heartbeat"></i> 72 BPM</div>
+                    <div class="pill pill-2"><i class="fas fa-tint"></i> O₂ 98%</div>
+                    <div class="pill pill-3"><i class="fas fa-thermometer-half"></i> 36.8°C</div>
+                    <div class="pill pill-4"><i class="fas fa-brain"></i>  AI Active</div>
+                    <div class="pill pill-5"><i class="fas fa-shield-alt"></i> Protected</div>
                 </div>
             </div>
         </div>
 
-        {# ── Right: Login Form ── #}
-        <div class="login-form-wrapper">
-            <h3>Welcome Back</h3>
-            <p class="subtitle">Sign in to access your health dashboard</p>
+        <!-- ── RIGHT: Login Form ── -->
+        <div class="form-side">
+            <div class="glass-card">
 
-            {% if error %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <strong>Login failed.</strong> {{ error.messageKey|trans(error.messageData, 'security') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-
-            <form method="post" name="login" novalidate id="loginForm">
-                <div class="form-group">
-                    <label for="inputUsername" class="form-label">
-                        <i class="fas fa-envelope"></i> Email Address
-                    </label>
-                    <input type="email"
-                           name="_username"
-                           id="inputUsername"
-                           class="form-control"
-                           value="{{ last_username }}"
-                           placeholder="your@email.com"
-                           autocomplete="email"
-                           data-ajax-validate="email"
-                           required>
-                </div>
-
-                <div class="form-group">
-                    <label for="inputPassword" class="form-label">
-                        <i class="fas fa-lock"></i> Password
-                    </label>
-                    <input type="password"
-                           name="_password"
-                           id="inputPassword"
-                           class="form-control"
-                           placeholder="Enter your password"
-                           autocomplete="current-password"
-                           required>
-                </div>
-
-                <div class="form-group">
-                    <div class="captcha-wrapper">
-                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                <div class="card-header-row">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    {% if captcha_error %}
-                        <small class="text-danger d-block mt-2">
-                            <i class="fas fa-exclamation-circle me-1"></i>{{ captcha_error }}
-                        </small>
-                    {% endif %}
-                </div>
-
-                <div class="remember-row">
-                    <div class="d-flex align-items-center">
-                        <input type="checkbox" name="_remember_me" id="remember" class="form-check-input">
-                        <label for="remember">Keep me signed in</label>
+                    <div>
+                        <div class="card-title">Secure Access</div>
                     </div>
-                    <a href="{{ path('forgot_password') }}" class="forgot-link">Forgot password?</a>
+                </div>
+                <p class="card-subtitle">Sign in to your health intelligence dashboard</p>
+
+                <div class="status-bar">
+                    <div class="status-dot"></div>
+                    <span class="status-text">All systems operational &nbsp;·&nbsp; End-to-end encrypted</span>
                 </div>
 
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
-                </button>
-            </form>
-
-            {# ── Face Recognition Login ── #}
-            <div class="or-divider">or sign in with face</div>
-
-            <div class="face-login-section">
-                <div class="face-login-header">
-                    <i class="fas fa-camera"></i>
-                    Face Recognition
-                    <span class="face-badge">BIOMETRIC</span>
+                {% if error %}
+                <div class="alert-danger-custom">
+                    <i class="fas fa-exclamation-circle" style="flex-shrink:0; margin-top:2px;"></i>
+                    <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                    <button class="alert-dismiss" onclick="this.parentElement.remove()">✕</button>
                 </div>
+                {% endif %}
 
-                <div class="face-preview-row">
-                    <div class="webcam-box">
-                        <video id="loginWebcamVideo" autoplay playsinline muted></video>
-                        <canvas id="loginCapturedCanvas"></canvas>
-                    </div>
-                    <div class="face-controls-col">
-                        <button type="button" class="btn-face btn-face-open" id="loginBtnOpen">
-                            <i class="fas fa-video"></i> Open Camera
-                        </button>
-                        <button type="button" class="btn-face btn-face-capture" id="loginBtnCapture" disabled>
-                            <i class="fas fa-circle"></i> Capture
-                        </button>
-                        <button type="button" class="btn-face btn-face-retake" id="loginBtnRetake" style="display:none">
-                            <i class="fas fa-redo"></i> Retake
-                        </button>
-                        <label class="btn-face btn-face-upload" style="cursor:pointer">
-                            <i class="fas fa-upload"></i> Upload Photo
-                            <input type="file" id="loginFaceFileInput" accept="image/*" style="display:none">
+                <form method="post" name="login" novalidate id="loginForm">
+
+                    <div class="field-group">
+                        <label class="field-label" for="inputUsername">
+                            <i class="fas fa-at"></i> Email Address
                         </label>
+                        <div class="field-input-wrap">
+                            <input type="email" name="_username" id="inputUsername"
+                                   class="field-input"
+                                   value="{{ last_username }}"
+                                   placeholder="your@email.com"
+                                   autocomplete="email"
+                                   data-ajax-validate="email" required>
+                            <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                        </div>
                     </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="inputPassword">
+                            <i class="fas fa-key"></i> Password
+                        </label>
+                        <div class="field-input-wrap">
+                            <input type="password" name="_password" id="inputPassword"
+                                   class="field-input"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password" required>
+                            <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">
+                                <i class="fas fa-eye" id="togglePwIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="captcha-wrap">
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                        </div>
+                        {% if captcha_error %}
+                        <small style="color:#ff6b6b; font-size:0.78rem; display:block; margin-top:6px;">
+                            <i class="fas fa-exclamation-circle"></i> {{ captcha_error }}
+                        </small>
+                        {% endif %}
+                    </div>
+
+                    <div class="actions-row">
+                        <a href="{{ path('forgot_password') }}" class="forgot-link">
+                            <i class="fas fa-unlock-alt" style="font-size:0.75rem; margin-right:4px;"></i>Forgot password?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn-signin" id="signinBtn">
+                        <i class="fas fa-shield-alt" style="margin-right:8px;"></i>
+                        Authenticate &amp; Enter
+                    </button>
+                </form>
+
+                <!-- OR divider -->
+                <div class="or-divider">or sign in with face</div>
+
+                <!-- Face Recognition -->
+                <div class="face-section">
+                    <div class="face-header">
+                        <i class="fas fa-camera"></i>
+                        Face Recognition
+                        <span class="face-badge">BIOMETRIC</span>
+                    </div>
+                    <div class="face-preview-row">
+                        <div class="webcam-box">
+                            <video id="loginWebcamVideo" autoplay playsinline muted></video>
+                            <canvas id="loginCapturedCanvas"></canvas>
+                        </div>
+                        <div class="face-controls">
+                            <button type="button" class="btn-face btn-face-open" id="loginBtnOpen">
+                                <i class="fas fa-video"></i> Open
+                            </button>
+                            <button type="button" class="btn-face btn-face-capture" id="loginBtnCapture" disabled>
+                                <i class="fas fa-circle"></i> Capture
+                            </button>
+                            <button type="button" class="btn-face btn-face-retake" id="loginBtnRetake" style="display:none">
+                                <i class="fas fa-redo"></i> Retake
+                            </button>
+                            <label class="btn-face btn-face-upload">
+                                <i class="fas fa-upload"></i> Upload
+                                <input type="file" id="loginFaceFileInput" accept="image/*" style="display:none">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="face-feedback" id="loginFaceFeedback">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="loginFaceMsg">Photo captured</span>
+                    </div>
+                    <button type="button" class="btn-face-login" id="btnFaceLogin" disabled>
+                        <i class="fas fa-user-check"></i> Sign In with Face
+                    </button>
                 </div>
 
-                <div class="face-feedback" id="loginFaceFeedback">
-                    <i class="fas fa-check-circle"></i> <span id="loginFaceMsg">Photo captured</span>
+                <div class="register-row">
+                    Don't have an account?
+                    <a href="{{ path('register') }}">
+                        <i class="fas fa-user-plus" style="font-size:0.75rem;"></i> Create Account
+                    </a>
                 </div>
-
-                <button type="button" class="btn-face-login" id="btnFaceLogin" disabled>
-                    <i class="fas fa-user-check"></i> Sign In with Face
-                </button>
-            </div>
-            {# ──────────────────────────────── #}
-
-            <div class="register-section">
-                <p>Don't have an account yet?</p>
-                <a href="{{ path('register') }}" class="btn-register">
-                    <i class="fas fa-user-plus me-2"></i> Create Account
-                </a>
             </div>
         </div>
 
     </div>
 </div>
-
 {% endblock %}
 
 {% block javascripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ── Standard form AJAX validation ──────────────────────────────
+
+    // ── Starfield particles ──────────────────────────────────────────
+    const sf = document.getElementById('starfield');
+    for (let i = 0; i < 50; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%;
+            background:${Math.random()>0.7 ? '#c0396b' : Math.random()>0.5 ? '#60a5fa' : '#fff'};
+            animation-duration:${Math.random()*15+8}s;
+            animation-delay:${Math.random()*10}s;
+            box-shadow:0 0 ${size*3}px currentColor;
+        `;
+        sf.appendChild(p);
+    }
+
+    // ── Password toggle ──────────────────────────────────────────────
+    const togglePw   = document.getElementById('togglePw');
+    const pwInput    = document.getElementById('inputPassword');
+    const toggleIcon = document.getElementById('togglePwIcon');
+    if (togglePw) {
+        togglePw.addEventListener('click', () => {
+            const isPass = pwInput.type === 'password';
+            pwInput.type = isPass ? 'text' : 'password';
+            toggleIcon.className = isPass ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+    }
+
+    // ── Standard AJAX validation ─────────────────────────────────────
     const form = document.getElementById('loginForm');
-    if (form) {
+    if (form && typeof AjaxValidator !== 'undefined') {
         AjaxValidator.attachBlur(form);
         AjaxValidator.attachSubmit(form, null, function () {
             form.removeEventListener('submit', null);
@@ -676,87 +905,88 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── Face Recognition Login ──────────────────────────────────────
-    const video         = document.getElementById('loginWebcamVideo');
-    const canvas        = document.getElementById('loginCapturedCanvas');
-    const btnOpen       = document.getElementById('loginBtnOpen');
-    const btnCapture    = document.getElementById('loginBtnCapture');
-    const btnRetake     = document.getElementById('loginBtnRetake');
-    const fileInput     = document.getElementById('loginFaceFileInput');
-    const btnFaceLogin  = document.getElementById('btnFaceLogin');
-    const feedback      = document.getElementById('loginFaceFeedback');
-    const feedbackMsg   = document.getElementById('loginFaceMsg');
-    const emailInput    = document.getElementById('inputUsername');
+    // ── 3D tilt on glass card ────────────────────────────────────────
+    const card = document.querySelector('.glass-card');
+    if (card) {
+        card.addEventListener('mousemove', (e) => {
+            const r  = card.getBoundingClientRect();
+            const x  = (e.clientX - r.left) / r.width  - 0.5;
+            const y  = (e.clientY - r.top)  / r.height - 0.5;
+            card.style.transform = `perspective(800px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateY(-4px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    }
 
-    let stream        = null;
-    let capturedBlob  = null;
+    // ── Face Recognition ─────────────────────────────────────────────
+    const video        = document.getElementById('loginWebcamVideo');
+    const canvas       = document.getElementById('loginCapturedCanvas');
+    const btnOpen      = document.getElementById('loginBtnOpen');
+    const btnCapture   = document.getElementById('loginBtnCapture');
+    const btnRetake    = document.getElementById('loginBtnRetake');
+    const fileInput    = document.getElementById('loginFaceFileInput');
+    const btnFaceLogin = document.getElementById('btnFaceLogin');
+    const feedback     = document.getElementById('loginFaceFeedback');
+    const feedbackMsg  = document.getElementById('loginFaceMsg');
+    const emailInput   = document.getElementById('inputUsername');
 
-    function setFeedback(type, msg, icon = '') {
+    let stream = null, capturedBlob = null;
+
+    function setFeedback(type, msg, icon='') {
         feedback.className = 'face-feedback ' + type;
         feedbackMsg.textContent = msg;
         if (icon) feedback.querySelector('i').className = icon;
     }
-
     function stopStream() {
         if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     }
-
-    function showCanvasState() {
-        video.style.display   = 'none';
-        canvas.style.display  = 'block';
-        btnCapture.style.display = 'none';
-        btnRetake.style.display  = 'inline-flex';
-        btnOpen.style.display    = 'none';
+    function showCanvas() {
+        video.style.display='none'; canvas.style.display='block';
+        btnCapture.style.display='none'; btnRetake.style.display='inline-flex'; btnOpen.style.display='none';
         stopStream();
     }
-
-    function showVideoState() {
-        video.style.display   = 'block';
-        canvas.style.display  = 'none';
-        btnCapture.style.display = 'inline-flex';
-        btnRetake.style.display  = 'none';
+    function showVideo() {
+        video.style.display='block'; canvas.style.display='none';
+        btnCapture.style.display='inline-flex'; btnRetake.style.display='none';
     }
 
-    // Open camera
     btnOpen.addEventListener('click', async () => {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
             video.srcObject = stream;
             video.style.display = 'block';
             btnCapture.disabled = false;
-            btnOpen.innerHTML   = '<i class="fas fa-video"></i> Camera On';
-            btnOpen.style.opacity = '0.6';
+            btnOpen.innerHTML = '<i class="fas fa-video"></i> On';
+            btnOpen.style.opacity = '0.5';
         } catch (err) {
-            alert('Camera access denied: ' + err.message + '\n\nUse the Upload Photo button instead.');
+            alert('Camera denied: ' + err.message + '\n\nUse Upload Photo instead.');
         }
     });
 
-    // Capture frame
     btnCapture.addEventListener('click', () => {
-        canvas.width  = video.videoWidth  || 320;
+        canvas.width = video.videoWidth || 320;
         canvas.height = video.videoHeight || 240;
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        showCanvasState();
-        canvas.toBlob(blob => {
-            capturedBlob = blob;
+        showCanvas();
+        canvas.toBlob(b => {
+            capturedBlob = b;
             btnFaceLogin.disabled = false;
             setFeedback('captured', 'Photo captured — ready to sign in', 'fas fa-check-circle');
         }, 'image/jpeg', 0.92);
     });
 
-    // Retake
     btnRetake.addEventListener('click', async () => {
         capturedBlob = null;
         btnFaceLogin.disabled = true;
         feedback.className = 'face-feedback';
-        showVideoState();
+        showVideo();
         btnCapture.disabled = true;
-        btnOpen.innerHTML   = '<i class="fas fa-video"></i> Open Camera';
+        btnOpen.innerHTML = '<i class="fas fa-video"></i> Open';
         btnOpen.style.opacity = '';
         btnOpen.click();
     });
 
-    // Upload photo fallback
     fileInput.addEventListener('change', () => {
         if (!fileInput.files.length) return;
         capturedBlob = fileInput.files[0];
@@ -764,10 +994,9 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.onload = e => {
             const img = new Image();
             img.onload = () => {
-                canvas.width  = img.width;
-                canvas.height = img.height;
+                canvas.width = img.width; canvas.height = img.height;
                 canvas.getContext('2d').drawImage(img, 0, 0);
-                showCanvasState();
+                showCanvas();
             };
             img.src = e.target.result;
         };
@@ -776,19 +1005,15 @@ document.addEventListener('DOMContentLoaded', function () {
         setFeedback('captured', 'Photo loaded — ready to sign in', 'fas fa-check-circle');
     });
 
-    // Submit face login
     btnFaceLogin.addEventListener('click', async () => {
         const email = emailInput ? emailInput.value.trim() : '';
         if (!email) {
-            setFeedback('error', 'Please enter your email address above first.', 'fas fa-exclamation-circle');
-            emailInput && emailInput.focus();
-            return;
+            setFeedback('error', 'Enter your email address above first.', 'fas fa-exclamation-circle');
+            emailInput && emailInput.focus(); return;
         }
         if (!capturedBlob) {
-            setFeedback('error', 'Please capture or upload a photo first.', 'fas fa-exclamation-circle');
-            return;
+            setFeedback('error', 'Capture or upload a photo first.', 'fas fa-exclamation-circle'); return;
         }
-
         setFeedback('scanning', 'Scanning face, please wait…', 'fas fa-spinner fa-spin');
         btnFaceLogin.disabled = true;
 
@@ -799,20 +1024,36 @@ document.addEventListener('DOMContentLoaded', function () {
             : new File([capturedBlob], 'face_login.jpg', { type: 'image/jpeg' }));
 
         try {
-            const res  = await fetch('{{ path('face_login') }}', { method: 'POST', body: fd });
+            const res  = await fetch('/face-login', { method: 'POST', body: fd });
             const data = await res.json();
-
             if (data.success) {
-                setFeedback('success', data.message || 'Face recognised! Redirecting…', 'fas fa-check-circle');
-                setTimeout(() => { window.location.href = data.redirect_url; }, 800);
+                setFeedback('success', 'Face verified! Redirecting…', 'fas fa-check-circle');
+                setTimeout(() => { window.location.href = data.redirect || '/'; }, 800);
             } else {
-                setFeedback('error', data.message || 'Face not recognised. Please try again.', 'fas fa-times-circle');
+                setFeedback('error', data.message || 'Face not recognized.', 'fas fa-times-circle');
                 btnFaceLogin.disabled = false;
             }
         } catch (err) {
             setFeedback('error', 'Network error. Please try again.', 'fas fa-times-circle');
             btnFaceLogin.disabled = false;
         }
+    });
+
+    // ── Scroll reveal ────────────────────────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.style.opacity = '1';
+                e.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.field-group, .btn-signin, .or-divider, .face-section, .register-row').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
     });
 });
 </script>

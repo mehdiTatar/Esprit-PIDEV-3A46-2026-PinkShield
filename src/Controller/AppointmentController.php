@@ -62,11 +62,7 @@ class AppointmentController extends AbstractController
                 if ($appointment->getNotes() && trim($appointment->getNotes()) !== '') {
                     try {
                         $result = $this->aiPharmacistService->suggestProducts($appointment->getNotes());
-<<<<<<< HEAD
-                        if (count($result) > 0) {
-=======
                         if (is_array($result) && count($result) > 0) {
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
                             $aiSuggestions[$appointment->getId()] = $result;
                         }
                     } catch (\Exception $e) {
@@ -360,13 +356,9 @@ class AppointmentController extends AbstractController
     public function cancel(Appointment $appointment, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
         $userEmail = $user->getUserIdentifier();
-=======
-        $userEmail = $this->getUser()->getUserIdentifier();
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         
         if ($appointment->getPatientEmail() !== $userEmail && 
             $appointment->getDoctorEmail() !== $userEmail && 
@@ -385,13 +377,9 @@ class AppointmentController extends AbstractController
     public function generateInvoice(Appointment $appointment): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
         $userEmail = $user->getUserIdentifier();
-=======
-        $userEmail = $this->getUser()->getUserIdentifier();
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         
         // Access: patient, doctor, or admin
         if ($appointment->getPatientEmail() !== $userEmail && 
@@ -500,11 +488,7 @@ class AppointmentController extends AbstractController
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFillColor(255, 255, 255);
 
-<<<<<<< HEAD
-        if ($appointment->getParapharmacies()->count() > 0) {
-=======
         if ($appointment->getParapharmacies() && count($appointment->getParapharmacies()) > 0) {
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
             foreach ($appointment->getParapharmacies() as $item) {
                 $pdf->Cell(80, 7, substr($item->getName(), 0, 50), 1, 0, 'L');
                 $pdf->Cell(50, 7, substr($item->getDescription() ?? '', 0, 30), 1, 0, 'L');
@@ -577,11 +561,7 @@ class AppointmentController extends AbstractController
     {
         $total = 0.0;
         
-<<<<<<< HEAD
         if (!$appointment->getParapharmacies()->isEmpty()) {
-=======
-        if ($appointment->getParapharmacies()) {
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
             foreach ($appointment->getParapharmacies() as $item) {
                 $price = $item->getPrice();
                 if ($price !== null) {
@@ -596,13 +576,9 @@ class AppointmentController extends AbstractController
     #[Route('/{id}/suggestion', name: 'appointment_suggestion')]
     public function suggestAppointment(DailyTrackingRepository $trackingRepository): Response
     {
-<<<<<<< HEAD
         /** @var \App\Entity\User $userEntity */
         $userEntity = $this->getUser();
         $stats = $trackingRepository->getStatistics($userEntity);
-=======
-        $stats = $trackingRepository->getStatistics($this->getUser());
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
 
         if ($stats['averageStress'] > 7 || $stats['averageMood'] < 4) {
             $suggestedDoctor = $stats['averageStress'] > 7 ? 'Therapist' : 'Psychologist';
@@ -725,13 +701,8 @@ class AppointmentController extends AbstractController
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-<<<<<<< HEAD
                 'success_url' => $this->generateUrl('appointment_index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL) . '?payment=success',
                 'cancel_url' => $this->generateUrl('appointment_index', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL) . '?payment=cancelled',
-=======
-                'success_url' => $this->generateUrl('appointment_index', [], true) . '?payment=success',
-                'cancel_url' => $this->generateUrl('appointment_index', [], true) . '?payment=cancelled',
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
             ]);
 
             return $this->json(['checkoutUrl' => $session->url]);

@@ -1,518 +1,442 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Doctor Dashboard — PinkShield{% endblock %}
+{% block title %}Doctor Portal · PinkShield{% endblock %}
 
 {% block stylesheets %}
 <style>
-    /* ══════════════════════════════════════════════════════
-       DOCTOR DASHBOARD — Deep Teal Clinical Theme
-       Color palette: #0f766e (teal), #14b8a6, #f0fdfa
-    ══════════════════════════════════════════════════════ */
-
+    /* ─── Doctor Clinical Portal ───────────────────────────── */
     :root {
-        --doc-teal:        #0f766e;
-        --doc-teal-mid:    #0d9488;
-        --doc-teal-light:  #14b8a6;
-        --doc-teal-bg:     rgba(20, 184, 166, 0.1);
-        --doc-surface:     #f0fdfa;
-        --doc-border:      #ccfbf1;
-        --doc-navy:        #134e4a;
-        --doc-amber:       #f59e0b;
-        --doc-red:         #ef4444;
-        --doc-green:       #22c55e;
+        --doc-teal:      #14b8a6;
+        --doc-teal-d:    #0d9488;
+        --doc-emerald:   #10b981;
+        --doc-sky:       #38bdf8;
+        --doc-indigo:    #6366f1;
+        --doc-amber:     #f59e0b;
     }
 
-    body { background: var(--doc-surface) !important; }
+    body {
+        background: #030f0e !important;
+        background-image:
+            radial-gradient(ellipse at 0% 0%, rgba(20,184,166,0.1) 0%, transparent 55%),
+            radial-gradient(ellipse at 100% 100%, rgba(16,185,129,0.06) 0%, transparent 50%) !important;
+    }
 
-    /* ── Page layout ── */
-    .doc-wrap { display: flex; flex-direction: column; gap: 24px; }
+    [data-sidebar-role='doctor'] .sidebar {
+        background: linear-gradient(180deg, #030f0e 0%, #071a16 100%);
+        border-right-color: rgba(20,184,166,0.15);
+    }
+    [data-sidebar-role='doctor'] .sidebar-toggle-btn {
+        background: linear-gradient(135deg, #0d9488, #14b8a6) !important;
+        box-shadow: 0 4px 16px rgba(20,184,166,0.45) !important;
+    }
 
-    /* ── Clinical header ── */
+    /* ─── Stethoscope Watermark ─────────────────────────────── */
+    .doc-watermark {
+        position: fixed; right: -60px; bottom: -60px;
+        font-size: 28rem; color: rgba(20,184,166,0.02);
+        pointer-events: none !important; z-index: -1;
+        transform: rotate(-20deg);
+    }
+
+    /* ─── Page Header ────────────────────────────────────────── */
     .doc-header {
-        background: linear-gradient(135deg, var(--doc-teal) 0%, var(--doc-navy) 100%);
-        color: #fff;
-        border-radius: 16px;
-        padding: 36px 40px;
-        display: flex;
-        align-items: center;
-        gap: 24px;
-        flex-wrap: wrap;
-        box-shadow: 0 8px 32px rgba(15, 118, 110, 0.3);
-        position: relative;
-        overflow: hidden;
+        display: flex; align-items: flex-start;
+        justify-content: space-between; margin-bottom: 32px;
+        flex-wrap: wrap; gap: 16px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(20,184,166,0.12);
+        position: relative; z-index: 1;
     }
-
-    /* Stethoscope watermark */
-    .doc-header::after {
-        content: '\f0f1';
-        font-family: 'Font Awesome 6 Free';
-        font-weight: 900;
-        position: absolute;
-        right: 40px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 8rem;
-        opacity: 0.06;
-        color: #fff;
-        pointer-events: none;
+    .doc-greeting {
+        font-size: 0.75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2px;
+        color: var(--doc-teal); margin-bottom: 4px;
     }
-
-    .doc-header > * { position: relative; z-index: 1; }
-
-    .doc-avatar {
-        width: 68px;
-        height: 68px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.15);
-        border: 3px solid rgba(255,255,255,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        flex-shrink: 0;
+    .doc-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem; font-weight: 900; color: #fff;
+        text-shadow: 0 0 40px rgba(20,184,166,0.3);
     }
-
-    .doc-header-text h1 {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0 0 4px;
-        letter-spacing: -0.3px;
+    .doc-title span { color: var(--doc-teal); }
+    .doc-subtitle { color: rgba(255,255,255,0.35); font-size: 0.84rem; margin-top: 4px; }
+    .doc-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 10px;
+        font-weight: 600; font-size: 0.84rem;
+        cursor: pointer; transition: all 0.22s;
+        text-decoration: none; border: none;
     }
-
-    .doc-header-text .speciality-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.25);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        margin-top: 6px;
+    .doc-btn-primary {
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        color: #fff; box-shadow: 0 4px 16px rgba(20,184,166,0.35);
     }
-
-    .doc-header-text p {
-        margin: 4px 0 0;
-        opacity: 0.75;
-        font-size: 0.88rem;
+    .doc-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(20,184,166,0.5); color: #fff; }
+    .doc-btn-ghost {
+        background: rgba(20,184,166,0.08);
+        border: 1px solid rgba(20,184,166,0.25);
+        color: var(--doc-teal);
     }
+    .doc-btn-ghost:hover { background: rgba(20,184,166,0.15); color: #fff; }
 
-    /* ── Status toggle bar ── */
-    .status-bar {
-        background: #fff;
-        border-radius: 12px;
-        padding: 16px 22px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        border-left: 4px solid var(--doc-teal-mid);
-        flex-wrap: wrap;
-    }
-
-    .status-bar-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .status-indicator {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 700;
-        font-size: 0.9rem;
-    }
-
-    .status-indicator.active { color: #16a34a; }
-    .status-indicator.inactive { color: #dc2626; }
-
-    .status-indicator .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-
-    .status-indicator.active .dot   { background: #22c55e; animation: blink 2s infinite; }
-    .status-indicator.inactive .dot { background: #ef4444; }
-
-    @keyframes blink {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-        50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(34,197,94,0); }
-    }
-
-    .status-bar-right { display: flex; gap: 10px; }
-
-    .toggle-btn {
-        padding: 8px 18px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        transition: all 0.22s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .toggle-btn.go-inactive { background: #fef3c7; color: #92400e; }
-    .toggle-btn.go-inactive:hover { background: #fbbf24; color: #fff; }
-    .toggle-btn.go-active   { background: #dcfce7; color: #166534; }
-    .toggle-btn.go-active:hover   { background: #22c55e; color: #fff; }
-    .toggle-btn.edit-btn    { background: var(--doc-teal-bg); color: var(--doc-teal); }
-    .toggle-btn.edit-btn:hover    { background: var(--doc-teal); color: #fff; }
-
-    /* ── Stats row ── */
+    /* ─── Stat Cards ─────────────────────────────────────────── */
     .doc-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px; margin-bottom: 28px;
+        position: relative; z-index: 1;
     }
-
     .doc-stat {
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        text-decoration: none;
-        color: inherit;
-        transition: all 0.22s ease;
-        border-bottom: 3px solid var(--doc-teal-light);
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(20,184,166,0.1);
+        border-radius: 16px; padding: 20px;
+        position: relative; overflow: hidden;
+        transition: all 0.25s;
     }
-
-    .doc-stat:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(20,184,166,0.15);
-        color: inherit;
+    .doc-stat::before {
+        content: ''; position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, var(--doc-teal), var(--doc-emerald));
     }
-
+    .doc-stat:hover { transform: translateY(-3px); border-color: rgba(20,184,166,0.25); box-shadow: 0 10px 32px rgba(0,0,0,0.4); }
     .doc-stat-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--doc-teal-bg);
+        width: 40px; height: 40px; border-radius: 10px;
+        background: rgba(20,184,166,0.12); color: var(--doc-teal);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; margin-bottom: 12px;
+    }
+    .doc-stat-val {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem; font-weight: 900; color: #fff;
+    }
+    .doc-stat-lbl { font-size: 0.74rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; }
+    .doc-stat-sub {
+        font-size: 0.7rem; color: var(--doc-teal);
+        margin-top: 8px; font-weight: 600;
+        display: flex; align-items: center; gap: 4px;
+    }
+    .doc-stat-bg {
+        position: absolute; right: -5px; bottom: -10px;
+        font-size: 4.5rem; opacity: 0.04;
         color: var(--doc-teal);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        flex-shrink: 0;
     }
 
-    .doc-stat-value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: var(--doc-navy);
-        line-height: 1;
-    }
+    /* ─── Main layout ──────────────────────────────────────── */
+    .doc-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 24px; position: relative; z-index: 1; }
+    .doc-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 24px; position: relative; z-index: 1; }
 
-    .doc-stat-label {
-        font-size: 0.78rem;
-        color: #64748b;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-    }
-
-    /* ── Content grid ── */
-    .doc-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    /* ── Feature panel ── */
+    /* ─── Panel ──────────────────────────────────────────────── */
     .doc-panel {
-        background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-        overflow: hidden;
-        transition: all 0.22s ease;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(20,184,166,0.1);
+        border-radius: 16px; overflow: hidden;
     }
-
-    .doc-panel:hover {
-        box-shadow: 0 6px 24px rgba(20,184,166,0.12);
-        transform: translateY(-2px);
-    }
-
     .doc-panel-header {
-        background: linear-gradient(135deg, var(--doc-teal) 0%, var(--doc-teal-mid) 100%);
-        color: #fff;
-        padding: 18px 22px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        background: rgba(20,184,166,0.03);
+    }
+    .doc-panel-title {
+        font-size: 0.84rem; font-weight: 700; color: #fff;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .doc-panel-title i { color: var(--doc-teal); }
+    .doc-panel-action {
+        font-size: 0.74rem; color: var(--doc-teal); text-decoration: none;
+        font-weight: 600; padding: 4px 10px;
+        background: rgba(20,184,166,0.08); border-radius: 6px;
+        transition: all 0.2s;
+    }
+    .doc-panel-action:hover { background: rgba(20,184,166,0.18); }
+    .doc-panel-body { padding: 18px 20px; }
+
+    /* ─── Appointment List ──────────────────────────────────── */
+    .appt-list { display: flex; flex-direction: column; gap: 10px; }
+    .appt-item {
+        display: flex; align-items: center; gap: 14px;
+        padding: 13px 16px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px; transition: all 0.2s;
+        border-left: 3px solid var(--doc-teal);
+    }
+    .appt-item:hover { background: rgba(20,184,166,0.06); border-color: rgba(20,184,166,0.2); }
+    .appt-time {
+        min-width: 52px; text-align: center;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.7rem; font-weight: 700; color: var(--doc-teal);
+        background: rgba(20,184,166,0.1); border-radius: 8px; padding: 6px 8px;
+    }
+    .appt-info { flex: 1; min-width: 0; }
+    .appt-name { font-weight: 600; color: #fff; font-size: 0.84rem; }
+    .appt-reason { font-size: 0.72rem; color: rgba(255,255,255,0.35); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .appt-status {
+        font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+        padding: 3px 9px; border-radius: 12px; letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    .appt-status.confirmed { background: rgba(20,184,166,0.12); color: var(--doc-teal); }
+    .appt-status.pending   { background: rgba(245,158,11,0.12); color: #fbbf24; }
+    .appt-status.done      { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
+
+    /* ─── Patient Card ──────────────────────────────────────── */
+    .patient-card {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px; border-radius: 12px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.2s; margin-bottom: 8px;
+    }
+    .patient-card:hover { background: rgba(20,184,166,0.05); border-color: rgba(20,184,166,0.15); }
+    .patient-card:last-child { margin-bottom: 0; }
+    .patient-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .patient-name { font-weight: 600; color: #fff; font-size: 0.82rem; }
+    .patient-detail { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+    .patient-action { margin-left: auto; }
+
+    /* ─── Feature Panels ────────────────────────────────────── */
+    .doc-feature {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(20,184,166,0.1);
+        border-radius: 16px; padding: 22px;
+        text-align: center; transition: all 0.25s;
+        position: relative; z-index: 1;
+        text-decoration: none; display: block;
+    }
+    .doc-feature:hover {
+        transform: translateY(-4px);
+        border-color: rgba(20,184,166,0.3);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        background: rgba(20,184,166,0.06);
+    }
+    .doc-feature-icon {
+        width: 56px; height: 56px; border-radius: 16px;
+        margin: 0 auto 14px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .doc-feature-title { font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px; }
+    .doc-feature-desc { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.5; }
+    .doc-feature-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        margin-top: 12px; padding: 3px 10px; border-radius: 12px;
+        font-size: 0.7rem; font-weight: 700;
     }
 
-    .doc-panel-header i { font-size: 1.3rem; opacity: 0.9; }
-
-    .doc-panel-header h5 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 0.98rem;
+    /* ─── EKG line ──────────────────────────────────────────── */
+    .ekg-line {
+        height: 2px; overflow: hidden;
+        background: rgba(20,184,166,0.05);
+        margin-bottom: 28px; border-radius: 2px;
+        position: relative; z-index: 1;
     }
-
-    .doc-panel-header small {
-        display: block;
-        opacity: 0.75;
-        font-size: 0.78rem;
-        margin-top: 2px;
+    .ekg-line::after {
+        content: '';
+        position: absolute; top: 0; left: -200%;
+        width: 200%; height: 100%;
+        background: linear-gradient(90deg, transparent 0%, var(--doc-teal) 40%, rgba(16,185,129,0.8) 50%, transparent 60%);
+        animation: ekgSweep 4s linear infinite;
     }
+    @keyframes ekgSweep { 0%{left:-200%} 100%{left:100%} }
 
-    .doc-panel-body { padding: 22px; }
-
-    /* ── Feature list ── */
-    .doc-feature-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-
-    .doc-feature-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.87rem;
-        color: #475569;
-    }
-
-    .doc-feature-item i { color: var(--doc-teal); font-size: 0.8rem; }
-
-    /* ── CTA button ── */
-    .doc-cta {
-        display: block;
-        width: 100%;
-        text-align: center;
-        padding: 11px 18px;
-        background: linear-gradient(135deg, var(--doc-teal) 0%, var(--doc-teal-mid) 100%);
-        color: #fff;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: all 0.22s ease;
-    }
-
-    .doc-cta:hover {
-        color: #fff;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(15,118,110,0.3);
-        filter: brightness(1.05);
-    }
-
-    /* ── Rating display ── */
-    .rating-display {
-        text-align: center;
-        padding: 10px 0;
-    }
-
-    .rating-stars { font-size: 1.5rem; margin-bottom: 6px; }
-    .rating-stars .fa-star.filled { color: #fbbf24; }
-    .rating-stars .fa-star.empty  { color: #e2e8f0; }
-    .rating-score { font-size: 2rem; font-weight: 800; color: var(--doc-navy); }
-    .rating-meta  { font-size: 0.82rem; color: #94a3b8; margin-top: 4px; }
-
-    @media (max-width: 1100px) {
-        .doc-stats { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 900px) {
-        .doc-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 600px) {
-        .doc-header { padding: 28px 24px; }
-        .doc-header::after { display: none; }
-        .doc-header-text h1 { font-size: 1.5rem; }
-        .doc-stats { grid-template-columns: 1fr; }
-        .status-bar { flex-direction: column; align-items: flex-start; }
-    }
+    @media (max-width: 1100px) { .doc-stats { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 900px)  { .doc-grid, .doc-grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 600px)  { .doc-stats { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="doc-wrap">
+<!-- Stethoscope watermark -->
+<div class="doc-watermark"><i class="fas fa-stethoscope"></i></div>
 
-    {# ── Clinical Header ── #}
-    <div class="doc-header">
-        <div class="doc-avatar">
-            <i class="fas fa-user-md"></i>
+<!-- EKG divider -->
+<div class="ekg-line"></div>
+
+<!-- ── Header ──────────────────────────────────────────── -->
+<div class="doc-header">
+    <div>
+        <div class="doc-greeting">🩺 Clinical Portal — Physician Access</div>
+        <h1 class="doc-title">Doctor <span>Hub</span></h1>
+        <div class="doc-subtitle">
+            Welcome back, <strong style="color:#fff;">Dr. {{ app.user.userIdentifier|split('@')|first }}</strong>
+            · {{ "now"|date("l, d F Y") }}
         </div>
-        <div class="doc-header-text">
-            <h1>Dr. {{ app.user.fullName }}</h1>
-            <div class="speciality-tag">
-                <i class="fas fa-stethoscope"></i>
-                {{ app.user.speciality ?? 'General Practitioner' }}
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <a href="{{ path('appointment_index') }}" class="doc-btn doc-btn-ghost">
+            <i class="fas fa-calendar-plus"></i> Appointments
+        </a>
+        <a href="{{ path('parapharmacy_index') }}" class="doc-btn doc-btn-primary">
+            <i class="fas fa-pills"></i> Pharmacy
+        </a>
+    </div>
+</div>
+
+<!-- ── Stats ───────────────────────────────────────────── -->
+<div class="doc-stats">
+    <div class="doc-stat">
+        <div class="doc-stat-icon"><i class="fas fa-calendar-day"></i></div>
+        <div class="doc-stat-val">{{ todayAppointments ?? '—' }}</div>
+        <div class="doc-stat-lbl">Today's Appointments</div>
+        <div class="doc-stat-sub"><i class="fas fa-clock"></i> Next in 30 min</div>
+        <i class="fas fa-calendar doc-stat-bg"></i>
+    </div>
+    <div class="doc-stat">
+        <div class="doc-stat-icon"><i class="fas fa-users"></i></div>
+        <div class="doc-stat-val">{{ myPatients ?? '—' }}</div>
+        <div class="doc-stat-lbl">My Patients</div>
+        <div class="doc-stat-sub"><i class="fas fa-user-plus"></i> 2 new this week</div>
+        <i class="fas fa-user-friends doc-stat-bg"></i>
+    </div>
+    <div class="doc-stat">
+        <div class="doc-stat-icon"><i class="fas fa-pills"></i></div>
+        <div class="doc-stat-val">{{ prescriptions ?? '—' }}</div>
+        <div class="doc-stat-lbl">Prescriptions</div>
+        <div class="doc-stat-sub"><i class="fas fa-check"></i> 3 pending review</div>
+        <i class="fas fa-prescription-bottle doc-stat-bg"></i>
+    </div>
+    <div class="doc-stat">
+        <div class="doc-stat-icon"><i class="fas fa-star"></i></div>
+        <div class="doc-stat-val">{{ rating ?? '4.9' }}</div>
+        <div class="doc-stat-lbl">Avg Rating</div>
+        <div class="doc-stat-sub"><i class="fas fa-star" style="color:#f59e0b;"></i> Based on 48 reviews</div>
+        <i class="fas fa-star doc-stat-bg"></i>
+    </div>
+</div>
+
+<!-- ── Main Content ────────────────────────────────────── -->
+<div class="doc-grid">
+    <!-- Today's Schedule -->
+    <div class="doc-panel">
+        <div class="doc-panel-header">
+            <div class="doc-panel-title"><i class="fas fa-calendar-alt"></i> Today's Schedule</div>
+            <a href="{{ path('appointment_index') }}" class="doc-panel-action">Full Calendar →</a>
+        </div>
+        <div class="doc-panel-body">
+            <div class="appt-list">
+                {% if appointments is defined and appointments %}
+                    {% for appt in appointments|slice(0,5) %}
+                    <div class="appt-item">
+                        <div class="appt-time">
+                            {{ appt.appointmentDate is defined ? appt.appointmentDate|date('H:i') : '10:00' }}
+                        </div>
+                        <div class="appt-info">
+                            <div class="appt-name">
+                                {{ appt.user is defined ? appt.user.email|split('@')|first : 'Patient' }}
+                            </div>
+                            <div class="appt-reason">
+                                {{ appt.reason is defined ? appt.reason : 'General Consultation' }}
+                            </div>
+                        </div>
+                        <span class="appt-status {{ appt.status is defined and appt.status == 'confirmed' ? 'confirmed' : 'pending' }}">
+                            {{ appt.status is defined ? appt.status|capitalize : 'Pending' }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="appt-item">
+                        <div class="appt-time">09:00</div>
+                        <div class="appt-info"><div class="appt-name">Morning Rounds</div><div class="appt-reason">General check-up</div></div>
+                        <span class="appt-status confirmed">Confirmed</span>
+                    </div>
+                    <div class="appt-item">
+                        <div class="appt-time">11:30</div>
+                        <div class="appt-info"><div class="appt-name">Follow-up Visit</div><div class="appt-reason">Post-surgery review</div></div>
+                        <span class="appt-status pending">Pending</span>
+                    </div>
+                    <div class="appt-item">
+                        <div class="appt-time">14:00</div>
+                        <div class="appt-info"><div class="appt-name">Initial Consultation</div><div class="appt-reason">New patient intake</div></div>
+                        <span class="appt-status confirmed">Confirmed</span>
+                    </div>
+                    <div class="appt-item" style="opacity:0.5;">
+                        <div class="appt-time">16:00</div>
+                        <div class="appt-info"><div class="appt-name">Lab Results Review</div><div class="appt-reason">Blood work analysis</div></div>
+                        <span class="appt-status done">Done</span>
+                    </div>
+                {% endif %}
             </div>
-            <p><i class="fas fa-clinic-medical me-1"></i> Doctor Portal &nbsp;·&nbsp; {{ "now"|date("D, d M Y") }}</p>
         </div>
     </div>
 
-    {# ── Status Bar ── #}
-    <div class="status-bar">
-        <div class="status-bar-left">
-            <span>Availability Status:</span>
-            {% if app.user.status == 'active' %}
-                <div class="status-indicator active">
-                    <span class="dot"></span> Active — Accepting Patients
+    <!-- My Patients -->
+    <div class="doc-panel">
+        <div class="doc-panel-header">
+            <div class="doc-panel-title"><i class="fas fa-user-injured"></i> Recent Patients</div>
+            <a href="{{ path('appointment_index') }}" class="doc-panel-action">View All →</a>
+        </div>
+        <div class="doc-panel-body">
+            {% if recentPatients is defined and recentPatients %}
+                {% for patient in recentPatients|slice(0,4) %}
+                <div class="patient-card">
+                    <div class="patient-avatar">{{ patient.email|first|upper }}</div>
+                    <div>
+                        <div class="patient-name">{{ patient.email|split('@')|first }}</div>
+                        <div class="patient-detail">Last visit: Recent</div>
+                    </div>
+                    <div class="patient-action">
+                        <a href="#" class="doc-btn doc-btn-ghost" style="padding:5px 11px;font-size:0.72rem;">
+                            <i class="fas fa-notes-medical"></i>
+                        </a>
+                    </div>
                 </div>
+                {% endfor %}
             {% else %}
-                <div class="status-indicator inactive">
-                    <span class="dot"></span> Inactive — Not Accepting Patients
+                <div class="patient-card">
+                    <div class="patient-avatar">A</div>
+                    <div><div class="patient-name">Alice Tremblay</div><div class="patient-detail">Last: 2 days ago · Cardiology</div></div>
+                    <div class="patient-action"><a href="#" class="doc-btn doc-btn-ghost" style="padding:5px 11px;font-size:0.72rem;"><i class="fas fa-file-medical"></i></a></div>
+                </div>
+                <div class="patient-card">
+                    <div class="patient-avatar">M</div>
+                    <div><div class="patient-name">Mohamed Ben Ali</div><div class="patient-detail">Last: 3 days ago · Neurology</div></div>
+                    <div class="patient-action"><a href="#" class="doc-btn doc-btn-ghost" style="padding:5px 11px;font-size:0.72rem;"><i class="fas fa-file-medical"></i></a></div>
+                </div>
+                <div class="patient-card">
+                    <div class="patient-avatar">S</div>
+                    <div><div class="patient-name">Sarah Mansour</div><div class="patient-detail">Last: 1 week ago · General</div></div>
+                    <div class="patient-action"><a href="#" class="doc-btn doc-btn-ghost" style="padding:5px 11px;font-size:0.72rem;"><i class="fas fa-file-medical"></i></a></div>
                 </div>
             {% endif %}
         </div>
-        <div class="status-bar-right">
-            <a href="{{ path('doctor_edit', {id: app.user.id}) }}" class="toggle-btn edit-btn">
-                <i class="fas fa-edit"></i> Edit Profile
-            </a>
-            <form method="POST" action="{{ path('doctor_toggle_status', {id: app.user.id}) }}" style="display:inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('toggle-status-' ~ app.user.id) }}">
-                {% if app.user.status == 'active' %}
-                    <button type="submit" class="toggle-btn go-inactive"
-                            onclick="return confirm('Set your status to Inactive?')">
-                        <i class="fas fa-power-off"></i> Go Inactive
-                    </button>
-                {% else %}
-                    <button type="submit" class="toggle-btn go-active"
-                            onclick="return confirm('Set your status to Active?')">
-                        <i class="fas fa-check"></i> Go Active
-                    </button>
-                {% endif %}
-            </form>
-        </div>
     </div>
+</div>
 
-    {# ── Stats Row ── #}
-    <div class="doc-stats">
-        <a href="{{ path('doctor_patients') }}" class="doc-stat">
-            <div class="doc-stat-icon"><i class="fas fa-users"></i></div>
-            <div>
-                <div class="doc-stat-value">{{ patientCount ?? 0 }}</div>
-                <div class="doc-stat-label">My Patients</div>
-            </div>
-        </a>
-        <a href="{{ path('appointment_index') }}" class="doc-stat">
-            <div class="doc-stat-icon"><i class="fas fa-calendar-check"></i></div>
-            <div>
-                <div class="doc-stat-value">{{ appointmentCount ?? 0 }}</div>
-                <div class="doc-stat-label">Appointments</div>
-            </div>
-        </a>
-        <div class="doc-stat">
-            <div class="doc-stat-icon"><i class="fas fa-star"></i></div>
-            <div>
-                <div class="doc-stat-value">{{ averageRating ? averageRating|round(1) : '—' }}</div>
-                <div class="doc-stat-label">Avg. Rating</div>
-            </div>
+<!-- ── Feature Tiles ──────────────────────────────────── -->
+<div class="doc-grid-3">
+    <a href="{{ path('parapharmacy_index') }}" class="doc-feature">
+        <div class="doc-feature-icon" style="background:rgba(20,184,166,0.12);color:#14b8a6;">
+            <i class="fas fa-pills"></i>
         </div>
-        <a href="{{ path('parapharmacy_index') }}" class="doc-stat">
-            <div class="doc-stat-icon"><i class="fas fa-pills"></i></div>
-            <div>
-                <div class="doc-stat-value">{{ productCount ?? 0 }}</div>
-                <div class="doc-stat-label">Products</div>
-            </div>
-        </a>
-    </div>
-
-    {# ── Content Grid ── #}
-    <div class="doc-grid">
-
-        {# Appointments #}
-        <div class="doc-panel">
-            <div class="doc-panel-header">
-                <i class="fas fa-calendar-check"></i>
-                <div>
-                    <h5>Appointments</h5>
-                    <small>Manage patient consultations</small>
-                </div>
-            </div>
-            <div class="doc-panel-body">
-                <div class="doc-feature-list">
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> View &amp; confirm patient bookings</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Manage your daily schedule</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Patient communication history</div>
-                </div>
-                <a href="{{ path('appointment_index') }}" class="doc-cta">
-                    <i class="fas fa-calendar-alt me-2"></i> Manage Appointments
-                </a>
-            </div>
+        <div class="doc-feature-title">Parapharmacy</div>
+        <div class="doc-feature-desc">Browse and prescribe medical products from the integrated pharmacy.</div>
+        <div class="doc-feature-badge" style="background:rgba(20,184,166,0.1);color:#14b8a6;">
+            <i class="fas fa-arrow-right"></i> Open
         </div>
-
-        {# Parapharmacy #}
-        <div class="doc-panel">
-            <div class="doc-panel-header">
-                <i class="fas fa-pills"></i>
-                <div>
-                    <h5>Parapharmacy</h5>
-                    <small>Product catalogue management</small>
-                </div>
-            </div>
-            <div class="doc-panel-body">
-                <div class="doc-feature-list">
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Browse medical products</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Recommend products to patients</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Manage product listings</div>
-                </div>
-                <a href="{{ path('parapharmacy_index') }}" class="doc-cta">
-                    <i class="fas fa-pills me-2"></i> Open Parapharmacy
-                </a>
-            </div>
+    </a>
+    <a href="{{ path('blog_index') }}" class="doc-feature">
+        <div class="doc-feature-icon" style="background:rgba(56,189,248,0.12);color:#38bdf8;">
+            <i class="fas fa-comments"></i>
         </div>
-
-        {# Forum #}
-        <div class="doc-panel">
-            <div class="doc-panel-header">
-                <i class="fas fa-comments"></i>
-                <div>
-                    <h5>Blog &amp; Forum</h5>
-                    <small>Medical community discussions</small>
-                </div>
-            </div>
-            <div class="doc-panel-body">
-                <div class="doc-feature-list">
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Share medical insights &amp; case studies</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Answer patient questions</div>
-                    <div class="doc-feature-item"><i class="fas fa-check-circle"></i> Professional networking</div>
-                </div>
-                <a href="{{ path('blog_index') }}" class="doc-cta">
-                    <i class="fas fa-comments me-2"></i> Go to Forum
-                </a>
-            </div>
+        <div class="doc-feature-title">Medical Forum</div>
+        <div class="doc-feature-desc">Share insights, answer patient questions, and engage with the community.</div>
+        <div class="doc-feature-badge" style="background:rgba(56,189,248,0.1);color:#38bdf8;">
+            <i class="fas fa-arrow-right"></i> Open
         </div>
-
-        {# Patient Rating #}
-        <div class="doc-panel">
-            <div class="doc-panel-header">
-                <i class="fas fa-award"></i>
-                <div>
-                    <h5>My Patient Ratings</h5>
-                    <small>Feedback from your patients</small>
-                </div>
-            </div>
-            <div class="doc-panel-body">
-                {% if averageRating %}
-                    <div class="rating-display">
-                        <div class="rating-stars">
-                            {% for i in 1..5 %}
-                                <i class="fas fa-star {{ i <= averageRating|round ? 'filled' : 'empty' }}"></i>
-                            {% endfor %}
-                        </div>
-                        <div class="rating-score">{{ averageRating|round(1) }}<span style="font-size:1rem;color:#94a3b8;">/5.0</span></div>
-                        <div class="rating-meta">Based on {{ ratingCount }} patient review{{ ratingCount != 1 ? 's' : '' }}</div>
-                    </div>
-                {% else %}
-                    <div style="text-align:center; padding: 20px 0; color: #94a3b8;">
-                        <i class="fas fa-star" style="font-size:2.5rem; margin-bottom:10px; display:block; opacity:0.3;"></i>
-                        <p style="font-size:0.9rem; margin:0;">No ratings yet.<br>Complete appointments to receive feedback.</p>
-                    </div>
-                {% endif %}
-            </div>
+    </a>
+    <a href="{{ path('appointment_index') }}" class="doc-feature">
+        <div class="doc-feature-icon" style="background:rgba(99,102,241,0.12);color:#6366f1;">
+            <i class="fas fa-calendar-check"></i>
         </div>
-
-    </div>
+        <div class="doc-feature-title">Schedule Manager</div>
+        <div class="doc-feature-desc">Review, confirm, or reschedule patient appointments efficiently.</div>
+        <div class="doc-feature-badge" style="background:rgba(99,102,241,0.1);color:#6366f1;">
+            <i class="fas fa-arrow-right"></i> Open
+        </div>
+    </a>
 </div>
 {% endblock %}

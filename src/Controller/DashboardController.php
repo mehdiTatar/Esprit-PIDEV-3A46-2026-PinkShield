@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\AdminRepository;
 use App\Repository\AppointmentRepository;
 use App\Repository\BlogPostRepository;
+use App\Repository\CommentRepository;
 use App\Repository\DoctorRepository;
 use App\Repository\RatingRepository;
 use App\Repository\UserRepository;
@@ -45,6 +46,7 @@ class DashboardController extends AbstractController
         AppointmentRepository $appointmentRepository,
         BlogPostRepository    $blogPostRepository,
         RatingRepository      $ratingRepository,
+        CommentRepository     $commentRepository,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -54,6 +56,7 @@ class DashboardController extends AbstractController
         $totalAdmins       = count($adminRepository->findAll());
         $totalBlogPosts    = count($blogPostRepository->findAll());
         $totalAppointments = $appointmentRepository->countTotal();
+        $totalComments     = $commentRepository->countTotal();
 
         // ── Status breakdowns ─────────────────────────────────
         $usersByStatus        = $userRepository->countByStatus();
@@ -93,6 +96,7 @@ class DashboardController extends AbstractController
             'topDoctors'           => $topDoctors,
             'recentUsers'          => $recentUsers,
             'avgRating'            => $avgRating,
+            'totalComments'        => $totalComments,
         ]);
     }
 
@@ -101,10 +105,7 @@ class DashboardController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_DOCTOR');
         
-<<<<<<< HEAD
         /** @var \App\Entity\Doctor $doctor */
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         $doctor = $this->getUser();
         $doctorEmail = $doctor->getEmail();
         
@@ -130,10 +131,7 @@ class DashboardController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         $user = $this->getUser();
         $appointments = $appointmentRepository->findByPatient($user->getUserIdentifier());
         

@@ -97,13 +97,9 @@ class BlogPostRepository extends ServiceEntityRepository
             $orderDir = 'ASC';
         }
 
-<<<<<<< HEAD
         $qb->leftJoin('b.comments', 'c')
            ->addSelect('c')
            ->orderBy($orderBy, $orderDir);
-=======
-        $qb->orderBy($orderBy, $orderDir);
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
 
         return $qb;
     }

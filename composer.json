@@ -7,20 +7,14 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-<<<<<<< HEAD
         "ahmed-bhs/doctrine-doctor": "*",
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         "doctrine/doctrine-bundle": "*",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^2.17",
         "knplabs/knp-paginator-bundle": "^6.10",
         "scheb/2fa-bundle": "^6.13.1",
         "scheb/2fa-email": "^6.13.1",
-<<<<<<< HEAD
         "stripe/stripe-php": "^19.4",
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         "symfony/asset": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",
@@ -39,12 +33,8 @@
         "symfony/yaml": "6.4.*",
         "tecnickcom/tcpdf": "^6.10",
         "twig/extra-bundle": "^2.12|^3.0",
-<<<<<<< HEAD
         "twig/twig": "^2.12|^3.0",
         "webmozart/assert": "1.11"
-=======
-        "twig/twig": "^2.12|^3.0"
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
     },
     "config": {
         "allow-plugins": {
@@ -97,12 +87,9 @@
         }
     },
     "require-dev": {
-<<<<<<< HEAD
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpunit/phpunit": "9.5",
-=======
->>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
         "symfony/stopwatch": "6.4.*",
         "symfony/web-profiler-bundle": "6.4.*"
     }
