@@ -1,0 +1,309 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Medical Blog & Forum — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Page Header ── */
+    .blog-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, #e8557a 100%);
+        border-radius: 16px;
+        padding: 36px 40px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 30px rgba(192,57,107,0.22);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .blog-hero::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+    }
+
+    .blog-hero h1 {
+        font-size: 1.85rem;
+        font-weight: 800;
+        margin: 0 0 6px;
+        letter-spacing: -0.4px;
+    }
+
+    .blog-hero p { margin: 0; opacity: 0.88; font-size: 0.92rem; }
+
+    /* ── Toolbar ── */
+    .blog-toolbar {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+        border: 1px solid #f0e4eb;
+    }
+
+    .blog-toolbar .search-wrap {
+        flex: 1;
+        min-width: 220px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .blog-toolbar .sort-wrap { display: flex; gap: 8px; min-width: 200px; }
+
+    .results-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        font-size: 0.88rem;
+        color: var(--text-gray);
+    }
+
+    /* ── Post Cards ── */
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 22px;
+    }
+
+    .post-card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid #f3e8ef;
+        transition: all 0.24s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(192,57,107,0.14);
+        border-color: var(--border);
+    }
+
+    .post-thumb {
+        height: 190px;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(135deg, #fff0f5, #fce4ec);
+    }
+
+    .post-thumb img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 0.36s ease;
+    }
+
+    .post-card:hover .post-thumb img { transform: scale(1.05); }
+
+    .post-thumb-placeholder {
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--primary);
+        opacity: 0.3;
+    }
+
+    .post-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+
+    .post-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+    }
+
+    .post-meta .author-chip {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .post-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 10px;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .post-excerpt {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        line-height: 1.6;
+        flex: 1;
+        margin-bottom: 18px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .post-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 14px;
+        border-top: 1px solid #f3e8ef;
+    }
+
+    .comment-count {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .comment-count i { color: var(--primary); }
+
+    /* ── Empty state ── */
+    .blog-empty {
+        text-align: center;
+        padding: 64px 0;
+        color: var(--text-muted);
+    }
+
+    .blog-empty i { font-size: 3.5rem; margin-bottom: 18px; opacity: 0.3; color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block body %}
+<div>
+    {# Hero #}
+    <div class="blog-hero">
+        <div>
+            <h1><i class="fas fa-newspaper me-2" style="opacity:0.85;"></i>Medical Blog & Forum</h1>
+            <p>Share knowledge, ask questions, and connect with the healthcare community</p>
+        </div>
+        {% if app.user %}
+            <a href="{{ path('blog_new') }}" class="btn btn-outline-light fw-600 d-flex align-items-center gap-2">
+                <i class="fas fa-plus"></i> New Post
+            </a>
+        {% endif %}
+    </div>
+
+    {# Toolbar #}
+    <div class="blog-toolbar">
+            <form method="GET" class="d-flex gap-2 w-100" id="searchForm">
+                <input type="text" name="q" class="form-control"
+                       placeholder="Search posts, topics, authors…" value="{{ q }}">
+                <input type="hidden" name="sortBy" value="{{ sortBy }}">
+                <button type="submit" class="btn btn-primary px-3">
+                    <i class="fas fa-search"></i>
+                </button>
+                {% if q %}
+                    <a href="{{ path('blog_index', {'sortBy': sortBy}) }}" class="btn btn-secondary px-3">
+                        <i class="fas fa-times"></i>
+                    </a>
+                {% endif %}
+            </form>
+
+        <div class="sort-wrap">
+            <form method="GET" class="w-100">
+                <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                    <option value="date_newest" {% if sortBy == 'date_newest' %}selected{% endif %}>🕒 Newest First</option>
+                    <option value="date_oldest" {% if sortBy == 'date_oldest' %}selected{% endif %}>🕐 Oldest First</option>
+                    <option value="title_asc"   {% if sortBy == 'title_asc'   %}selected{% endif %}>🔤 Title A–Z</option>
+                    <option value="title_desc"  {% if sortBy == 'title_desc'  %}selected{% endif %}>🔤 Title Z–A</option>
+                    <option value="author"      {% if sortBy == 'author'      %}selected{% endif %}>👤 Author</option>
+                </select>
+                <input type="hidden" name="q" value="{{ q }}">
+            </form>
+        </div>
+    </div>
+
+    {# Results bar #}
+    <div class="results-bar">
+        <span style="background:var(--primary-light);color:var(--primary);padding:3px 12px;border-radius:20px;font-weight:700;">
+            {{ pagination.totalItemCount }} post{{ pagination.totalItemCount != 1 ? 's' : '' }}
+        </span>
+        {% if q %}
+            <span>matching "<strong>{{ q }}</strong>"</span>
+        {% endif %}
+    </div>
+
+    {# Post Grid #}
+    {% if pagination|length > 0 %}
+        <div class="blog-grid">
+            {% for post in pagination %}
+                <div class="post-card">
+                    <div class="post-thumb">
+                        {% if post.imagePath %}
+                            <img src="{{ post.imagePath }}" alt="{{ post.title }}">
+                        {% else %}
+                            <div class="post-thumb-placeholder">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="post-body">
+                        <div class="post-meta">
+                            <span class="author-chip">{{ post.authorName }}</span>
+                            <span>·</span>
+                            <span>{{ post.authorRole }}</span>
+                            <span>·</span>
+                            <i class="far fa-calendar-alt"></i>
+                            <span>{{ post.createdAt|date('M d, Y') }}</span>
+                        </div>
+                        <h5 class="post-title">{{ post.title }}</h5>
+                        <p class="post-excerpt">{{ post.content|slice(0, 160) }}</p>
+                        <div class="post-footer">
+                            <a href="{{ path('blog_show', {'id': post.id}) }}" class="btn btn-primary btn-sm">
+                                Read More <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                            <div class="comment-count">
+                                <i class="far fa-comment-alt"></i>
+                                {{ post.comments|length }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        <div class="d-flex justify-content-center mt-5">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    {% else %}
+        <div class="blog-empty">
+            <i class="fas fa-newspaper d-block"></i>
+            {% if q %}
+                <h5>No posts found for "{{ q }}"</h5>
+                <p>Try a different search term or <a href="{{ path('blog_index') }}" style="color:var(--primary);">browse all posts</a>.</p>
+            {% else %}
+                <h5>No posts yet</h5>
+                <p>Be the first to share something with the community!</p>
+                {% if app.user %}
+                    <a href="{{ path('blog_new') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>Write a Post
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

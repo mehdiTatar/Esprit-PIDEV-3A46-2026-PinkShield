@@ -1,0 +1,1195 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Health Tracking — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* ── Tracking Page Styles ───────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.3px;
+    margin: 0;
+}
+
+.page-title span {
+    color: var(--primary);
+}
+
+.page-subtitle {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    margin: 4px 0 0;
+}
+
+/* ── Suggestion Card ───────────────────────────────────── */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.suggestion-card {
+    border-radius: var(--card-radius);
+    border: 1px solid;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.8rem;
+    animation: slideIn 0.4s ease;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.suggestion-card.ok {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-color: #86efac;
+    border-left: 4px solid #22c55e;
+}
+.suggestion-card.warning {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-color: #fcd34d;
+    border-left: 4px solid #f59e0b;
+}
+.suggestion-card.urgent {
+    background: linear-gradient(135deg, #fff1f2, #fee2e2);
+    border-color: #fca5a5;
+    border-left: 4px solid #ef4444;
+}
+
+.suggestion-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.suggestion-card.ok      .suggestion-icon { background: rgba(34,197,94,0.15); color: #22c55e; }
+.suggestion-card.warning .suggestion-icon { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.suggestion-card.urgent  .suggestion-icon { background: rgba(239,68,68,0.15);  color: #ef4444; }
+
+.suggestion-body { flex: 1; min-width: 0; }
+.suggestion-body h3 { font-size: 1rem; font-weight: 700; margin: 0 0 4px; }
+.suggestion-card.ok      .suggestion-body h3 { color: #15803d; }
+.suggestion-card.warning .suggestion-body h3 { color: #92400e; }
+.suggestion-card.urgent  .suggestion-body h3 { color: #b91c1c; }
+
+.suggestion-body p { font-size: 0.88rem; color: var(--text-gray); margin: 0 0 10px; line-height: 1.5; }
+
+.reason-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.reason-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(239,68,68,0.1);
+    color: #b91c1c;
+}
+
+.btn-book-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.6rem 1.4rem;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+}
+
+.suggestion-card.urgent  .btn-book-now {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(239,68,68,0.3);
+}
+.suggestion-card.warning .btn-book-now {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.3);
+}
+.btn-book-now:hover { transform: translateY(-2px); filter: brightness(1.08); color: #fff; }
+
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 8px;
+}
+.score-badge.urgent  { background: rgba(239,68,68,0.15);  color: #dc2626; }
+.score-badge.warning { background: rgba(245,158,11,0.15); color: #d97706; }
+.score-badge.ok      { background: rgba(34,197,94,0.15);  color: #15803d; }
+
+/* ── Real-time alert (JS) ───────────────────────────────── */
+#liveAlert {
+    display: none;
+    border-radius: var(--card-radius);
+    padding: 0.85rem 1.1rem;
+    margin-top: 1rem;
+    font-size: 0.87rem;
+    font-weight: 600;
+    border: 1.5px solid;
+    animation: slideIn 0.3s ease;
+    align-items: center;
+    gap: 10px;
+}
+#liveAlert.show { display: flex; }
+#liveAlert.lvl-warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+#liveAlert.lvl-urgent  { background: #fff1f2; border-color: #fca5a5; color: #b91c1c; }
+
+/* ── Stats Grid ─────────────────────────────────────────── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 1.1rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+}
+
+.stat-card.mood::before    { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.stat-card.stress::before  { background: linear-gradient(90deg, #ef4444, #f87171); }
+.stat-card.energy::before  { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.stat-card.sleep::before   { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.stat-card.focus::before   { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+.stat-card.anxiety::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.stat-card.motivation::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.stat-card.appetite::before   { background: linear-gradient(90deg, #f97316, #fb923c); }
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.7rem;
+    font-size: 1rem;
+}
+
+.stat-card.mood .stat-icon    { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.stat-card.stress .stat-icon  { background: rgba(239,68,68,0.12);  color: #ef4444; }
+.stat-card.energy .stat-icon  { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.stat-card.sleep .stat-icon   { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+.stat-card.focus .stat-icon   { background: rgba(6,182,212,0.12);  color: #06b6d4; }
+.stat-card.anxiety .stat-icon { background: rgba(236,72,153,0.12); color: #ec4899; }
+.stat-card.motivation .stat-icon { background: rgba(16,185,129,0.12); color: #10b981; }
+.stat-card.appetite .stat-icon   { background: rgba(249,115,22,0.12);  color: #f97316; }
+
+.stat-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-card.mood .stat-value    { color: #f59e0b; }
+.stat-card.stress .stat-value  { color: #ef4444; }
+.stat-card.energy .stat-value  { color: #3b82f6; }
+.stat-card.sleep .stat-value   { color: #8b5cf6; }
+.stat-card.focus .stat-value   { color: #06b6d4; }
+.stat-card.anxiety .stat-value { color: #ec4899; }
+.stat-card.motivation .stat-value { color: #10b981; }
+.stat-card.appetite .stat-value   { color: #f97316; }
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ── Two-column layout ──────────────────────────────────── */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+    .content-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Cards ──────────────────────────────────────────────── */
+.card-section {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-section-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #f9fffe 0%, #f0faf7 100%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-section-header i { color: var(--primary); }
+.card-section-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.card-section-body { padding: 1.25rem; }
+
+/* ── Log Form ───────────────────────────────────────────── */
+.form-group-custom { margin-bottom: 1.2rem; }
+
+.form-label-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.form-label-custom .value-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+/* Emoji labels */
+.slider-emoji { font-size: 1rem; margin-right: 6px; }
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--primary) 0%, var(--primary) 50%, #e5e7eb 50%, #e5e7eb 100%);
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid var(--primary);
+    box-shadow: 0 1px 6px rgba(76,175,135,0.25);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 2px 12px rgba(76,175,135,0.4);
+}
+
+.form-control-custom {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: #fdfdfd;
+    transition: var(--transition);
+    resize: vertical;
+    outline: none;
+}
+
+.form-control-custom:focus {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(76,175,135,0.12);
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.7rem 0.9rem;
+    background: var(--light-bg);
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.checkbox-row:hover { border-color: var(--primary); background: var(--primary-light); }
+
+.checkbox-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.checkbox-row label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    margin: 0;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1rem;
+    letter-spacing: 0.3px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76,175,135,0.35);
+}
+
+/* ── Chart Area ─────────────────────────────────────────── */
+.chart-wrapper {
+    position: relative;
+    height: 240px;
+}
+
+/* ── History Table ──────────────────────────────────────── */
+.history-section {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+}
+
+.history-table th {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    background: linear-gradient(135deg, #f9fffe 0%, #f0faf7 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.history-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.history-table tr:last-child td { border-bottom: none; }
+.history-table tr:hover td { background: var(--light-bg); }
+
+.level-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.level-high   { background: rgba(239,68,68,0.12);  color: #ef4444; }
+.level-mid    { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.level-low    { background: rgba(76,175,135,0.12); color: var(--primary); }
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.3rem 0.7rem;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+.action-btn-edit {
+    background: rgba(59,130,246,0.1);
+    color: #3b82f6;
+}
+.action-btn-edit:hover { background: rgba(59,130,246,0.2); color: #2563eb; }
+
+.action-btn-delete {
+    background: rgba(239,68,68,0.1);
+    color: #ef4444;
+}
+.action-btn-delete:hover { background: rgba(239,68,68,0.2); color: #dc2626; }
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty-state p { font-size: 0.9rem; margin: 0; }
+
+/* ── Utility ────────────────────────────────────────────── */
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0.5rem 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+.section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.total-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-left: auto;
+}
+
+.trend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.trend-up   { background: rgba(239,68,68,0.10); color: #ef4444; }
+.trend-down { background: rgba(76,175,135,0.10); color: var(--primary); }
+.trend-flat { background: rgba(107,114,128,0.10); color: #6b7280; }
+</style>
+{% endblock %}
+
+{% block body %}
+{# ── Page Header ─────────────────────────────────────────────────────── #}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fas fa-heartbeat" style="color:var(--primary);margin-right:10px;"></i>Health <span>Tracking</span></h1>
+        <p class="page-subtitle">Monitor your daily wellbeing and mental health patterns</p>
+    </div>
+    <div style="display:flex;gap:.6rem;align-items:center;">
+        {% if advancedStats.totalEntries > 0 %}
+        <span class="total-badge"><i class="fas fa-database me-1"></i>{{ advancedStats.totalEntries }} entries logged</span>
+        {% endif %}
+        <a href="#log-form" class="btn-submit" style="width:auto;padding:.55rem 1.1rem;margin:0;font-size:.88rem;text-decoration:none;">
+            <i class="fas fa-plus"></i> Log Today
+        </a>
+    </div>
+</div>
+
+{# ── Suggestion Card ────────────────────────────────────────────────────── #}
+{% set sLevel = suggestion.level ?? 'ok' %}
+<div class="suggestion-card {{ sLevel }}">
+    <div class="suggestion-icon">
+        {% if sLevel == 'urgent' %}
+            <i class="fas fa-exclamation-triangle"></i>
+        {% elseif sLevel == 'warning' %}
+            <i class="fas fa-exclamation-circle"></i>
+        {% else %}
+            <i class="fas fa-check-circle"></i>
+        {% endif %}
+    </div>
+    <div class="suggestion-body">
+        <h3>
+            {% if sLevel == 'urgent' %}⚠️ Attention Recommended
+            {% elseif sLevel == 'warning' %}💛 Health Notice
+            {% else %}✅ You're Doing Well
+            {% endif %}
+            {% if sLevel != 'ok' %}
+                <span class="score-badge {{ sLevel }}"><i class="fas fa-chart-bar"></i> Risk score: {{ suggestion.score }}/14</span>
+            {% endif %}
+        </h3>
+        <p>{{ suggestion.message }}</p>
+
+        {# Reason chips #}
+        {% if suggestion.reasons|length > 0 %}
+        <div class="reason-chips">
+            {% for reason in suggestion.reasons %}
+            <span class="reason-chip"><i class="{{ reason.icon }}"></i> {{ reason.label }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# CTA button #}
+        {% if suggestion.cta and suggestion.specialty %}
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+            <a href="{{ path('appointment_new') }}" class="btn-book-now">
+                <i class="fas fa-calendar-plus"></i> {{ suggestion.cta }}
+            </a>
+            <span style="font-size:0.8rem;color:var(--text-muted);">
+                <i class="fas fa-stethoscope me-1"></i>Recommended: <strong>{{ suggestion.specialty }}</strong>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ── Stats Cards ──────────────────────────────────────────────────────── #}
+{% if stats.averageMood is not null %}
+<div class="stats-grid">
+
+    <div class="stat-card mood">
+        <div class="stat-icon"><i class="fas fa-smile"></i></div>
+        <div class="stat-value">{{ stats.averageMood ? stats.averageMood|number_format(1) : '—' }}</div>
+        <div class="stat-label">Mood</div>
+        <div class="stat-sub">avg / 10</div>
+        {% if advancedStats.moodTrend is not null %}
+            <div style="margin-top:6px;">
+                {% if advancedStats.moodTrend > 0 %}
+                    <span class="trend-chip trend-down"><i class="fas fa-arrow-up"></i> +{{ advancedStats.moodTrend|number_format(1) }}</span>
+                {% elseif advancedStats.moodTrend < 0 %}
+                    <span class="trend-chip trend-up"><i class="fas fa-arrow-down"></i> {{ advancedStats.moodTrend|number_format(1) }}</span>
+                {% else %}
+                    <span class="trend-chip trend-flat"><i class="fas fa-minus"></i> Stable</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="stat-card stress">
+        <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+        <div class="stat-value">{{ stats.averageStress ? stats.averageStress|number_format(1) : '—' }}</div>
+        <div class="stat-label">Stress</div>
+        <div class="stat-sub">avg / 10</div>
+        {% if advancedStats.stressTrend is not null %}
+            <div style="margin-top:6px;">
+                {% if advancedStats.stressTrend > 0 %}
+                    <span class="trend-chip trend-up"><i class="fas fa-arrow-up"></i> +{{ advancedStats.stressTrend|number_format(1) }}</span>
+                {% elseif advancedStats.stressTrend < 0 %}
+                    <span class="trend-chip trend-down"><i class="fas fa-arrow-down"></i> {{ advancedStats.stressTrend|number_format(1) }}</span>
+                {% else %}
+                    <span class="trend-chip trend-flat"><i class="fas fa-minus"></i> Stable</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="stat-card energy">
+        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+        <div class="stat-value">{{ stats.averageEnergy ? stats.averageEnergy|number_format(1) : '—' }}</div>
+        <div class="stat-label">Energy</div>
+        <div class="stat-sub">avg / 10</div>
+    </div>
+
+    <div class="stat-card sleep">
+        <div class="stat-icon"><i class="fas fa-moon"></i></div>
+        <div class="stat-value">{{ stats.averageSleepHours ? stats.averageSleepHours|number_format(1) : '—' }}</div>
+        <div class="stat-label">Sleep</div>
+        <div class="stat-sub">avg hrs</div>
+    </div>
+
+    <div class="stat-card focus">
+        <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+        <div class="stat-value">{{ stats.averageFocus ? stats.averageFocus|number_format(1) : '—' }}</div>
+        <div class="stat-label">Focus</div>
+        <div class="stat-sub">avg / 10</div>
+    </div>
+
+    <div class="stat-card anxiety">
+        <div class="stat-icon"><i class="fas fa-brain"></i></div>
+        <div class="stat-value">{{ stats.averageAnxiety ? stats.averageAnxiety|number_format(1) : '—' }}</div>
+        <div class="stat-label">Anxiety</div>
+        <div class="stat-sub">avg / 10</div>
+    </div>
+
+    <div class="stat-card motivation">
+        <div class="stat-icon"><i class="fas fa-star"></i></div>
+        <div class="stat-value">{{ stats.averageMotivation ? stats.averageMotivation|number_format(1) : '—' }}</div>
+        <div class="stat-label">Motivation</div>
+        <div class="stat-sub">avg / 10</div>
+    </div>
+
+    <div class="stat-card appetite">
+        <div class="stat-icon"><i class="fas fa-utensils"></i></div>
+        <div class="stat-value">{{ stats.averageAppetite ? stats.averageAppetite|number_format(1) : '—' }}</div>
+        <div class="stat-label">Appetite</div>
+        <div class="stat-sub">avg / 10</div>
+    </div>
+
+</div>
+{% endif %}
+
+{# ── Chart + Form ─────────────────────────────────────────────────────── #}
+<div class="content-grid">
+
+    {# Weekly Chart #}
+    <div class="card-section">
+        <div class="card-section-header">
+            <i class="fas fa-chart-line"></i>
+            <h2>7-Day Trends</h2>
+        </div>
+        <div class="card-section-body">
+            {% if weeklyData|length > 0 %}
+                <div class="chart-wrapper">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-chart-area d-block"></i>
+                    <p>No data yet.<br>Start logging to see your trends here.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Log Form #}
+    <div class="card-section" id="log-form">
+        <div class="card-section-header">
+            <i class="fas fa-plus-circle"></i>
+            <h2>Log Today's Health</h2>
+        </div>
+        <div class="card-section-body">
+            <form method="POST" action="{{ path('tracking_index') }}" id="trackingForm">
+
+                <div class="section-divider">Core Metrics</div>
+
+                {# Mood #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">😊</span> Mood</span>
+                        <span class="value-badge" id="mood-val">5</span>
+                    </div>
+                    <input type="range" name="mood" id="mood" min="1" max="10" value="5"
+                           oninput="updateSlider('mood', this.value)">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:3px;">
+                        <span>😞 Low</span><span>😄 High</span>
+                    </div>
+                </div>
+
+                {# Stress #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">⚡</span> Stress</span>
+                        <span class="value-badge" id="stress-val">5</span>
+                    </div>
+                    <input type="range" name="stress" id="stress" min="1" max="10" value="5"
+                           oninput="updateSlider('stress', this.value)">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:3px;">
+                        <span>😌 Calm</span><span>😤 Stressed</span>
+                    </div>
+                </div>
+
+                <div class="section-divider">Wellbeing</div>
+
+                {# Energy #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🔥</span> Energy Level</span>
+                        <span class="value-badge" id="energy_level-val">5</span>
+                    </div>
+                    <input type="range" name="energy_level" id="energy_level" min="1" max="10" value="5"
+                           oninput="updateSlider('energy_level', this.value)">
+                </div>
+
+                {# Sleep #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🌙</span> Sleep Hours</span>
+                        <span class="value-badge" id="sleep_hours-val">7</span>
+                    </div>
+                    <input type="range" name="sleep_hours" id="sleep_hours" min="0" max="24" value="7"
+                           oninput="updateSlider('sleep_hours', this.value)">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:3px;">
+                        <span>0h</span><span>24h</span>
+                    </div>
+                </div>
+
+                {# Focus #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🎯</span> Focus Level</span>
+                        <span class="value-badge" id="focus_level-val">5</span>
+                    </div>
+                    <input type="range" name="focus_level" id="focus_level" min="1" max="10" value="5"
+                           oninput="updateSlider('focus_level', this.value)">
+                </div>
+
+                <div class="section-divider">Mental Health</div>
+
+                {# Anxiety #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🧠</span> Anxiety Level</span>
+                        <span class="value-badge" id="anxiety_level-val">3</span>
+                    </div>
+                    <input type="range" name="anxiety_level" id="anxiety_level" min="1" max="10" value="3"
+                           oninput="updateSlider('anxiety_level', this.value)">
+                </div>
+
+                {# Motivation #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">⭐</span> Motivation</span>
+                        <span class="value-badge" id="motivation_level-val">5</span>
+                    </div>
+                    <input type="range" name="motivation_level" id="motivation_level" min="1" max="10" value="5"
+                           oninput="updateSlider('motivation_level', this.value)">
+                </div>
+
+                {# Social #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🤝</span> Social Interaction</span>
+                        <span class="value-badge" id="social_interaction_level-val">5</span>
+                    </div>
+                    <input type="range" name="social_interaction_level" id="social_interaction_level" min="1" max="10" value="5"
+                           oninput="updateSlider('social_interaction_level', this.value)">
+                </div>
+
+                <div class="section-divider">Lifestyle</div>
+
+                {# Appetite #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🍽️</span> Appetite Level</span>
+                        <span class="value-badge" id="appetite_level-val">5</span>
+                    </div>
+                    <input type="range" name="appetite_level" id="appetite_level" min="1" max="10" value="5"
+                           oninput="updateSlider('appetite_level', this.value)">
+                </div>
+
+                {# Water #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">💧</span> Water Intake (cl)</span>
+                        <span class="value-badge" id="water_intake-val">150</span>
+                    </div>
+                    <input type="range" name="water_intake" id="water_intake" min="0" max="500" step="10" value="150"
+                           oninput="updateSlider('water_intake', this.value)">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:3px;">
+                        <span>0 cl</span><span>500 cl</span>
+                    </div>
+                </div>
+
+                {# Physical Activity #}
+                <div class="form-group-custom">
+                    <div class="form-label-custom">
+                        <span><span class="slider-emoji">🏃</span> Physical Activity</span>
+                        <span class="value-badge" id="physical_activity_level-val">3</span>
+                    </div>
+                    <input type="range" name="physical_activity_level" id="physical_activity_level" min="1" max="10" value="3"
+                           oninput="updateSlider('physical_activity_level', this.value)">
+                </div>
+
+                {# Medication #}
+                <div class="form-group-custom">
+                    <div class="checkbox-row" onclick="this.querySelector('input').click();">
+                        <input type="checkbox" name="medication_taken" id="medication_taken" value="1" onclick="event.stopPropagation();">
+                        <label for="medication_taken"><i class="fas fa-pills me-2" style="color:var(--primary);"></i>Medication taken today</label>
+                    </div>
+                </div>
+
+                <div class="section-divider">Notes</div>
+
+                {# Activities #}
+                <div class="form-group-custom">
+                    <label class="form-label-custom" style="margin-bottom:6px;" for="activities">
+                        <span><i class="fas fa-running me-1" style="color:var(--primary);"></i> Activities today</span>
+                    </label>
+                    <textarea name="activities" id="activities" class="form-control-custom" rows="2"
+                              placeholder="e.g. went for a walk, yoga, reading..."></textarea>
+                </div>
+
+                {# Symptoms #}
+                <div class="form-group-custom">
+                    <label class="form-label-custom" style="margin-bottom:6px;" for="symptoms">
+                        <span><i class="fas fa-notes-medical me-1" style="color:#ef4444;"></i> Symptoms or notes</span>
+                    </label>
+                    <textarea name="symptoms" id="symptoms" class="form-control-custom" rows="2"
+                              placeholder="e.g. headache, fatigue, any concerns..."></textarea>
+                </div>
+
+                {# Live real-time alert #}
+                <div id="liveAlert" role="alert">
+                    <i class="fas fa-exclamation-triangle" style="flex-shrink:0;"></i>
+                    <span id="liveAlertMsg"></span>
+                    <a href="{{ path('appointment_new') }}" id="liveAlertBtn"
+                       style="margin-left:auto;white-space:nowrap;font-size:0.8rem;padding:4px 12px;border-radius:7px;text-decoration:none;font-weight:700;"></a>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Save Today's Log
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{# ── History Table ────────────────────────────────────────────────────── #}
+<div class="history-section">
+    <div class="card-section-header" style="background: linear-gradient(135deg, #f9fffe 0%, #f0faf7 100%);border-bottom: 1px solid var(--border);">
+        <i class="fas fa-history" style="color:var(--primary);"></i>
+        <h2 style="font-size:1rem;font-weight:700;margin:0;color:var(--text-dark);">Recent Entries</h2>
+        {% if recentEntries|length > 0 %}
+        <span class="total-badge" style="margin-left:auto;">Last {{ recentEntries|length }} entries</span>
+        {% endif %}
+    </div>
+
+    {% if recentEntries|length > 0 %}
+    <div style="overflow-x:auto;">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th><i class="fas fa-smile" style="color:#f59e0b;"></i> Mood</th>
+                    <th><i class="fas fa-bolt" style="color:#ef4444;"></i> Stress</th>
+                    <th><i class="fas fa-fire" style="color:#3b82f6;"></i> Energy</th>
+                    <th><i class="fas fa-moon" style="color:#8b5cf6;"></i> Sleep</th>
+                    <th><i class="fas fa-pills" style="color:var(--primary);"></i> Meds</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in recentEntries %}
+                <tr>
+                    <td>
+                        <div style="font-weight:600;font-size:0.85rem;">{{ entry.date|date('d M') }}</div>
+                        <div style="font-size:0.72rem;color:var(--text-muted);">{{ entry.date|date('Y') }}</div>
+                    </td>
+                    <td>
+                        <span class="level-pill {% if entry.mood >= 7 %}level-low{% elseif entry.mood >= 4 %}level-mid{% else %}level-high{% endif %}">
+                            {{ entry.mood }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="level-pill {% if entry.stress >= 7 %}level-high{% elseif entry.stress >= 4 %}level-mid{% else %}level-low{% endif %}">
+                            {{ entry.stress }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if entry.energyLevel %}
+                        <span class="level-pill {% if entry.energyLevel >= 7 %}level-low{% elseif entry.energyLevel >= 4 %}level-mid{% else %}level-high{% endif %}">
+                            {{ entry.energyLevel }}
+                        </span>
+                        {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if entry.sleepHours is not null %}
+                        <span style="font-weight:600;font-size:0.85rem;">{{ entry.sleepHours }}h</span>
+                        {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if entry.medicationTaken %}
+                            <i class="fas fa-check-circle" style="color:var(--primary);"></i>
+                        {% elseif entry.medicationTaken == false %}
+                            <i class="fas fa-times-circle" style="color:#ef4444;"></i>
+                        {% else %}
+                            <span style="color:var(--text-muted);">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:0.8rem;color:var(--text-gray);"
+                             title="{{ entry.symptoms ?? entry.activities ?? '' }}">
+                            {{ entry.symptoms ?? entry.activities ?? '—' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <a href="{{ path('tracking_edit', {id: entry.id}) }}" class="action-btn action-btn-edit">
+                                <i class="fas fa-pen"></i> Edit
+                            </a>
+                            <form method="POST" action="{{ path('tracking_delete', {id: entry.id}) }}"
+                                  onsubmit="return confirm('Delete this entry?');" style="margin:0;">
+                                <button type="submit" class="action-btn action-btn-delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-heartbeat d-block"></i>
+        <p>No entries yet. Use the form above to log your first health entry!</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* ── Slider update helper ─────────────────────────────── */
+function updateSlider(name, value) {
+    const badge = document.getElementById(name + '-val');
+    if (badge) badge.textContent = value;
+
+    const input = document.getElementById(name);
+    if (input) {
+        const min = parseFloat(input.min) || 0;
+        const max = parseFloat(input.max) || 10;
+        const pct = ((parseFloat(value) - min) / (max - min)) * 100;
+        input.style.background =
+            `linear-gradient(to right, var(--primary) 0%, var(--primary) ${pct}%, #e5e7eb ${pct}%, #e5e7eb 100%)`;
+    }
+
+    // Trigger live risk analysis on every slider change
+    analyzeRisk();
+}
+
+/* ── Real-time Risk Analysis ──────────────────────────── */
+function analyzeRisk() {
+    const val = id => parseFloat(document.getElementById(id)?.value || 0);
+
+    const stress    = val('stress');
+    const mood      = val('mood');
+    const anxiety   = val('anxiety_level');
+    const sleep     = val('sleep_hours');
+    const energy    = val('energy_level');
+    const motivation = val('motivation_level');
+
+    let score = 0;
+    let reasons = [];
+
+    if (stress >= 8)       { score += 3; reasons.push('Very high stress'); }
+    else if (stress >= 6)  { score += 1; reasons.push('Elevated stress'); }
+
+    if (mood <= 3)         { score += 3; reasons.push('Very low mood'); }
+    else if (mood <= 5)    { score += 1; reasons.push('Low mood'); }
+
+    if (anxiety >= 7)      { score += 2; reasons.push('High anxiety'); }
+    else if (anxiety >= 5) { score += 1; reasons.push('Moderate anxiety'); }
+
+    if (sleep > 0 && sleep < 4)         { score += 2; reasons.push('Very low sleep'); }
+    else if (sleep >= 4 && sleep < 6)   { score += 1; reasons.push('Low sleep'); }
+
+    if (energy > 0 && energy <= 2)      { score += 2; reasons.push('Critically low energy'); }
+    else if (energy > 2 && energy <= 4) { score += 1; reasons.push('Low energy'); }
+
+    if (motivation > 0 && motivation <= 2) { score += 1; reasons.push('Very low motivation'); }
+
+    const alert   = document.getElementById('liveAlert');
+    const alertMsg = document.getElementById('liveAlertMsg');
+    const alertBtn = document.getElementById('liveAlertBtn');
+
+    if (!alert) return;
+
+    // Remove existing level classes
+    alert.classList.remove('show', 'lvl-warning', 'lvl-urgent');
+    alertBtn.style.display = 'none';
+
+    if (score >= 5) {
+        alert.classList.add('show', 'lvl-urgent');
+        alertMsg.textContent = `⚠️ Current inputs suggest high health risk (score: ${score}/14) — ${reasons.slice(0,2).join(', ')}. Consider booking an appointment.`;
+        alertBtn.textContent = '📅 Book Now';
+        alertBtn.style.cssText = 'display:inline-flex;margin-left:auto;white-space:nowrap;font-size:0.8rem;padding:5px 12px;border-radius:7px;text-decoration:none;font-weight:700;background:#ef4444;color:#fff;';
+    } else if (score >= 2) {
+        alert.classList.add('show', 'lvl-warning');
+        alertMsg.textContent = `💛 Some concern detected (score: ${score}/14) — ${reasons.join(', ')}.`;
+        alertBtn.textContent = '📅 Book Consultation';
+        alertBtn.style.cssText = 'display:inline-flex;margin-left:auto;white-space:nowrap;font-size:0.8rem;padding:5px 12px;border-radius:7px;text-decoration:none;font-weight:700;background:#f59e0b;color:#fff;';
+    }
+}
+
+/* Init all sliders on page load */
+document.querySelectorAll('input[type="range"]').forEach(input => {
+    updateSlider(input.name, input.value);
+});
+
+/* ── Weekly Chart ─────────────────────────────────────── */
+{% if weeklyData|length > 0 %}
+const weeklyLabels = [
+    {% for item in weeklyData %}
+        "{{ item.date|date('d/m') }}",
+    {% endfor %}
+];
+const moodData = [{% for item in weeklyData %}{{ item.mood ? item.mood|number_format(1) : 'null' }},{% endfor %}];
+const stressData = [{% for item in weeklyData %}{{ item.stress ? item.stress|number_format(1) : 'null' }},{% endfor %}];
+const energyData = [{% for item in weeklyData %}{{ item.energy ? item.energy|number_format(1) : 'null' }},{% endfor %}];
+
+const ctx = document.getElementById('weeklyChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: weeklyLabels,
+        datasets: [
+            {
+                label: 'Mood',
+                data: moodData,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245,158,11,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#f59e0b',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true,
+            },
+            {
+                label: 'Stress',
+                data: stressData,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239,68,68,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#ef4444',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true,
+            },
+            {
+                label: 'Energy',
+                data: energyData,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#3b82f6',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.35,
+                fill: true,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: { size: 11, weight: '600', family: 'Inter' },
+                    usePointStyle: true,
+                    pointStyleWidth: 8,
+                    padding: 16,
+                }
+            },
+            tooltip: {
+                backgroundColor: '#fff',
+                titleColor: '#1a2332',
+                bodyColor: '#6b7280',
+                borderColor: '#d1ede5',
+                borderWidth: 1,
+                padding: 10,
+                cornerRadius: 8,
+                titleFont: { weight: '700', size: 12 },
+                callbacks: {
+                    label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y ?? 'N/A'}/10`,
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 11, family: 'Inter' }, color: '#9ca3af' }
+            },
+            y: {
+                min: 0, max: 10,
+                grid: { color: 'rgba(0,0,0,0.04)' },
+                ticks: { stepSize: 2, font: { size: 11, family: 'Inter' }, color: '#9ca3af' }
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

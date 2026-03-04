@@ -1,0 +1,180 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ title }} — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .profile-edit-wrap {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .profile-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, #e8557a 100%);
+        border-radius: 16px 16px 0 0;
+        padding: 32px 36px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .profile-avatar {
+        width: 68px; height: 68px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #fff;
+        flex-shrink: 0;
+        border: 3px solid rgba(255,255,255,0.4);
+    }
+
+    .profile-hero h2 { font-size: 1.4rem; font-weight: 800; margin: 0 0 4px; }
+    .profile-hero p  { margin: 0; opacity: 0.78; font-size: 0.88rem; }
+
+    .profile-form-card {
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 8px 32px rgba(192,57,107,0.12);
+        border: 1px solid var(--border);
+        border-top: none;
+    }
+
+    .profile-form-body { padding: 36px; }
+
+    .form-section-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        margin: 0 0 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-section-title i { color: var(--primary); }
+
+    .form-section + .form-section { margin-top: 28px; }
+
+    .field-hint {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        padding: 22px 36px;
+        border-top: 1px solid var(--border);
+        background: #fafafa;
+        border-radius: 0 0 16px 16px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-edit-wrap">
+    {# Hero Header #}
+    <div class="profile-hero">
+        <div class="profile-avatar">
+            {{ app.user is defined and app.user ? app.user.userIdentifier|first|upper : '?' }}
+        </div>
+        <div>
+            <h2>{{ title }}</h2>
+            <p><i class="fas fa-id-card me-1"></i>Update your personal information and account settings</p>
+        </div>
+    </div>
+
+    {# Form Card #}
+    <div class="profile-form-card">
+        <div class="profile-form-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'userProfileForm'}}) }}
+
+                {# Personal Information #}
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-user"></i> Personal Information
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_label(form.firstName) }}
+                            {{ form_widget(form.firstName, {'attr': {'data-ajax-validate': 'firstName', 'placeholder': 'First name'}}) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(form.lastName) }}
+                            {{ form_widget(form.lastName, {'attr': {'data-ajax-validate': 'lastName', 'placeholder': 'Last name'}}) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Contact Details #}
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-address-book"></i> Contact Details
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'data-ajax-validate': 'email', 'placeholder': 'your@email.com'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.phone) }}
+                        {{ form_widget(form.phone, {'attr': {'data-ajax-validate': 'phone', 'placeholder': '+216 XX XXX XXX'}}) }}
+                        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>Used for appointment reminders</div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.address) }}
+                        {{ form_widget(form.address, {'attr': {'data-ajax-validate': 'address', 'placeholder': 'Your address'}}) }}
+                    </div>
+                </div>
+
+                {# Security #}
+                {% if form.password is defined %}
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <i class="fas fa-lock"></i> Change Password
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password, {'attr': {
+                            'data-ajax-validate': 'password',
+                            'placeholder': 'Leave blank to keep your current password'
+                        }}) }}
+                        <div class="field-hint"><i class="fas fa-shield-alt me-1"></i>Minimum 8 characters recommended</div>
+                    </div>
+                </div>
+                {% endif %}
+
+            {{ form_end(form) }}
+        </div>
+
+        {# Sticky actions bar #}
+        <div class="form-actions">
+            <button type="submit" form="userProfileForm" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% if form.vars.data.id %}{{ path('user_index') }}{% else %}{{ path('login') }}{% endif %}"
+               class="btn btn-secondary d-flex align-items-center gap-2">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('userProfileForm');
+    if (!form) return;
+    AjaxValidator.attachBlur(form);
+    AjaxValidator.attachSubmit(form);
+});
+</script>
+{% endblock %}

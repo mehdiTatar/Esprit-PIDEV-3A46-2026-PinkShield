@@ -1,0 +1,7 @@
+# CSRF protection is handled per-form and via security.yaml in Symfony 6.4
+# The token_id and stateless_token_ids options are Symfony 7+ only
+framework:
+    form:
+        csrf_protection:
+            enabled: true
+            field_name: _token

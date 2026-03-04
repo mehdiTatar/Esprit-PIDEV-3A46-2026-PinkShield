@@ -1,0 +1,73 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        doctor_provider:
+            entity:
+                class: App\Entity\Doctor
+                property: email
+        admin_provider:
+            entity:
+                class: App\Entity\Admin
+                property: email
+        chain_provider:
+            chain:
+                providers: [admin_provider, doctor_provider, user_provider]
+
+    firewalls:
+        dev:
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        main:
+            lazy: true
+            provider: chain_provider
+            form_login:
+                login_path: login
+                check_path: login
+                default_target_path: home
+                username_parameter: _username
+                password_parameter: _password
+            logout:
+                path: logout
+                target: login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+            two_factor:
+                check_path: 2fa_login_check
+                default_target_path: home
+                always_use_default_target_path: true
+                prepare_on_login: true
+                prepare_on_access_denied: true
+
+    # Note: Only the *first* matching rule is applied
+    access_control:
+        - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: ^/2fa_skip, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # Allow doctors, admins and regular users to access /doctor area per request
+        - { path: ^/doctor, roles: [ROLE_DOCTOR, ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/user, roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/face-login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon
+

@@ -1,0 +1,480 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Doctor Registration — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Page shell ──────────────────────────────────────────── */
+    .navbar { position: static !important; }
+    aside.sidebar { display: none !important; }
+    footer { display: none !important; }
+
+    body {
+        background: linear-gradient(135deg, #fce4ec 0%, #f8d0df 100%) !important;
+        min-height: 100vh;
+    }
+
+    main {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        width: 100% !important;
+        min-height: calc(100vh - 64px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        background: radial-gradient(circle at 10% 20%, rgba(192, 57, 107, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(192, 57, 107, 0.05) 0%, transparent 40%);
+    }
+
+    footer, .site-footer {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .reg-card-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 20px;
+        margin: auto;
+    }
+
+    .reg-card {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        max-width: 1000px;
+        width: 100%;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.13);
+        overflow: hidden;
+    }
+
+    /* ── Left panel ──────────────────────────────────────────── */
+    .reg-panel {
+        background: linear-gradient(160deg, var(--primary, #c0396b) 0%, #9b2553 100%);
+        padding: 52px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #fff;
+    }
+
+    .reg-panel-logo { display: flex; align-items: center; gap: 12px; }
+    .reg-panel-logo img { height: 38px; filter: brightness(0) invert(1); }
+    .reg-panel-logo span { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
+
+    .reg-panel-hero { text-align: center; padding: 20px 0; }
+    .reg-panel-hero .hero-icon {
+        width: 88px; height: 88px;
+        background: rgba(255,255,255,0.18);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem;
+        margin: 0 auto 22px;
+        backdrop-filter: blur(6px);
+    }
+    .reg-panel-hero h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.4px; }
+    .reg-panel-hero p { font-size: 0.95rem; opacity: 0.85; line-height: 1.6; }
+
+    .reg-panel-benefits { display: flex; flex-direction: column; gap: 14px; }
+    .benefit {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+    .benefit i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+    /* ── Right form panel ────────────────────────────────────── */
+    .reg-form-panel {
+        padding: 48px 44px;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+
+    .reg-form-header { margin-bottom: 28px; }
+    .reg-form-header h3 {
+        font-size: 1.6rem; font-weight: 800;
+        color: #1a2332; letter-spacing: -0.4px;
+        margin-bottom: 4px;
+    }
+    .reg-form-header p { font-size: 0.9rem; color: #6b7280; }
+
+    /* ── Form fields ─────────────────────────────────────────── */
+    .field { margin-bottom: 16px; }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+    .field label i { color: var(--primary, #c0396b); font-size: 0.8rem; width: 14px; }
+
+    .field input,
+    .field select {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        background: #f9fafb;
+        color: #1a2332;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .field input::placeholder { color: #c4c9d4; }
+    .field input:focus,
+    .field select:focus {
+        outline: none;
+        border-color: var(--primary, #c0396b);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(192,57,107,0.15);
+    }
+    .field input.is-invalid,
+    .field select.is-invalid { border-color: #ef4444; background: #fff8f8; }
+    .field input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+
+    /* password wrapper */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle {
+        position: absolute;
+        right: 12px; top: 50%;
+        transform: translateY(-50%);
+        background: none; border: none;
+        color: #9ca3af; cursor: pointer;
+        font-size: 0.9rem;
+        padding: 2px 4px;
+        transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--primary, #c0396b); }
+
+    /* select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 14px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        font-size: 0.75rem;
+    }
+
+    /* error messages */
+    .field-error {
+        color: #ef4444;
+        font-size: 0.80rem;
+        margin-top: 4px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* ── Alerts ──────────────────────────────────────────────── */
+    .reg-alert {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #ef4444;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        color: #b91c1c;
+        font-size: 0.88rem;
+    }
+    .reg-alert ul { margin: 6px 0 0 16px; }
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .section-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 6px 0 16px;
+        color: #9ca3af;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+    .section-divider::before, .section-divider::after {
+        content: ''; flex: 1;
+        height: 1px; background: #e5e7eb;
+    }
+
+    /* ── Actions ─────────────────────────────────────────────── */
+    .reg-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-submit {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--primary, #c0396b), #e8557a);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #9b2553, #c0396b);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(192,57,107,0.35);
+    }
+
+    .btn-back-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 11px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all 0.2s;
+        background: #f9fafb;
+    }
+    .btn-back-link:hover {
+        border-color: var(--primary, #c0396b);
+        color: var(--primary, #c0396b);
+        background: #fff0f5;
+    }
+
+    /* ── Footer login link ───────────────────────────────────── */
+    .reg-login-row {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+        text-align: center;
+        font-size: 0.87rem;
+        color: #6b7280;
+    }
+    .reg-login-row a { color: var(--primary, #c0396b); font-weight: 600; text-decoration: none; }
+    .reg-login-row a:hover { text-decoration: underline; }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 860px) {
+        .reg-card { grid-template-columns: 1fr; }
+        .reg-panel { padding: 36px 28px; }
+        .reg-panel-benefits { display: none; }
+        .reg-form-panel { padding: 36px 28px; max-height: none; }
+    }
+    @media (max-width: 560px) {
+        .field-row { grid-template-columns: 1fr; gap: 0; }
+        main { padding: 20px 12px; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="reg-card-wrapper">
+<div class="reg-card">
+
+    {# ── Left branding panel ───────────────────────────────────── #}
+    <div class="reg-panel">
+        <div class="reg-panel-logo">
+            <img src="{{ asset('images/colored-logo.png') }}" alt="PinkShield">
+            <span>PinkShield</span>
+        </div>
+
+        <div class="reg-panel-hero">
+            <div class="hero-icon"><i class="fas fa-stethoscope"></i></div>
+            <h2>Join as a Doctor</h2>
+            <p>Connect with patients, manage appointments, and deliver exceptional care through our platform.</p>
+        </div>
+
+        <div class="reg-panel-benefits">
+            <div class="benefit"><i class="fas fa-shield-alt"></i> Secure & HIPAA-compliant</div>
+            <div class="benefit"><i class="fas fa-users"></i> Grow your patient base</div>
+            <div class="benefit"><i class="fas fa-calendar-check"></i> Smart appointment scheduling</div>
+            <div class="benefit"><i class="fas fa-chart-line"></i> Practice analytics dashboard</div>
+        </div>
+    </div>
+
+    {# ── Right form panel ──────────────────────────────────────── #}
+    <div class="reg-form-panel">
+        <div class="reg-form-header">
+            <h3>Create your account</h3>
+            <p>Fill in the details below to register as a licensed practitioner.</p>
+        </div>
+
+        {% if form.vars.errors|length > 0 %}
+            <div class="reg-alert">
+                <strong><i class="fas fa-exclamation-circle me-2"></i>Please fix the following errors:</strong>
+                <ul>
+                    {% for error in form.vars.errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'autocomplete': 'off', 'id': 'doctorRegForm'}}) }}
+        {{ form_widget(form._token) }}
+
+        {# Email #}
+        <div class="field">
+            <label for="doctor_email"><i class="fas fa-envelope"></i> Email Address</label>
+            {{ form_widget(form.email, {
+                'attr': {'class': 'form-control', 'placeholder': 'doctor@example.com',
+                         'id': 'doctor_email', 'data-ajax-validate': 'email'}
+            }) }}
+        </div>
+
+        {# First / Last name #}
+        <div class="field-row">
+            <div class="field" style="margin-bottom:0">
+                <label for="doctor_firstName"><i class="fas fa-user"></i> First Name</label>
+                {{ form_widget(form.firstName, {
+                    'attr': {'class': 'form-control', 'placeholder': 'First name',
+                             'id': 'doctor_firstName', 'data-ajax-validate': 'firstName'}
+                }) }}
+            </div>
+            <div class="field" style="margin-bottom:0">
+                <label for="doctor_lastName"><i class="fas fa-user"></i> Last Name</label>
+                {{ form_widget(form.lastName, {
+                    'attr': {'class': 'form-control', 'placeholder': 'Last name',
+                             'id': 'doctor_lastName', 'data-ajax-validate': 'lastName'}
+                }) }}
+            </div>
+        </div>
+
+        {# Speciality #}
+        <div class="field">
+            <label for="doctor_speciality"><i class="fas fa-stethoscope"></i> Medical Speciality</label>
+            <div class="select-wrap">
+                {{ form_widget(form.speciality, {
+                    'attr': {'class': 'form-control', 'id': 'doctor_speciality'}
+                }) }}
+            </div>
+        </div>
+
+        {# Address (optional) #}
+        {% if form.address is defined %}
+        <div class="field">
+            <label for="doctor_address"><i class="fas fa-map-marker-alt"></i> Clinic / Office Address <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+            {{ form_widget(form.address, {
+                'attr': {'class': 'form-control', 'placeholder': 'e.g. 12 Rue de la Paix, Paris',
+                         'id': 'doctor_address', 'data-ajax-validate': 'address'}
+            }) }}
+        </div>
+        {% endif %}
+
+        {# Phone (optional) #}
+        {% if form.phone is defined %}
+        <div class="field">
+            <label for="doctor_phone"><i class="fas fa-phone"></i> Phone Number <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+            {{ form_widget(form.phone, {
+                'attr': {'class': 'form-control', 'placeholder': '+213 5XX XXX XXX',
+                         'id': 'doctor_phone', 'data-ajax-validate': 'phone'}
+            }) }}
+        </div>
+        {% endif %}
+
+        <div class="section-divider">Security</div>
+
+        {# Password #}
+        <div class="field">
+            <label for="doctor_password"><i class="fas fa-lock"></i> Password</label>
+            <div class="pw-wrap">
+                {{ form_widget(form.password, {
+                    'attr': {'class': 'form-control', 'id': 'doctor_password',
+                             'placeholder': 'Min. 8 characters', 'data-ajax-validate': 'password'}
+                }) }}
+                <button type="button" class="pw-toggle" id="doctorPwToggle" aria-label="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        {# Actions #}
+        <div class="reg-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-user-check"></i> Create Doctor Account
+            </button>
+            <a href="{{ path('register') }}" class="btn-back-link">
+                <i class="fas fa-arrow-left"></i> Back to account type selection
+            </a>
+        </div>
+
+        {{ form_end(form, {'render_rest': false}) }}
+
+        <div class="reg-login-row">
+            Already have an account? <a href="{{ path('login') }}">Sign in</a>
+        </div>
+    </div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function () {
+    const pwBtn = document.getElementById('doctorPwToggle');
+    const pwInput = document.getElementById('doctor_password');
+    if (pwBtn && pwInput) {
+        pwBtn.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                pwInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    }
+
+    const form = document.getElementById('doctorRegForm');
+    if (form) {
+        AjaxValidator.attachBlur(form);
+        AjaxValidator.attachSubmit(form);
+    }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,817 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Admin Dashboard — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ══════════════════════════════════════════════════════
+       ADMIN DASHBOARD — Dark Navy Command Center Theme
+    ══════════════════════════════════════════════════════ */
+
+    :root {
+        --adm-navy:       #1e293b;
+        --adm-navy-mid:   #334155;
+        --adm-blue:       #3b82f6;
+        --adm-blue-dark:  #2563eb;
+        --adm-blue-light: rgba(59, 130, 246, 0.12);
+        --adm-red:        #ef4444;
+        --adm-amber:      #f59e0b;
+        --adm-green:      #22c55e;
+        --adm-purple:     #8b5cf6;
+        --adm-teal:       #14b8a6;
+        --adm-surface:    #f8fafc;
+        --adm-border:     #e2e8f0;
+    }
+
+    body { background: var(--adm-surface) !important; }
+
+    /* ── Page layout ── */
+    .adm-wrap { display: flex; flex-direction: column; gap: 24px; }
+
+    /* ── Command header ── */
+    .adm-header {
+        background: linear-gradient(135deg, var(--adm-navy) 0%, var(--adm-navy-mid) 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 36px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        box-shadow: 0 8px 32px rgba(30, 41, 59, 0.25);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .adm-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(59,130,246,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59,130,246,0.08) 1px, transparent 1px);
+        background-size: 32px 32px;
+        pointer-events: none;
+    }
+
+    .adm-header > * { position: relative; z-index: 1; }
+
+    .adm-header-left h1 {
+        font-size: 1.9rem;
+        font-weight: 800;
+        margin: 0 0 6px;
+        letter-spacing: -0.4px;
+    }
+
+    .adm-header-left p { margin: 0; opacity: 0.7; font-size: 0.9rem; }
+
+    .adm-header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+    }
+
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: #86efac;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .status-dot {
+        width: 8px; height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
+    }
+
+    .adm-date { font-size: 0.78rem; color: rgba(255,255,255,0.5); font-weight: 500; }
+
+    /* ── KPI strip ── */
+    .kpi-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+    }
+
+    .kpi-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 24px 20px;
+        box-shadow: var(--shadow-sm);
+        border-top: 3px solid var(--adm-blue);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-decoration: none;
+        color: inherit;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0; right: 0;
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        background: var(--adm-blue-light);
+        transform: translate(30%, 30%);
+        transition: transform 0.3s ease;
+    }
+
+    .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(59,130,246,0.18); color: inherit; }
+    .kpi-card:hover::after { transform: translate(20%, 20%) scale(1.3); }
+
+    .kpi-card.red    { border-top-color: var(--adm-red); }
+    .kpi-card.red::after    { background: rgba(239,68,68,0.08); }
+    .kpi-card.amber  { border-top-color: var(--adm-amber); }
+    .kpi-card.amber::after  { background: rgba(245,158,11,0.08); }
+    .kpi-card.green  { border-top-color: var(--adm-green); }
+    .kpi-card.green::after  { background: rgba(34,197,94,0.08); }
+    .kpi-card.purple { border-top-color: var(--adm-purple); }
+    .kpi-card.purple::after { background: rgba(139,92,246,0.08); }
+    .kpi-card.teal   { border-top-color: var(--adm-teal); }
+    .kpi-card.teal::after   { background: rgba(20,184,166,0.08); }
+
+    .kpi-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        background: var(--adm-blue-light);
+        color: var(--adm-blue);
+        position: relative; z-index: 1;
+    }
+
+    .kpi-card.red    .kpi-icon { background: rgba(239,68,68,0.1);   color: var(--adm-red); }
+    .kpi-card.amber  .kpi-icon { background: rgba(245,158,11,0.1);  color: var(--adm-amber); }
+    .kpi-card.green  .kpi-icon { background: rgba(34,197,94,0.1);   color: var(--adm-green); }
+    .kpi-card.purple .kpi-icon { background: rgba(139,92,246,0.1);  color: var(--adm-purple); }
+    .kpi-card.teal   .kpi-icon { background: rgba(20,184,166,0.1);  color: var(--adm-teal); }
+
+    .kpi-value {
+        font-size: 2rem; font-weight: 800;
+        color: var(--adm-navy); line-height: 1;
+        position: relative; z-index: 1;
+    }
+
+    .kpi-label {
+        font-size: 0.74rem; font-weight: 600;
+        color: #64748b; text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative; z-index: 1;
+    }
+
+    .kpi-sub {
+        font-size: 0.72rem; color: #94a3b8;
+        position: relative; z-index: 1;
+    }
+
+    /* ── Charts row ── */
+    .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.4fr;
+        gap: 18px;
+    }
+
+    /* ── Panel ── */
+    .adm-panel {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+
+    .adm-panel-header {
+        background: var(--adm-navy);
+        color: #fff;
+        padding: 15px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .adm-panel-header .header-left { display: flex; align-items: center; gap: 9px; }
+    .adm-panel-header i { color: var(--adm-blue); font-size: 1rem; }
+
+    .adm-panel-header .badge-sm {
+        font-size: 0.68rem; font-weight: 700;
+        background: rgba(59,130,246,0.2);
+        color: #93c5fd;
+        padding: 2px 8px; border-radius: 10px;
+    }
+
+    .adm-panel-body { padding: 22px; }
+
+    .chart-container { position: relative; }
+    .chart-container canvas { width: 100% !important; }
+
+    /* ── Main grid ── */
+    .adm-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 20px;
+    }
+
+    /* ── Management table ── */
+    .mgmt-table { width: 100%; border-collapse: collapse; }
+
+    .mgmt-table th {
+        text-align: left; font-size: 0.7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        color: #94a3b8; padding: 0 0 12px;
+        border-bottom: 1px solid var(--adm-border);
+    }
+
+    .mgmt-table td {
+        padding: 11px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 0.87rem; vertical-align: middle;
+    }
+
+    .mgmt-table tr:last-child td { border-bottom: none; }
+
+    .mgmt-count { font-size: 1.3rem; font-weight: 800; color: var(--adm-navy); }
+
+    .mgmt-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 5px 12px; border-radius: 8px; font-size: 0.78rem;
+        font-weight: 600; text-decoration: none;
+        background: var(--adm-blue-light); color: var(--adm-blue);
+        transition: all 0.2s;
+    }
+
+    .mgmt-btn:hover { background: var(--adm-blue); color: #fff; }
+
+    /* ── Quick actions ── */
+    .quick-actions-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .qa-btn {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px; border-radius: 10px; text-decoration: none;
+        font-weight: 600; font-size: 0.87rem; transition: all 0.22s ease;
+        border: 1.5px solid var(--adm-border); color: var(--adm-navy); background: #fff;
+    }
+
+    .qa-btn:hover {
+        border-color: var(--adm-blue); background: var(--adm-blue-light);
+        color: var(--adm-blue); transform: translateX(4px);
+    }
+
+    .qa-btn .qa-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--adm-blue-light); color: var(--adm-blue);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem; flex-shrink: 0; transition: all 0.22s;
+    }
+
+    .qa-btn:hover .qa-icon { background: var(--adm-blue); color: #fff; }
+
+    /* ── Status pill ── */
+    .status-pill {
+        display: inline-block; padding: 3px 10px;
+        border-radius: 20px; font-size: 0.71rem; font-weight: 700;
+    }
+
+    .pill-active   { background: rgba(34,197,94,0.12);   color: #15803d; }
+    .pill-inactive { background: rgba(245,158,11,0.12);  color: #92400e; }
+    .pill-suspended{ background: rgba(239,68,68,0.12);   color: #991b1b; }
+
+    /* ── Top doctors list ── */
+    .top-doctor-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 0.86rem;
+    }
+
+    .top-doctor-item:last-child { border-bottom: none; }
+
+    .td-rank {
+        width: 28px; height: 28px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+    }
+
+    .td-rank.gold   { background: rgba(245,158,11,0.15); color: #d97706; }
+    .td-rank.silver { background: rgba(148,163,184,0.15); color: #64748b; }
+    .td-rank.bronze { background: rgba(180,83,9,0.1);    color: #92400e; }
+    .td-rank.other  { background: var(--adm-blue-light);  color: var(--adm-blue); }
+
+    .td-name { font-weight: 600; color: var(--adm-navy); }
+    .td-email { font-size: 0.72rem; color: #94a3b8; }
+    .td-count {
+        margin-left: auto; font-weight: 800; color: var(--adm-blue);
+        background: var(--adm-blue-light); padding: 3px 10px; border-radius: 8px; font-size: 0.82rem;
+    }
+
+    /* ── Recent patients ── */
+    .recent-patient-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 0; border-bottom: 1px solid #f1f5f9;
+        font-size: 0.85rem;
+    }
+
+    .recent-patient-item:last-child { border-bottom: none; }
+
+    .rp-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--adm-blue-light); color: var(--adm-blue);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+
+    .rp-name { font-weight: 600; color: var(--adm-navy); }
+    .rp-email { font-size: 0.72rem; color: #94a3b8; }
+    .rp-id { margin-left: auto; font-size: 0.72rem; color: #94a3b8; font-weight: 500; }
+
+    /* ── System info ── */
+    .sysinfo-item {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 9px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.84rem;
+    }
+
+    .sysinfo-item:last-child { border-bottom: none; }
+
+    .sysinfo-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--adm-blue); margin-top: 5px; flex-shrink: 0;
+    }
+
+    .sysinfo-text { color: #475569; line-height: 1.4; }
+    .sysinfo-sub  { font-size: 0.73rem; color: #94a3b8; margin-top: 2px; }
+
+    @media (max-width: 1400px) {
+        .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+        .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+        .charts-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 900px) {
+        .adm-grid    { grid-template-columns: 1fr; }
+        .charts-row  { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .kpi-strip { grid-template-columns: 1fr; }
+        .adm-header { padding: 28px 24px; }
+        .adm-header-left h1 { font-size: 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="adm-wrap">
+
+    {# ── Command Header ── #}
+    <div class="adm-header">
+        <div class="adm-header-left">
+            <h1><i class="fas fa-shield-alt me-2" style="color:#60a5fa;"></i>Admin Control Panel</h1>
+            <p>Full system access &nbsp;·&nbsp; User &amp; content administration &nbsp;·&nbsp; Live statistics</p>
+        </div>
+        <div class="adm-header-right">
+            <div class="system-status">
+                <span class="status-dot"></span> All Systems Operational
+            </div>
+            <div class="adm-date">
+                <i class="fas fa-calendar me-1"></i>{{ "now"|date("D, d M Y — H:i") }}
+            </div>
+        </div>
+    </div>
+
+    {# ── KPI Strip (6 cards) ── #}
+    <div class="kpi-strip">
+        <a href="{{ path('user_index') }}" class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-value">{{ totalUsers }}</div>
+            <div class="kpi-label">Total Patients</div>
+            <div class="kpi-sub">
+                <span style="color:#22c55e;">{{ usersByStatus.active }}</span> active
+                · <span style="color:#f59e0b;">{{ usersByStatus.inactive }}</span> inactive
+            </div>
+        </a>
+
+        <a href="{{ path('doctor_index') }}" class="kpi-card amber">
+            <div class="kpi-icon"><i class="fas fa-user-md"></i></div>
+            <div class="kpi-value">{{ totalDoctors }}</div>
+            <div class="kpi-label">Doctors</div>
+            <div class="kpi-sub">Medical professionals</div>
+        </a>
+
+        <a href="{{ path('admin_index') }}" class="kpi-card red">
+            <div class="kpi-icon"><i class="fas fa-user-shield"></i></div>
+            <div class="kpi-value">{{ totalAdmins }}</div>
+            <div class="kpi-label">Admins</div>
+            <div class="kpi-sub">System administrators</div>
+        </a>
+
+        <a href="{{ path('appointment_index') }}" class="kpi-card green">
+            <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="kpi-value">{{ totalAppointments }}</div>
+            <div class="kpi-label">Appointments</div>
+            <div class="kpi-sub">
+                <span style="color:#22c55e;">{{ appointmentsByStatus.confirmed }}</span> confirmed
+                · <span style="color:#f59e0b;">{{ appointmentsByStatus.pending }}</span> pending
+            </div>
+        </a>
+
+        <a href="{{ path('admin_manage_blog') }}" class="kpi-card purple">
+            <div class="kpi-icon"><i class="fas fa-newspaper"></i></div>
+            <div class="kpi-value">{{ totalBlogPosts }}</div>
+            <div class="kpi-label">Blog Posts</div>
+            <div class="kpi-sub">Published articles</div>
+        </a>
+
+        <a href="{{ path('admin_health_stats') }}" class="kpi-card teal">
+            <div class="kpi-icon"><i class="fas fa-star"></i></div>
+            <div class="kpi-value">{{ avgRating > 0 ? avgRating : '—' }}</div>
+            <div class="kpi-label">Avg. Rating</div>
+            <div class="kpi-sub">Doctor ratings / 5</div>
+        </a>
+    </div>
+
+    {# ── Charts Row ── #}
+    <div class="charts-row">
+
+        {# Doughnut: User Status #}
+        <div class="adm-panel">
+            <div class="adm-panel-header">
+                <div class="header-left"><i class="fas fa-users"></i> Patient Status</div>
+            </div>
+            <div class="adm-panel-body">
+                <div class="chart-container" style="height:200px; display:flex; align-items:center; justify-content:center;">
+                    <canvas id="userStatusChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-center gap-3 mt-3" style="font-size:0.78rem; font-weight:600;">
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#22c55e;border-radius:50%;margin-right:4px;"></span>Active: {{ usersByStatus.active }}</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:50%;margin-right:4px;"></span>Inactive: {{ usersByStatus.inactive }}</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:50%;margin-right:4px;"></span>Suspended: {{ usersByStatus.suspended }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# Doughnut: Appointment Status #}
+        <div class="adm-panel">
+            <div class="adm-panel-header">
+                <div class="header-left"><i class="fas fa-calendar-check"></i> Appointment Status</div>
+            </div>
+            <div class="adm-panel-body">
+                <div class="chart-container" style="height:200px; display:flex; align-items:center; justify-content:center;">
+                    <canvas id="appointmentStatusChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-center gap-3 mt-3" style="font-size:0.78rem; font-weight:600;">
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:50%;margin-right:4px;"></span>Pending: {{ appointmentsByStatus.pending }}</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#22c55e;border-radius:50%;margin-right:4px;"></span>Confirmed: {{ appointmentsByStatus.confirmed }}</span>
+                    <span><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:50%;margin-right:4px;"></span>Cancelled: {{ appointmentsByStatus.cancelled }}</span>
+                </div>
+            </div>
+        </div>
+
+        {# Bar: Platform Overview #}
+        <div class="adm-panel">
+            <div class="adm-panel-header">
+                <div class="header-left"><i class="fas fa-chart-bar"></i> Platform Overview</div>
+            </div>
+            <div class="adm-panel-body">
+                <div class="chart-container" style="height:230px;">
+                    <canvas id="platformOverviewChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Main Grid ── #}
+    <div class="adm-grid">
+
+        {# Left: Entity Management + Top Doctors #}
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+            <div class="adm-panel">
+                <div class="adm-panel-header">
+                    <div class="header-left"><i class="fas fa-table"></i> Entity Management</div>
+                </div>
+                <div class="adm-panel-body">
+                    <table class="mgmt-table">
+                        <thead>
+                            <tr>
+                                <th>Entity</th>
+                                <th>Count</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-users me-2" style="color:#3b82f6;"></i><strong>Patients</strong></td>
+                                <td><span class="mgmt-count">{{ totalUsers }}</span></td>
+                                <td>
+                                    <a href="{{ path('user_index') }}" class="mgmt-btn"><i class="fas fa-list"></i> Manage</a>
+                                    <a href="{{ path('user_new') }}"   class="mgmt-btn ms-1"><i class="fas fa-plus"></i> Add</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-user-md me-2" style="color:#f59e0b;"></i><strong>Doctors</strong></td>
+                                <td><span class="mgmt-count">{{ totalDoctors }}</span></td>
+                                <td>
+                                    <a href="{{ path('doctor_index') }}" class="mgmt-btn"><i class="fas fa-list"></i> Manage</a>
+                                    <a href="{{ path('doctor_new') }}"   class="mgmt-btn ms-1"><i class="fas fa-plus"></i> Add</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-user-shield me-2" style="color:#ef4444;"></i><strong>Admins</strong></td>
+                                <td><span class="mgmt-count">{{ totalAdmins }}</span></td>
+                                <td>
+                                    <a href="{{ path('admin_index') }}" class="mgmt-btn"><i class="fas fa-list"></i> Manage</a>
+                                    <a href="{{ path('admin_new') }}"   class="mgmt-btn ms-1"><i class="fas fa-plus"></i> Add</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-calendar-check me-2" style="color:#22c55e;"></i><strong>Appointments</strong></td>
+                                <td><span class="mgmt-count">{{ totalAppointments }}</span></td>
+                                <td>
+                                    <a href="{{ path('appointment_index') }}" class="mgmt-btn"><i class="fas fa-list"></i> View All</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-newspaper me-2" style="color:#8b5cf6;"></i><strong>Blog Posts</strong></td>
+                                <td><span class="mgmt-count">{{ totalBlogPosts }}</span></td>
+                                <td>
+                                    <a href="{{ path('admin_manage_blog') }}" class="mgmt-btn"><i class="fas fa-list"></i> Manage</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Top 5 Doctors Panel #}
+            <div class="adm-panel">
+                <div class="adm-panel-header">
+                    <div class="header-left"><i class="fas fa-trophy"></i> Top 5 Doctors by Appointments</div>
+                    <span class="badge-sm">Ranked</span>
+                </div>
+                <div class="adm-panel-body">
+                    {% if topDoctors is empty %}
+                        <p class="text-muted text-center py-3" style="font-size:0.85rem;">No appointment data available yet.</p>
+                    {% else %}
+                        {% for doc in topDoctors %}
+                            {% set rankClass = loop.index == 1 ? 'gold' : (loop.index == 2 ? 'silver' : (loop.index == 3 ? 'bronze' : 'other')) %}
+                            <div class="top-doctor-item">
+                                <div class="td-rank {{ rankClass }}">{{ loop.index }}</div>
+                                <div>
+                                    <div class="td-name">Dr. {{ doc.doctorName }}</div>
+                                    <div class="td-email">{{ doc.doctorEmail }}</div>
+                                </div>
+                                <div class="td-count">{{ doc.total }} appts</div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        {# Right: Quick Actions + Recent Patients + System Info #}
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+            <div class="adm-panel">
+                <div class="adm-panel-header">
+                    <div class="header-left"><i class="fas fa-bolt"></i> Quick Actions</div>
+                </div>
+                <div class="adm-panel-body">
+                    <div class="quick-actions-list">
+                        <a href="{{ path('user_new') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-user-plus"></i></span> Add New Patient
+                        </a>
+                        <a href="{{ path('doctor_new') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-user-md"></i></span> Add New Doctor
+                        </a>
+                        <a href="{{ path('admin_new') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-user-shield"></i></span> Add New Admin
+                        </a>
+                        <a href="{{ path('admin_health_stats') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-chart-bar"></i></span> Health Statistics
+                        </a>
+                        <a href="{{ path('appointment_index') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-calendar-alt"></i></span> All Appointments
+                        </a>
+                        <a href="{{ path('admin_manage_blog') }}" class="qa-btn">
+                            <span class="qa-icon"><i class="fas fa-newspaper"></i></span> Manage Blog
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Recent Patients #}
+            <div class="adm-panel">
+                <div class="adm-panel-header">
+                    <div class="header-left"><i class="fas fa-user-clock"></i> Recent Patients</div>
+                    <a href="{{ path('user_index') }}" style="font-size:0.75rem; color:#93c5fd; font-weight:600; text-decoration:none;">View all →</a>
+                </div>
+                <div class="adm-panel-body">
+                    {% if recentUsers is empty %}
+                        <p class="text-muted text-center py-3" style="font-size:0.85rem;">No patients registered yet.</p>
+                    {% else %}
+                        {% for u in recentUsers %}
+                            <div class="recent-patient-item">
+                                <div class="rp-avatar">
+                                    {{ u.firstName ? u.firstName|first|upper : (u.email|first|upper) }}
+                                </div>
+                                <div>
+                                    <div class="rp-name">{{ u.firstName ?? '' }} {{ u.lastName ?? '' }}</div>
+                                    <div class="rp-email">{{ u.email }}</div>
+                                </div>
+                                <div>
+                                    <span class="status-pill pill-{{ u.status ?? 'active' }}">{{ u.status ?? 'active' }}</span>
+                                    <div class="rp-id">#{{ u.id }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# System Info #}
+            <div class="adm-panel">
+                <div class="adm-panel-header">
+                    <div class="header-left"><i class="fas fa-server"></i> System Info</div>
+                </div>
+                <div class="adm-panel-body">
+                    <div class="sysinfo-item">
+                        <div class="sysinfo-dot" style="background:#22c55e;"></div>
+                        <div>
+                            <div class="sysinfo-text">Database connection active</div>
+                            <div class="sysinfo-sub">MySQL — pinkshield_db</div>
+                        </div>
+                    </div>
+                    <div class="sysinfo-item">
+                        <div class="sysinfo-dot" style="background:#22c55e;"></div>
+                        <div>
+                            <div class="sysinfo-text">Symfony application running</div>
+                            <div class="sysinfo-sub">Environment: {{ app.environment }}</div>
+                        </div>
+                    </div>
+                    <div class="sysinfo-item">
+                        <div class="sysinfo-dot" style="background:#3b82f6;"></div>
+                        <div>
+                            <div class="sysinfo-text">Logged in as Administrator</div>
+                            <div class="sysinfo-sub">{{ app.user.userIdentifier }}</div>
+                        </div>
+                    </div>
+                    <div class="sysinfo-item">
+                        <div class="sysinfo-dot" style="background:#8b5cf6;"></div>
+                        <div>
+                            <div class="sysinfo-text">Suspended accounts</div>
+                            <div class="sysinfo-sub">{{ usersByStatus.suspended }} patient(s) suspended</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+Chart.defaults.plugins.legend.display = false;
+
+/* ── User Status Doughnut ── */
+new Chart(document.getElementById('userStatusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Active', 'Inactive', 'Suspended'],
+        datasets: [{
+            data: [
+                {{ usersByStatus.active }},
+                {{ usersByStatus.inactive }},
+                {{ usersByStatus.suspended }}
+            ],
+            backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 6,
+        }]
+    },
+    options: {
+        cutout: '72%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `  ${ctx.label}: ${ctx.parsed}`
+                }
+            }
+        }
+    }
+});
+
+/* ── Appointment Status Doughnut ── */
+new Chart(document.getElementById('appointmentStatusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Pending', 'Confirmed', 'Cancelled'],
+        datasets: [{
+            data: [
+                {{ appointmentsByStatus.pending }},
+                {{ appointmentsByStatus.confirmed }},
+                {{ appointmentsByStatus.cancelled }}
+            ],
+            backgroundColor: ['#3b82f6', '#22c55e', '#ef4444'],
+            borderWidth: 0,
+            hoverOffset: 6,
+        }]
+    },
+    options: {
+        cutout: '72%',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `  ${ctx.label}: ${ctx.parsed}`
+                }
+            }
+        }
+    }
+});
+
+/* ── Platform Overview Bar ── */
+new Chart(document.getElementById('platformOverviewChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Patients', 'Doctors', 'Admins', 'Appointments', 'Blog Posts'],
+        datasets: [{
+            label: 'Count',
+            data: [
+                {{ totalUsers }},
+                {{ totalDoctors }},
+                {{ totalAdmins }},
+                {{ totalAppointments }},
+                {{ totalBlogPosts }}
+            ],
+            backgroundColor: [
+                'rgba(59,130,246,0.75)',
+                'rgba(245,158,11,0.75)',
+                'rgba(239,68,68,0.75)',
+                'rgba(34,197,94,0.75)',
+                'rgba(139,92,246,0.75)'
+            ],
+            borderRadius: 8,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `  ${ctx.parsed.y} total`
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: '600' }, color: '#64748b' }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: '#f1f5f9' },
+                ticks: {
+                    precision: 0,
+                    font: { size: 11 },
+                    color: '#94a3b8'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

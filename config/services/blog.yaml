@@ -1,0 +1,7 @@
+# Service wiring for the blog-related services
+
+services:
+    App\Service\CommentModerationService:
+        arguments:
+            $aiApiKey: '%env(AI_API_KEY)%'
+            $aiModel: '%env(AI_MODEL)%'

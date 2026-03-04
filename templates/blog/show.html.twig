@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('blog_index') }}">Blog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-5">
+        {% if post.imagePath %}
+            <img src="{{ post.imagePath }}" alt="{{ post.title }}" class="card-img-top" style="max-height: 400px; object-fit: cover;">
+        {% endif %}
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h1 class="h2 text-danger fw-bold">{{ post.title }}</h1>
+                {% if app.user and (app.user.userIdentifier == post.authorEmail or is_granted('ROLE_ADMIN')) %}
+                    <div>
+                        <a href="{{ path('blog_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a href="{{ path('blog_delete', {'id': post.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="text-muted mb-4">
+                <i class="fas fa-user"></i> {{ post.authorName }} 
+                <span class="mx-2">|</span>
+                <i class="fas fa-calendar"></i> {{ post.createdAt|date('M d, Y H:i') }}
+                <span class="mx-2">|</span>
+                <span class="badge bg-info text-dark">{{ post.authorRole }}</span>
+            </div>
+
+            <div class="post-content mb-5" style="white-space: pre-wrap; line-height: 1.6;">
+                {{ post.content }}
+            </div>
+
+            <hr>
+
+            <h3 class="h4 text-danger mb-4">Comments ({{ pagination.totalItemCount }})</h3>
+            
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+            
+            <div class="comments-list mt-4">
+                {% for comment in pagination %}
+                    <div class="card mb-3 bg-light" id="comment-{{ comment.id }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-start">
+                                <div>
+                                    <strong class="text-primary">{{ comment.authorName }}</strong>
+                                    <small class="text-muted d-block">{{ comment.createdAt|date('M d, Y H:i') }}</small>
+                                </div>
+                                <div class="btn-group">
+                                    {% if app.user %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="setReplyTo({{ comment.id }}, '{{ comment.authorName }}')">
+                                            <i class="fas fa-reply"></i> Reply
+                                        </button>
+                                    {% endif %}
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <a href="{{ path('comment_edit', {id: comment.id}) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <a href="{{ path('comment_delete', {id: comment.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this comment?')">Delete</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="mb-0 mt-2">{{ comment.content }}</p>
+
+                            {# Replies #}
+                            {% if comment.replies|length > 0 %}
+                                <div class="replies-list mt-3 ms-4 border-start ps-3">
+                                    {% for reply in comment.replies %}
+                                        <div class="reply-item mb-2 p-2 rounded bg-white border">
+                                            <div class="d-flex justify-content-between">
+                                                <small><strong>{{ reply.authorName }}</strong> · {{ reply.createdAt|date('M d, Y H:i') }}</small>
+                                                {% if is_granted('ROLE_ADMIN') %}
+                                                    <a href="{{ path('comment_delete', {id: reply.id}) }}" class="text-danger small" onclick="return confirm('Delete?')"><i class="fas fa-trash"></i></a>
+                                                {% endif %}
+                                            </div>
+                                            <p class="mb-0 small">{{ reply.content }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No comments yet. Share your thoughts!</p>
+                {% endfor %}
+
+                <div class="d-flex justify-content-center mt-4">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+            </div>
+
+            {% if app.user %}
+                <div class="add-comment mt-5" id="comment-form-section">
+                    <h4 class="text-danger" id="form-title">Add a Comment</h4>
+                    
+                    <div id="reply-info" class="alert alert-info d-none d-flex justify-content-between align-items-center">
+                        <span>Replying to <strong id="reply-to-name"></strong></span>
+                        <button class="btn btn-sm btn-close" onclick="cancelReply()"></button>
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="parent_comment_id" id="parent_comment_id">
+                        <div class="mb-3">
+                            <textarea name="comment" id="comment-textarea" class="form-control" rows="3" placeholder="Write your comment here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Submit Comment</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-5">
+                    Please <a href="{{ path('login') }}">login</a> to add a comment.
+                </div>
+            {% endif %}
+
+            <script>
+                function setReplyTo(id, name) {
+                    document.getElementById('parent_comment_id').value = id;
+                    document.getElementById('reply-to-name').innerText = name;
+                    document.getElementById('reply-info').classList.remove('d-none');
+                    document.getElementById('form-title').innerText = 'Reply to ' + name;
+                    document.querySelector('#comment-form-section').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('comment-textarea').focus();
+                }
+
+                function cancelReply() {
+                    document.getElementById('parent_comment_id').value = '';
+                    document.getElementById('reply-info').classList.add('d-none');
+                    document.getElementById('form-title').innerText = 'Add a Comment';
+                }
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}
