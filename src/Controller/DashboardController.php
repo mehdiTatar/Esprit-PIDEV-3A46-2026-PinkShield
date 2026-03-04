@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Repository\AdminRepository;
 use App\Repository\AppointmentRepository;
 use App\Repository\BlogPostRepository;
+<<<<<<< HEAD
 use App\Repository\CommentRepository;
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 use App\Repository\DoctorRepository;
 use App\Repository\RatingRepository;
 use App\Repository\UserRepository;
@@ -46,7 +49,10 @@ class DashboardController extends AbstractController
         AppointmentRepository $appointmentRepository,
         BlogPostRepository    $blogPostRepository,
         RatingRepository      $ratingRepository,
+<<<<<<< HEAD
         CommentRepository     $commentRepository,
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -56,7 +62,10 @@ class DashboardController extends AbstractController
         $totalAdmins       = count($adminRepository->findAll());
         $totalBlogPosts    = count($blogPostRepository->findAll());
         $totalAppointments = $appointmentRepository->countTotal();
+<<<<<<< HEAD
         $totalComments     = $commentRepository->countTotal();
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 
         // ── Status breakdowns ─────────────────────────────────
         $usersByStatus        = $userRepository->countByStatus();
@@ -96,7 +105,10 @@ class DashboardController extends AbstractController
             'topDoctors'           => $topDoctors,
             'recentUsers'          => $recentUsers,
             'avgRating'            => $avgRating,
+<<<<<<< HEAD
             'totalComments'        => $totalComments,
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         ]);
     }
 
@@ -105,7 +117,10 @@ class DashboardController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_DOCTOR');
         
+<<<<<<< HEAD
         /** @var \App\Entity\Doctor $doctor */
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         $doctor = $this->getUser();
         $doctorEmail = $doctor->getEmail();
         
@@ -131,7 +146,10 @@ class DashboardController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         
+<<<<<<< HEAD
         /** @var \App\Entity\User $user */
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         $user = $this->getUser();
         $appointments = $appointmentRepository->findByPatient($user->getUserIdentifier());
         

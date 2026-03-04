@@ -165,7 +165,25 @@ class Doctor implements UserInterface, PasswordAuthenticatedUserInterface, TwoFa
 
     public function getFullName(): ?string
     {
+<<<<<<< HEAD
         return $this->firstName . ' ' . $this->lastName;
+=======
+        return trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
+    }
+
+    /**
+     * Helper used by the seeder when only a single name string is provided.
+     * Splits the value into first/last components so that getFullName()
+     * will continue to return a sensible result.
+     */
+    public function setFullName(string $fullName): static
+    {
+        $parts = explode(' ', $fullName, 2);
+        $this->firstName = $parts[0] ?? null;
+        $this->lastName  = $parts[1] ?? null;
+
+        return $this;
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     }
 
     public function getSpeciality(): ?string

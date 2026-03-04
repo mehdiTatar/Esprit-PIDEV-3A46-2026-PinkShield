@@ -360,7 +360,11 @@ class AuthController extends AbstractController
                 );
 
                 $email = (new Email())
+<<<<<<< HEAD
                     ->from($this->getParameter('mailer_from'))
+=======
+                    ->from('mehditatarpidev7@gmail.com')
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                     ->to($user->getEmail())
                     ->subject('PinkShield — Réinitialisation de votre mot de passe')
                     ->html($this->renderView('emails/reset_password.html.twig', [

@@ -13,7 +13,11 @@ class CaptchaService
     {
     }
 
+<<<<<<< HEAD
     private function getSession(): \Symfony\Component\HttpFoundation\Session\SessionInterface
+=======
+    private function getSession()
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     {
         return $this->requestStack->getSession();
     }

@@ -29,6 +29,13 @@ class Parapharmacie
     #[Assert\PositiveOrZero(message: 'Price must be a positive number')]
     private ?string $price = '0.00';
 
+<<<<<<< HEAD
+=======
+    #[ORM\Column(type: 'integer')]
+    #[Assert\PositiveOrZero(message: 'Stock cannot be negative')]
+    private ?int $stock = 0;
+
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     #[ORM\ManyToOne(targetEntity: Appointment::class, inversedBy: 'parapharmacies')]
     #[ORM\JoinColumn(name: 'appointment_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Appointment $appointment = null;
@@ -74,6 +81,21 @@ class Parapharmacie
         return $this;
     }
 
+<<<<<<< HEAD
+=======
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     public function getAppointment(): ?Appointment
     {
         return $this->appointment;

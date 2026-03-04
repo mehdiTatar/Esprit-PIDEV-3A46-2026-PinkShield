@@ -18,7 +18,12 @@ class ParapharmacieController extends AbstractController
         if (!$user || (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_DOCTOR'))) {
             throw $this->createAccessDeniedException('Access denied');
         }
+<<<<<<< HEAD
         
+=======
+
+        // simply fetch all products; sorting is handled in the UI
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         $products = $parapharmacieRepository->findAll();
 
         return $this->render('parapharmacy/index.html.twig', [

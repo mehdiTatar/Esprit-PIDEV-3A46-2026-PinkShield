@@ -82,6 +82,7 @@ class DailyTracking
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $updatedAt;
 
+<<<<<<< HEAD
     public function __construct()
     {
         $this->mood = 5;
@@ -89,6 +90,8 @@ class DailyTracking
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
     }
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
     public function getId(): ?int
     {
         return $this->id;

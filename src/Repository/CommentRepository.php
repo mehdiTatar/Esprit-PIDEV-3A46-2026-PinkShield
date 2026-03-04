@@ -15,6 +15,7 @@ class CommentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Comment::class);
     }
+<<<<<<< HEAD
 
     public function countTotal(): int
     {
@@ -23,4 +24,6 @@ class CommentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+=======
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 }

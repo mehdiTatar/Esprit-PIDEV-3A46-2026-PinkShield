@@ -26,6 +26,14 @@
                                     <option value="{{ choice.value }}">{{ choice.label }}</option>
                                 {% endfor %}
                             </select>
+<<<<<<< HEAD
+=======
+                            {% if form.doctorEmail.vars.choices is empty %}
+                                <div class="alert alert-warning mt-2" role="alert">
+                                    No doctors are currently available. Please try again later or contact support.
+                                </div>
+                            {% endif %}
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                             <small class="form-text text-muted d-block mt-2">
                                 <i class="fas fa-info-circle"></i> Only active doctors are available for booking.
                             </small>

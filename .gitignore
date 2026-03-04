@@ -9,6 +9,7 @@
 /vendor/
 ###< symfony/framework-bundle ###
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ###> phpunit/phpunit ###
 /phpunit.xml
@@ -16,3 +17,10 @@
 ###< phpunit/phpunit ###
 =======
 >>>>>>> 10f9f68c6c7b8cd667f9d1988e26b0b3f7d255f2
+=======
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173

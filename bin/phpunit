@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 declare(strict_types=1);
@@ -18,3 +19,9 @@ if (file_exists($phpunitFile)) {
     fwrite(STDERR, "PHPUnit binary was not found in vendor.\nTry running 'composer install --dev'.\n");
     exit(1);
 }
+=======
+#!/usr/bin/env php
+<?php
+
+require dirname(__DIR__).'/vendor/phpunit/phpunit/phpunit';
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173

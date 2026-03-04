@@ -11,5 +11,15 @@ return [
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
+<<<<<<< HEAD
     AhmedBhs\DoctrineDoctor\DoctrineDoctorBundle::class => ['dev' => true, 'test' => true],
 ];
+=======
+    App\AppointmentBundle\AppointmentBundle::class => ['all' => true],
+    App\WishlistBundle\WishlistBundle::class => ['all' => true],
+    App\ParapharmacieBundle\ParapharmacieBundle::class => ['all' => true],
+    AhmedBhs\DoctrineDoctor\DoctrineDoctorBundle::class => ['dev' => 
+true],
+
+];
+>>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
