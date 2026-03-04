@@ -8,28 +8,15 @@ use Symfony\Component\Mime\Email;
 
 class AppointmentMailer
 {
-<<<<<<< HEAD
     public function __construct(
         private MailerInterface $mailer,
         private string $senderEmail
     ) {}
-=======
-    private MailerInterface $mailer;
-
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 
     public function sendAppointmentCompletedEmail(Appointment $appointment): void
     {
         $email = (new Email())
-<<<<<<< HEAD
             ->from($this->senderEmail)
-=======
-            ->from('noreply@pinkshield.com')
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
             ->to($appointment->getDoctorEmail())
             ->subject('Appointment Completed - ' . $appointment->getPatientName())
             ->html(sprintf(

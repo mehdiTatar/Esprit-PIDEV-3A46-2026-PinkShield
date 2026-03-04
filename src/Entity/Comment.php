@@ -109,7 +109,6 @@ class Comment
 
     public function setBlogPost(?BlogPost $blogPost): static
     {
-<<<<<<< HEAD
         if ($this->blogPost === $blogPost) {
             return $this;
         }
@@ -125,9 +124,6 @@ class Comment
         if ($blogPost !== null) {
             $blogPost->addComment($this);
         }
-=======
-        $this->blogPost = $blogPost;
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         return $this;
     }
 
@@ -138,7 +134,6 @@ class Comment
 
     public function setParentComment(?self $parentComment): static
     {
-<<<<<<< HEAD
         if ($this->parentComment === $parentComment) {
             return $this;
         }
@@ -154,9 +149,6 @@ class Comment
         if ($parentComment !== null) {
             $parentComment->addReply($this);
         }
-=======
-        $this->parentComment = $parentComment;
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         return $this;
     }
 

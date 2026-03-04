@@ -32,10 +32,7 @@ class RatingController extends AbstractController
         }
 
         $doctors = $doctorRepository->findAll();
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
-=======
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         $user = $this->getUser();
 
         // Get ratings for each doctor
@@ -69,10 +66,7 @@ class RatingController extends AbstractController
             return $this->redirectToRoute('dashboard');
         }
 
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
-=======
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         $user = $this->getUser();
 
         // Check if user already rated this doctor
@@ -91,11 +85,7 @@ class RatingController extends AbstractController
 
             $this->notificationService->notifyAdmins(
                 'Doctor Rated',
-<<<<<<< HEAD
                 $user->getFullName() . ' rated Dr. ' . $doctor->getFullName() . ' (' . $rating->getRating() . '★)',
-=======
-                $user->getFullName() . ' rated Dr. ' . $doctor->getFullName() . ' (' . $rating->getScore() . '★)',
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                 'info',
                 'fas fa-star'
             );

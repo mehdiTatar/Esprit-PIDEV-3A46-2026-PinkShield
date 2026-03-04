@@ -12,10 +12,7 @@ parameters:
     face_api_key: '%env(FACE_API_KEY)%'
     face_api_secret: '%env(FACE_API_SECRET)%'
     stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
-<<<<<<< HEAD
     mailer_from: '%env(MAILER_FROM)%'
-=======
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 
 services:
     # default configuration for services in *this* file
@@ -45,7 +42,6 @@ services:
         arguments:
             $aiApiKey: '%env(AI_API_KEY)%'
             $aiModel: '%env(AI_MODEL)%'
-<<<<<<< HEAD
 
     App\Service\EmailNotificationService:
         arguments:
@@ -54,5 +50,3 @@ services:
     App\Service\AppointmentMailer:
         arguments:
             $senderEmail: '%mailer_from%'
-=======
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173

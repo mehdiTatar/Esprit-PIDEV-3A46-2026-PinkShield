@@ -8,10 +8,6 @@ use App\Entity\Doctor;
 use App\Entity\HealthLog;
 use App\Entity\Notification;
 use App\Entity\User;
-<<<<<<< HEAD
-=======
-use App\Entity\Parapharmacie;
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 use App\Repository\AdminRepository;
 use App\Repository\AppointmentRepository;
 use App\Repository\DoctorRepository;
@@ -84,13 +80,7 @@ class SeedDataCommand extends Command
             for ($i = 1; $i <= 10; $i++) {
                 $doctor = new Doctor();
                 $doctor->setEmail("doctor{$i}@pinkshield.com");
-<<<<<<< HEAD
                 $doctor->setFullName("Dr. Doctor {$i}");
-=======
-                // the entity stores first/last name separately; build them explicitly
-                $doctor->setFirstName('Doctor');
-                $doctor->setLastName((string) $i);
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                 $doctor->setSpeciality($specialties[$i - 1]);
                 $doctor->setRoles(['ROLE_DOCTOR']);
                 $doctor->setStatus('active');
@@ -117,11 +107,7 @@ class SeedDataCommand extends Command
                 $user->setFirstName("Patient");
                 $user->setLastName("User {$i}");
                 $user->setFullName("Patient User {$i}");
-<<<<<<< HEAD
                 $user->setPhone("+1-555-000-" . str_pad((string)$i, 4, '0', STR_PAD_LEFT));
-=======
-                $user->setPhone("+1-555-000-" . str_pad($i, 4, '0', STR_PAD_LEFT));
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                 $user->setAddress("123 Main Street, City {$i}, State");
                 $user->setRoles(['ROLE_USER']);
                 $user->setStatus('active');
@@ -250,114 +236,6 @@ class SeedDataCommand extends Command
             $output->writeln("  ✓ Created sample notifications for all users");
         }
 
-<<<<<<< HEAD
-=======
-        // Parapharmacy products list (realistic names, descriptions, prices)
-        $products = [
-            ['name' => 'SunShield SPF50 Sunscreen', 'description' => 'Broad-spectrum SPF50 sunscreen for face and body, non-greasy and water-resistant.', 'price' => 14.99],
-            ['name' => 'Hydrating Face Moisturizer', 'description' => 'Lightweight daily moisturizer with hyaluronic acid for long-lasting hydration.', 'price' => 9.99],
-            ['name' => 'Gentle Baby Wash', 'description' => 'Tear-free baby wash with natural chamomile to soothe and clean delicate skin.', 'price' => 7.50],
-            ['name' => 'Antiseptic Wound Spray', 'description' => 'Fast-acting antiseptic spray to clean and protect minor cuts and abrasions.', 'price' => 6.25],
-            ['name' => 'PainRelief Gel 50g', 'description' => 'Topical analgesic gel for muscle and joint pain relief.', 'price' => 8.99],
-            ['name' => 'Multivitamin Adult 60 tabs', 'description' => 'Daily multivitamin to support general health and vitality.', 'price' => 12.50],
-            ['name' => 'Omega-3 Fish Oil 1000mg (60)', 'description' => 'High-strength omega-3 capsules to support heart and brain health.', 'price' => 15.00],
-            ['name' => 'Probiotic 30 capsules', 'description' => 'Live probiotics to support gut flora and digestion.', 'price' => 18.99],
-            ['name' => 'Vitamin C 500mg (100)', 'description' => 'Immune support vitamin C tablets, antioxidant formula.', 'price' => 9.50],
-            ['name' => 'Zinc 50mg (60)', 'description' => 'Zinc supplement to support immune function and skin health.', 'price' => 8.00],
-            ['name' => 'Calcium + D3 (90)', 'description' => 'Bone support supplement combining calcium and vitamin D3.', 'price' => 11.00],
-            ['name' => 'Sleep Aid Herbal (30)', 'description' => 'Natural herbal sleep aid with valerian and lemon balm.', 'price' => 10.00],
-            ['name' => 'Cough Syrup 200ml', 'description' => 'Soothing cough syrup for cough and throat irritation.', 'price' => 7.99],
-            ['name' => 'Nasal Saline Spray 100ml', 'description' => 'Saline nasal spray to relieve congestion and moisturize nasal passages.', 'price' => 5.49],
-            ['name' => 'Eye Lubricant Drops 10ml', 'description' => 'Lubricating eye drops for dry and irritated eyes.', 'price' => 6.99],
-            ['name' => 'Earwax Removal Drops 15ml', 'description' => 'Gentle ear drops to soften and remove excess earwax.', 'price' => 5.99],
-            ['name' => 'Antifungal Cream 15g', 'description' => 'Effective topical cream for fungal skin infections.', 'price' => 6.49],
-            ['name' => 'Diaper Rash Cream 50ml', 'description' => 'Protective ointment to soothe and prevent diaper rash.', 'price' => 8.49],
-            ['name' => 'Hand Sanitizer 500ml', 'description' => 'Quick-drying alcohol sanitizer for effective hand hygiene.', 'price' => 6.99],
-            ['name' => 'Hydrocortisone Cream 1% 15g', 'description' => 'Mild steroid cream for itching and minor skin irritation.', 'price' => 4.99],
-            ['name' => 'Oral Rehydration Salts (10)', 'description' => 'Electrolyte replacement sachets to prevent dehydration.', 'price' => 3.99],
-            ['name' => 'Digital Thermometer', 'description' => 'Fast and accurate digital thermometer for oral/axillary use.', 'price' => 19.99],
-            ['name' => 'Cold & Flu Relief Tablets (20)', 'description' => 'Relieves common cold and flu symptoms: fever, ache, congestion.', 'price' => 8.99],
-            ['name' => 'Vitamin D3 1000IU (120)', 'description' => 'Daily vitamin D3 supplement to support bone and immune health.', 'price' => 7.99],
-            ['name' => 'Collagen Peptides 250g', 'description' => 'Hydrolyzed collagen powder to support skin, hair and joint health.', 'price' => 24.99],
-            ['name' => 'Hyaluronic Acid Serum 30ml', 'description' => 'Anti-aging hydrating serum to plump and smooth skin.', 'price' => 19.99],
-            ['name' => 'Acne Cleansing Gel 150ml', 'description' => 'Gentle acne cleanser with salicylic acid to clear pores.', 'price' => 9.99],
-            ['name' => 'Sensitive Shampoo 250ml', 'description' => 'Mild shampoo for sensitive scalp and daily use.', 'price' => 6.50],
-            ['name' => 'Conditioner 250ml', 'description' => 'Moisturizing conditioner for soft, manageable hair.', 'price' => 6.50],
-            ['name' => 'Foot Repair Cream 75ml', 'description' => 'Intensive foot cream for cracked heels and dry skin.', 'price' => 7.50],
-            ['name' => 'Insect Repellent Spray 150ml', 'description' => 'Long-lasting insect repellent for outdoor protection.', 'price' => 9.49],
-            ['name' => 'Lip Balm SPF15', 'description' => 'Moisturizing lip balm with sun protection.', 'price' => 3.49],
-            ['name' => 'Muscle Rub 100ml', 'description' => 'Cooling and warming rub for sore muscles.', 'price' => 8.99],
-            ['name' => 'Small Heating Pad', 'description' => 'Reusable heating pad for targeted pain relief.', 'price' => 14.00],
-            ['name' => 'Eye Makeup Remover 100ml', 'description' => 'Gentle eye makeup remover that cleans without irritation.', 'price' => 5.49],
-            ['name' => 'Saline Nasal Rinse Pack', 'description' => 'Complete nasal rinse kit to clear sinuses and allergens.', 'price' => 7.99],
-            ['name' => 'Electrolyte Drink Mix (10)', 'description' => 'Powdered electrolyte mix to rehydrate after exercise or illness.', 'price' => 6.99],
-            ['name' => 'Iron Supplement (30)', 'description' => 'Iron tablets to support healthy blood and energy levels.', 'price' => 8.50],
-            ['name' => 'Magnesium 250mg (60)', 'description' => 'Magnesium supplement for muscle function and relaxation.', 'price' => 9.00],
-            ['name' => 'Digestive Enzymes 60 caps', 'description' => 'Digestive enzyme blend to aid nutrient absorption.', 'price' => 15.50],
-            ['name' => 'Gentle Laxative 20 tabs', 'description' => 'Mild laxative for occasional constipation relief.', 'price' => 5.99],
-            ['name' => 'Herbal Calm Tea (20)', 'description' => 'Soothing herbal tea blend to promote relaxation and sleep.', 'price' => 4.99],
-            ['name' => 'Protein Powder 500g (Vanilla)', 'description' => 'Whey protein powder for muscle recovery and daily protein needs.', 'price' => 29.99],
-            ['name' => 'Face Clay Mask 100ml', 'description' => 'Purifying clay mask to detoxify and refine pores.', 'price' => 8.99],
-            ['name' => 'Antibacterial Wipes (50)', 'description' => 'Convenient antibacterial wipes for hands and surfaces.', 'price' => 4.99],
-            ['name' => 'Deodorant Roll-on 50ml', 'description' => 'Alcohol-free deodorant with long-lasting protection.', 'price' => 5.99],
-            ['name' => 'Toothpaste Sensitive 75ml', 'description' => 'Toothpaste formulated for sensitive teeth and enamel protection.', 'price' => 3.99],
-            ['name' => 'Mouthwash Antiseptic 500ml', 'description' => 'Antiseptic mouthwash to freshen breath and reduce bacteria.', 'price' => 6.99],
-            ['name' => 'Cooling Eye Gel 15ml', 'description' => 'Refreshing eye gel to reduce puffiness and soothe tired eyes.', 'price' => 8.99],
-            ['name' => 'Nasal Decongestant Spray 15ml', 'description' => 'Fast-acting nasal decongestant for short-term relief.', 'price' => 7.49],
-        ];
-
-        // Seed parapharmacy products
-        $output->writeln('Checking parapharmacy product catalog...');
-        $productRepo = $this->entityManager->getRepository(Parapharmacie::class);
-        $existingProducts = $productRepo->findAll();
-
-        if (count($existingProducts) === 0) {
-            $output->writeln('Creating 50 parapharmacy products...');
-            foreach ($products as $p) {
-                $product = new Parapharmacie();
-                $product->setName($p['name']);
-                $product->setDescription($p['description']);
-                $product->setPrice(number_format($p['price'], 2, '.', ''));
-                // assign a random starting stock amount
-                $product->setStock(rand(10, 100));
-                $this->entityManager->persist($product);
-            }
-            $this->entityManager->flush();
-            $output->writeln('  ✓ Created 50 parapharmacy products');
-        } elseif (count($existingProducts) < count($products)) {
-            $toCreate = count($products) - count($existingProducts);
-            $output->writeln(sprintf('Adding %d missing parapharmacy products...', $toCreate));
-            for ($i = count($existingProducts); $i < count($products); $i++) {
-                $p = $products[$i];
-                $product = new Parapharmacie();
-                $product->setName($p['name']);
-                $product->setDescription($p['description']);
-                $product->setPrice(number_format($p['price'], 2, '.', ''));
-                $product->setStock(rand(10, 100));
-                $this->entityManager->persist($product);
-            }
-            $this->entityManager->flush();
-            $output->writeln('  ✓ Added missing parapharmacy products');
-        } else {
-            $output->writeln('Updating existing parapharmacy products with realistic data...');
-            for ($i = 0; $i < count($products); $i++) {
-                if (!isset($existingProducts[$i])) break;
-                $p = $products[$i];
-                $prod = $existingProducts[$i];
-                $prod->setName($p['name']);
-                $prod->setDescription($p['description']);
-                $prod->setPrice(number_format($p['price'], 2, '.', ''));
-                // retain existing stock or set to random if zero
-                if (!$prod->getStock()) {
-                    $prod->setStock(rand(10, 100));
-                }
-                $this->entityManager->persist($prod);
-            }
-            $this->entityManager->flush();
-            $output->writeln('  ✓ Updated parapharmacy catalog (first 50 entries)');
-        }
-
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
         if (count($doctors) > 0) {
             $doctorNotifications = [
                 ['title' => 'New Patient Appointment', 'message' => 'You have a new appointment scheduled. Patient: John Doe, Date: Tomorrow at 10:00 AM', 'type' => 'info', 'icon' => 'fas fa-calendar-plus'],

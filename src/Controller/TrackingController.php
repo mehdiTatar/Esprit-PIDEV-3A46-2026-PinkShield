@@ -30,15 +30,10 @@ class TrackingController extends AbstractController
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
 
-<<<<<<< HEAD
             /** @var \App\Entity\User $user */
             $user = $this->getUser();
             $tracking = new DailyTracking();
             $tracking->setUser($user);
-=======
-            $tracking = new DailyTracking();
-            $tracking->setUser($this->getUser());
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
             $tracking->setDate(new \DateTime());
             $tracking->setMood((int) $data['mood']);
             $tracking->setStress((int) $data['stress']);
@@ -60,10 +55,7 @@ class TrackingController extends AbstractController
             $this->entityManager->persist($tracking);
             $this->entityManager->flush();
 
-<<<<<<< HEAD
             /** @var \App\Entity\User $user */
-=======
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
             $user = $this->getUser();
             $this->notificationService->notifyAdmins(
                 'New Health Tracking Entry',
@@ -75,7 +67,6 @@ class TrackingController extends AbstractController
             return $this->redirectToRoute('tracking_index');
         }
 
-<<<<<<< HEAD
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
         $stats = $repository->getStatistics($user);
@@ -83,13 +74,6 @@ class TrackingController extends AbstractController
         $recentEntries = $repository->findRecentByUser($user, 10);
         $advancedStats = $repository->getAdvancedStatistics($user);
         $weeklyData = $repository->getWeeklyStatistics($user);
-=======
-        $stats = $repository->getStatistics($this->getUser());
-        $suggestion = $this->getSuggestion($stats);
-        $recentEntries = $repository->findRecentByUser($this->getUser(), 10);
-        $advancedStats = $repository->getAdvancedStatistics($this->getUser());
-        $weeklyData = $repository->getWeeklyStatistics($this->getUser());
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
 
         return $this->render('tracking/index.html.twig', [
             'stats' => $stats,

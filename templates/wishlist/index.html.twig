@@ -349,11 +349,7 @@
                     row.style.textDecoration = 'line-through';
                     setTimeout(() => {
                         row.remove();
-<<<<<<< HEAD
                         // Refresh total via API
-=======
-                        // Refresh total & count via API
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                         refreshTotal();
                         // Refresh page if empty
                         if (document.querySelectorAll('tbody tr').length === 0) {
@@ -374,16 +370,6 @@
                     if (totalEl) {
                         totalEl.textContent = parseFloat(data.totalPrice).toFixed(2);
                     }
-<<<<<<< HEAD
-=======
-
-                    // update count summary if visible
-                    const summaryEl = document.querySelector('.summary-items');
-                    if (summaryEl) {
-                        const count = data.itemCount || 0;
-                        summaryEl.textContent = `${count} ${count === 1 ? 'item' : 'items'} in your wishlist`;
-                    }
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                 }
             })
             .catch(err => console.error('Failed to refresh total:', err));

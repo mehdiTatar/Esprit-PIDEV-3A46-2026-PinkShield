@@ -36,14 +36,7 @@ class AppointmentFormType extends AbstractType
                     'class' => 'form-select',
                 ],
                 'query_builder' => function (DoctorRepository $repo) {
-<<<<<<< HEAD
                     return $repo->createQueryBuilder('d')
-=======
-                    // only load active doctors for the dropdown
-                    return $repo->createQueryBuilder('d')
-                        ->where('d.status = :status')
-                        ->setParameter('status', 'active')
->>>>>>> f6cc000b0612f83d55ba4325b4872374266fe173
                         ->orderBy('d.lastName', 'ASC')
                         ->addOrderBy('d.firstName', 'ASC');
                 },
