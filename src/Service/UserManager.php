@@ -15,11 +15,11 @@ class UserManager
      */
     public function validate(User $user): bool
     {
-        if (!$user->getEmail() || !filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
+        if (empty($user->getEmail()) || !filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException("L'email de l'utilisateur est obligatoire et doit être valide.");
         }
 
-        if (!$user->getFullName() || strlen($user->getFullName()) < 2) {
+        if (empty($user->getFullName()) || strlen($user->getFullName()) < 2) {
             throw new \InvalidArgumentException("Le nom complet de l'utilisateur est obligatoire (min 2 caractères).");
         }
 

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport de Performance & Optimisation - PinkShield</title>
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                padding: 20px !important;
+            }
+
+            .report-card {
+                box-shadow: none !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #f4f4f9;
+        }
+
+        .report-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        h2 {
+            color: #2980b9;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #34495e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .screenshot {
+            display: block;
+            max-width: 100%;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .screenshot-sm {
+            max-width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .checkbox {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checkbox li::before {
+            content: '✓ ';
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .summary {
+            background: #e8f4fd;
+            padding: 15px;
+            border-left: 5px solid #3498db;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .entity-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        .result-ok {
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .result-warning {
+            font-weight: bold;
+            color: #e67e22;
+        }
+
+        .caption {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-card">
+        <p style="text-align: right; font-size: 0.8em; color: #999;">PI-DEV 2025-2026</p>
+        <h1>Rapport de Performance & Optimisation</h1>
+
+        <p><strong>Nom de groupe :</strong> PinkShield</p>
+        <p><strong>Entité choisie :</strong> <span class="entity-badge">User</span></p>
+
+        <p>Comparez votre code avec et <u>sans</u> :</p>
+        <ul class="checkbox">
+            <li>PHPStan</li>
+            <li>Tests unitaires</li>
+            <li>Optimisation Doctrine Doctor</li>
+        </ul>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  1 — PHPStan                                          -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <h2>1- PHPStan</h2>
+
+        <h3>a) Avant Optimisation (avec preuves : des captures)</h3>
+
+        <p><strong>i. Test 1 :</strong> Analyse au <strong>Niveau 0</strong> — vérification de base uniquement</p>
+        <p>Au niveau 0, PHPStan ne détecte aucun problème de typage ou de sécurité. Les anti-patterns passent inaperçus.
+        </p>
+        <img src="phpstan0.png" class="screenshot" alt="PHPStan Level 0 — No errors">
+        <p class="caption">Figure 1 : PHPStan Level 0 — [OK] No errors détecté</p>
+
+        <p><strong>ii. Test 2 :</strong> Anti-pattern <code>count(findAll())</code> dans
+            <code>DashboardController</code>
+        </p>
+        <p>Le code chargeait <strong>tous les objets User</strong> en mémoire juste pour les compter :</p>
+        <pre>$totalUsers = count($userRepository->findAll());  // ⚠️ charge TOUS les Users en mémoire</pre>
+        <p>Ce pattern est invisible à PHPStan Level 0 mais cause un problème de performance majeur.</p>
+
+        <h3>b) Après Optimisation (avec preuves : des captures)</h3>
+
+        <p><strong>i. Test 1 :</strong> Analyse au <strong>Niveau 5</strong> — vérification stricte des types</p>
+        <p>PHPStan Level 5 détecte des erreurs de typage, des propriétés inutilisées et des méthodes manquantes :</p>
+        <img src="phpstan5.png" class="screenshot" alt="PHPStan Level 5 — Errors detected">
+        <p class="caption">Figure 2 : PHPStan Level 5 — Erreurs détectées dans SeedDataCommand, AppointmentController,
+            AuthController</p>
+
+        <p><strong>ii. Test 2 :</strong> Remplacement par des requêtes COUNT DQL optimisées</p>
+        <pre>// APRÈS — requête DQL optimisée sur l'entité User
+$totalUsers = $userRepository->createQueryBuilder('u')
+    ->select('count(u.id)')
+    ->getQuery()
+    ->getSingleScalarResult();</pre>
+        <p class="result-ok">✅ Anti-pattern résolu : plus de chargement massif en mémoire</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  2 — Tests Unitaires                                   -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="page-break"></div>
+        <h2>2- Tests Unitaires</h2>
+
+        <p>Service et Entité testés : <strong>UserManager</strong> & <strong>User</strong> — Validation de l'entité
+            <span class="entity-badge">User</span>
+        </p>
+
+        <p><strong>i. Test 1 :</strong> <code>testValidUser</code> — Vérifie qu'un User avec email et nom valides passe
+            la validation ✅</p>
+        <p><strong>ii. Test 2 :</strong> <code>testUserWithInvalidEmail</code> — Vérifie que
+            <code>InvalidArgumentException</code> est levée pour un email invalide ✅
+        </p>
+        <p><strong>iii. Test 3 :</strong> <code>testUserWithoutFullName</code> — Vérifie que
+            <code>InvalidArgumentException</code> est levée si le nom complet est manquant ✅
+        </p>
+
+        <img src="phpunit.png" class="screenshot" alt="PHPUnit — Tests User OK">
+        <p class="caption">Figure 3 : PHPUnit — User & UserManager (Tests de validation) OK</p>
+        <p class="result-ok">Résultat : OK — Validation des contraintes d'email, de nom et de logique métier
+            (UserManager).</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  3 — Doctrine Doctor                                   -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <h2>3- Problèmes détectés (DoctrineDoctor)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Indicateur de performance</th>
+                    <th>Avant optimisation (par défaut)</th>
+                    <th>Après optimisation</th>
+                    <th>Preuves (des captures)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Nombre de problèmes N+1 détectés (DoctrineDoctor)</strong></td>
+                    <td>4 problèmes détectés (Lazy Loading sur User, BlogPost, Comment)</td>
+                    <td>1 problème résiduel (User → DailyTracking, faible impact)</td>
+                    <td><img src="doctrine_queries.png" class="screenshot-sm"
+                            alt="Doctrine Queries — Après optimisation"></td>
+                </tr>
+                <tr>
+                    <td><strong>Les problèmes</strong></td>
+                    <td>Chargement "Lazy" répétitif dans les boucles du Blog et Dashboard. <code>count(findAll())</code>
+                        sur l'entité User.</td>
+                    <td>Utilisation de <code>leftJoin</code>, <code>addSelect</code> et COUNT DQL.</td>
+                    <td><img src="doctrine.png" class="screenshot-sm" alt="Doctrine Doctor — Avant"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Capture du Symfony Profiler — Doctrine Queries (après optimisation) :</strong></p>
+        <img src="doctrine_queries.png" class="screenshot" alt="Symfony Profiler — Doctrine Queries">
+        <p class="caption">Figure 4 : Symfony Profiler — 3 Database Queries, Query time: 2.56 ms, 9 Managed entities, 0
+            Invalid entities</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  PI-DEV Table                                          -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <table style="margin-top: 30px;">
+            <thead>
+                <tr>
+                    <th colspan="4" style="text-align: center; background: #eee;">PI-DEV 2025-2026</th>
+                </tr>
+                <tr>
+                    <th>Indicateur de performance</th>
+                    <th>Avant optimisation (par défaut)</th>
+                    <th>Après optimisation</th>
+                    <th>Preuves (des captures)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Les problèmes</strong></td>
+                    <td>Chargement Lazy N+1, <code>count(findAll())</code> inefficace, pas de JOINs DQL</td>
+                    <td>JOINs DQL avec <code>addSelect</code>, COUNT optimisé, requêtes réduites</td>
+                    <td><img src="doctrine.png" class="screenshot-sm" alt="Problèmes Doctrine"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  4 — Tableau de Performance                            -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="page-break"></div>
+        <h2>4- Complétez le tableau suivant</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Indicateur de performance</th>
+                    <th>Avant optimisation (par défaut)</th>
+                    <th>Après optimisation</th>
+                    <th>Preuves (des captures)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Temps moyen de réponse de la page d'accueil (ms)</strong></td>
+                    <td>3544 ms</td>
+                    <td>926 ms</td>
+                    <td><img src="login_screenshot.png" class="screenshot-sm" alt="Login Page — 926ms"><br>
+                        <img src="profiler_performance.png" class="screenshot-sm" alt="Profiler Performance">
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Temps d'exécution d'une fonctionnalité principale (Blog Index)</strong></td>
+                    <td>5543 ms</td>
+                    <td>3180 ms</td>
+                    <td><img src="blog_screenshot.png" class="screenshot-sm" alt="Blog Page — 3180ms"></td>
+                </tr>
+                <tr>
+                    <td><strong>Utilisation mémoire</strong></td>
+                    <td>42.00 MiB</td>
+                    <td>8.00 MiB (login) / 10.0 MiB (blog)</td>
+                    <td><img src="profiler_performance.png" class="screenshot-sm" alt="Peak Memory 8.00 MiB"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Screenshots preuves -->
+        <h3>Preuves détaillées</h3>
+
+        <p><strong>Page de connexion (Login) — Symfony Profiler :</strong></p>
+        <img src="login_screenshot.png" class="screenshot" alt="PinkShield Login Page">
+        <p class="caption">Figure 5 : Page de connexion PinkShield — 926ms, 8.0 MiB (Symfony Profiler toolbar visible)
+        </p>
+
+        <p><strong>Symfony Profiler — Performance Metrics :</strong></p>
+        <img src="profiler_performance.png" class="screenshot" alt="Symfony Profiler Performance">
+        <p class="caption">Figure 6 : Symfony Profiler — Total execution time: 926 ms, Symfony initialization: 59 ms,
+            Peak memory: 8.00 MiB</p>
+
+        <p><strong>Page Blog Index :</strong></p>
+        <img src="blog_screenshot.png" class="screenshot" alt="Blog Index Page">
+        <p class="caption">Figure 7 : Blog Index — 3180 ms, 10.0 MiB, 8 queries, 2 AJAX calls (Symfony Profiler toolbar
+            visible)</p>
+
+        <p><strong>Symfony Profiler — Liste des requêtes HTTP :</strong></p>
+        <img src="profiler_requests.png" class="screenshot" alt="Symfony Profiler Request List">
+        <p class="caption">Figure 8 : Symfony Profiler — Last 10 HTTP Requests avec statuts et timestamps</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--  Résumé                                                -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="summary">
+            <h3>📝 Résumé des actions :</h3>
+            <ol>
+                <li><strong>Doctrine :</strong> Remplacement de <code>count($userRepository->findAll())</code> par des
+                    <code>COUNT()</code> DQL optimisés.
+                </li>
+                <li><strong>N+1 :</strong> Suppression des boucles de requêtes via JOINs (<code>addSelect</code>).</li>
+                <li><strong>Qualité :</strong> Correction des types identifiés par PHPStan Niveau 5 (entités User,
+                    Doctor, BlogPost).</li>
+                <li><strong>Tests :</strong> Validation de l'entité User (contraintes d'email/nom) et du service
+                    UserManager.</li>
+                <li><strong>Performance :</strong> Temps de réponse login réduit de 3544ms → 926ms. Blog réduit de
+                    5543ms → 3180ms.</li>
+                <li><strong>Mémoire :</strong> Peak memory réduit de 42 MiB → 8-10 MiB.</li>
+            </ol>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 PinkShield Project — Généré le 05 Mars 2026</p>
+        </footer>
+    </div>
+</body>
+
+</html>
