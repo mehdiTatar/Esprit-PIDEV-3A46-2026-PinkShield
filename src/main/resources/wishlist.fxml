@@ -4,36 +4,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.WishlistController" spacing="15" style="-fx-padding: 20;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.WishlistController" spacing="15" stylesheets="@style.css" style="-fx-padding: 20;">
 
-    <Label text="Wishlist Management" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+    <Label text="❤️ Wishlist Management" styleClass="label-title"/>
 
-    <TextField fx:id="searchBar" promptText="Search by User ID, Product ID, or Item ID..." prefHeight="35"/>
+    <TextField fx:id="searchBar" promptText="🔍 Search by User ID, Product ID, or Item ID..." prefHeight="35" styleClass="text-field"/>
 
-    <GridPane hgap="10" vgap="10" style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 15;">
-        <columnConstraints>
-            <ColumnConstraints prefWidth="100"/>
-            <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
-            <ColumnConstraints prefWidth="120"/>
-            <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints/>
-        </rowConstraints>
+    <VBox styleClass="card-pane" spacing="15">
+        <Label text="Wishlist Item Details" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
 
-        <Label text="User ID:" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtUserId" GridPane.columnIndex="1" promptText="Enter user ID"/>
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="120"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+                <ColumnConstraints prefWidth="130"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints/>
+            </rowConstraints>
 
-        <Label text="Product ID:" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtParapharmacieId" GridPane.columnIndex="3" promptText="Enter product ID"/>
-    </GridPane>
+            <Label text="User ID:" GridPane.columnIndex="0" styleClass="label-subtitle"/>
+            <TextField fx:id="txtUserId" GridPane.columnIndex="1" promptText="Enter user ID" styleClass="text-field"/>
+
+            <Label text="Product ID:" GridPane.columnIndex="2" styleClass="label-subtitle"/>
+            <TextField fx:id="txtParapharmacieId" GridPane.columnIndex="3" promptText="Enter product ID" styleClass="text-field"/>
+        </GridPane>
+    </VBox>
 
     <HBox spacing="10">
-        <Button text="Ajouter" onAction="#handleAjouter" style="-fx-padding: 10px 25px; -fx-font-size: 12;"/>
-        <Button text="Supprimer" onAction="#handleSupprimer" style="-fx-padding: 10px 25px; -fx-font-size: 12;"/>
+        <Button text="✅ Ajouter" onAction="#handleAjouter" styleClass="btn-primary"/>
+        <Button text="🗑️ Supprimer" onAction="#handleSupprimer" styleClass="btn-danger"/>
     </HBox>
 
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId" text="Item ID" prefWidth="100"/>
             <TableColumn fx:id="colUserId" text="User ID" prefWidth="120"/>

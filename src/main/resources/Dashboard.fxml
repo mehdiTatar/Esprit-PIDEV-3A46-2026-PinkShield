@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.DashboardController" stylesheets="@style.css">
+
+    <!-- ===== TOP: Header ===== -->
+    <top>
+        <HBox styleClass="header" alignment="CENTER_LEFT">
+            <!-- Logo -->
+            <Label text="💊 PinkShield" styleClass="header-logo"/>
+
+            <!-- Spacer -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Header Search Bar (Optional) -->
+            <TextField promptText="🔍 Quick search..." prefWidth="250" styleClass="text-field"/>
+
+            <!-- User Menu (Optional) -->
+            <Button text="👤" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-border-color: transparent; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <!-- ===== LEFT: Sidebar ===== -->
+    <left>
+        <VBox styleClass="sidebar">
+            <!-- Sidebar Title -->
+            <Label text="Menu" styleClass="sidebar-title"/>
+
+            <Separator/>
+
+            <!-- Navigation Buttons -->
+            <Button text="📅 Appointments" styleClass="sidebar-button" onAction="#handleAppointments" wrapText="true"/>
+            <Button text="💊 Parapharmacie" styleClass="sidebar-button" onAction="#handleParapharmacie" wrapText="true"/>
+            <Button text="❤️ Wishlist" styleClass="sidebar-button" onAction="#handleWishlist" wrapText="true"/>
+
+            <!-- Spacer -->
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Logout Button at Bottom -->
+            <Separator/>
+            <Button text="🚪 Logout" styleClass="sidebar-button" onAction="#handleLogout" wrapText="true"/>
+        </VBox>
+    </left>
+
+    <!-- ===== CENTER: Main Content Area ===== -->
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-background-color: #f5f6fa;">
+            <!-- This will be where sub-windows are dynamically loaded -->
+            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 40;">
+                <Label text="Welcome to PinkShield" styleClass="label-title" alignment="CENTER"/>
+                <Label text="Select an option from the sidebar to get started" styleClass="label-subtitle" alignment="CENTER"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>
+

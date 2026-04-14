@@ -5,79 +5,97 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.AppointmentController" spacing="15" style="-fx-padding: 20;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.AppointmentController" spacing="15" stylesheets="@style.css" style="-fx-padding: 20;">
 
-    <Label text="Appointment Management" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+    <Label text="📅 Appointment Management" styleClass="label-title"/>
 
-    <TextField fx:id="searchBar" promptText="Search by patient name or doctor name..." prefHeight="35"/>
+    <TextField fx:id="searchBar" promptText="🔍 Search by patient name or doctor name..." prefHeight="35" styleClass="text-field"/>
 
-    <GridPane hgap="10" vgap="10" style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 15;">
-        <columnConstraints>
-            <ColumnConstraints prefWidth="100"/>
-            <ColumnConstraints prefWidth="180" hgrow="ALWAYS"/>
-            <ColumnConstraints prefWidth="100"/>
-            <ColumnConstraints prefWidth="180" hgrow="ALWAYS"/>
-            <ColumnConstraints prefWidth="100"/>
-            <ColumnConstraints prefWidth="180" hgrow="ALWAYS"/>
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints/>
-            <RowConstraints/>
-        </rowConstraints>
+    <VBox styleClass="card-pane" spacing="15">
+        <Label text="Appointment Details" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
 
-        <!-- Row 1 -->
-        <Label text="Patient Email:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtPatientEmail" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="patient@example.com"/>
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints/>
+                <RowConstraints/>
+            </rowConstraints>
 
-        <Label text="Patient Name:" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtPatientName" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Enter name"/>
+            <!-- Row 1 -->
+            <Label text="Patient Email:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <TextField fx:id="txtPatientEmail" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="patient@example.com" styleClass="text-field"/>
 
-        <Label text="Doctor Email:" GridPane.columnIndex="4" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtDoctorEmail" GridPane.columnIndex="5" GridPane.rowIndex="0" promptText="doctor@example.com"/>
+            <Label text="Patient Name:" GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <TextField fx:id="txtPatientName" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="Enter name" styleClass="text-field"/>
 
-        <!-- Row 2 -->
-        <Label text="Doctor Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtDoctorName" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Enter name"/>
+            <!-- Row 2 -->
+            <Label text="Doctor Email:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label-subtitle"/>
+            <TextField fx:id="txtDoctorEmail" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="doctor@example.com" styleClass="text-field"/>
 
-        <Label text="Date:" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <DatePicker fx:id="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+            <Label text="Doctor Name:" GridPane.columnIndex="2" GridPane.rowIndex="1" styleClass="label-subtitle"/>
+            <TextField fx:id="txtDoctorName" GridPane.columnIndex="3" GridPane.rowIndex="1" promptText="Enter name" styleClass="text-field"/>
+        </GridPane>
 
-        <Label text="Time (HH:mm):" GridPane.columnIndex="4" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
-        <TextField fx:id="txtHeure" GridPane.columnIndex="5" GridPane.rowIndex="1" promptText="14:30"/>
-    </GridPane>
+        <Separator/>
 
-    <GridPane hgap="10" vgap="10" style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 15;">
-        <columnConstraints>
-            <ColumnConstraints prefWidth="80"/>
-            <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
-            <ColumnConstraints prefWidth="80"/>
-            <ColumnConstraints prefWidth="300" hgrow="ALWAYS"/>
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints/>
-        </rowConstraints>
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints/>
+            </rowConstraints>
 
-        <Label text="Status:" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-        <ComboBox fx:id="comboStatus" GridPane.columnIndex="1" prefWidth="200">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="pending"/>
-                    <String fx:value="confirmed"/>
-                    <String fx:value="cancelled"/>
-                </FXCollections>
-            </items>
-        </ComboBox>
+            <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="date-picker"/>
 
-        <Label text="Notes:" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-        <TextArea fx:id="txtNotes" GridPane.columnIndex="3" prefHeight="60" wrapText="true" promptText="Enter appointment notes..."/>
-    </GridPane>
+            <Label text="Time (HH:mm):" GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <TextField fx:id="txtHeure" GridPane.columnIndex="3" GridPane.rowIndex="0" promptText="14:30" styleClass="text-field"/>
+        </GridPane>
+
+        <Separator/>
+
+        <GridPane hgap="15" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="300" hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints prefHeight="100"/>
+            </rowConstraints>
+
+            <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <ComboBox fx:id="comboStatus" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="200" styleClass="combo-box">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="pending"/>
+                        <String fx:value="confirmed"/>
+                        <String fx:value="cancelled"/>
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <Label text="Notes:" GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="label-subtitle"/>
+            <TextArea fx:id="txtNotes" GridPane.columnIndex="3" GridPane.rowIndex="0" prefHeight="80" wrapText="true" promptText="Enter appointment notes..." styleClass="text-area"/>
+        </GridPane>
+    </VBox>
 
     <HBox spacing="10">
-        <Button text="Ajouter" onAction="#handleAjouter" style="-fx-padding: 10px 25px; -fx-font-size: 12;"/>
-        <Button text="Supprimer" onAction="#handleSupprimer" style="-fx-padding: 10px 25px; -fx-font-size: 12;"/>
+        <Button text="✅ Ajouter" onAction="#handleAjouter" styleClass="btn-primary"/>
+        <Button text="🗑️ Supprimer" onAction="#handleSupprimer" styleClass="btn-danger"/>
     </HBox>
 
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
             <TableColumn fx:id="colPatient" text="Patient" prefWidth="150"/>
