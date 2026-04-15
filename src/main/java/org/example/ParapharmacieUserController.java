@@ -139,16 +139,31 @@ public class ParapharmacieUserController implements Initializable {
 
             showAlert("Success", product.getNom() + " added to your wishlist!");
         } catch (SQLException e) {
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "";
+            System.out.println("DEBUG: Full SQL Error: " + e);
+            System.out.println("DEBUG: Error message: " + errorMsg);
+            
             // Check if it's a duplicate entry error
-            if (e.getMessage().contains("Duplicate entry")) {
+            if (errorMsg.contains("Duplicate entry")) {
                 showAlert("Info", "This item is already in your wishlist!");
-            } else if (e.getMessage().contains("Unknown column")) {
-                showAlert("Database Issue", "Database needs to be reset. Please restart the application.");
+            } else if (errorMsg.contains("Unknown column") || errorMsg.contains("parapharmacie_id")) {
+                showAlert("Database Configuration Error", 
+                    "The wishlist table needs to be fixed.\n\n" +
+                    "Please:\n" +
+                    "1. Open PHPMyAdmin or MySQL\n" +
+                    "2. Run the FIX_WISHLIST_DATABASE.sql script\n" +
+                    "3. Restart the application\n\n" +
+                    "Error: " + errorMsg);
+            } else if (errorMsg.contains("Table") && errorMsg.contains("doesn't exist")) {
+                showAlert("Database Error", 
+                    "Wishlist table doesn't exist.\n\n" +
+                    "Please run FIX_WISHLIST_DATABASE.sql to create it.");
             } else {
-                showAlert("Error", "Failed to add to wishlist: " + e.getMessage());
+                showAlert("Error", "Failed to add to wishlist:\n" + errorMsg);
             }
         } catch (Exception e) {
             showAlert("Error", "Failed to add to wishlist: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
