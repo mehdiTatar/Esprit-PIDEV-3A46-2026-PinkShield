@@ -1,53 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.ParapharmacieController" spacing="15" stylesheets="@style.css" style="-fx-padding: 20;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.ParapharmacieController" spacing="15" style="-fx-padding: 20; -fx-background-color: #f4f4f9;">
 
-    <Label text="💊 Parapharmacie Management" styleClass="label-title"/>
+    <Label text="🌿 Gestion Parapharmacie" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2d3436;"/>
 
-    <TextField fx:id="searchBar" promptText="🔍 Search by product name..." prefHeight="35" styleClass="text-field"/>
-
-    <VBox styleClass="card-pane" spacing="15">
-        <Label text="Add New Product" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
-
-        <GridPane hgap="15" vgap="12">
-            <columnConstraints>
-                <ColumnConstraints prefWidth="120"/>
-                <ColumnConstraints prefWidth="200" hgrow="ALWAYS"/>
-                <ColumnConstraints prefWidth="100"/>
-                <ColumnConstraints prefWidth="150" hgrow="ALWAYS"/>
-                <ColumnConstraints prefWidth="100"/>
-                <ColumnConstraints prefWidth="150" hgrow="ALWAYS"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints/>
-            </rowConstraints>
-
-            <Label text="Product Name:" GridPane.columnIndex="0" styleClass="label-subtitle"/>
-            <TextField fx:id="txtNom" GridPane.columnIndex="1" promptText="Enter product name" styleClass="text-field"/>
-
-            <Label text="Price:" GridPane.columnIndex="2" styleClass="label-subtitle"/>
-            <TextField fx:id="txtPrix" GridPane.columnIndex="3" promptText="0.00" styleClass="text-field"/>
-
-            <Label text="Stock:" GridPane.columnIndex="4" styleClass="label-subtitle"/>
-            <TextField fx:id="txtStock" GridPane.columnIndex="5" promptText="0" styleClass="text-field"/>
-        </GridPane>
-    </VBox>
-
-    <HBox spacing="10">
-        <Button text="✅ Ajouter" onAction="#handleAjouter" styleClass="btn-primary"/>
-        <Button text="🗑️ Supprimer" onAction="#handleSupprimer" styleClass="btn-danger"/>
-        <Button text="🔄 Refresh Products" onAction="#handleRefresh" styleClass="btn-secondary"/>
+    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;">
+        <TextField fx:id="txtNom" promptText="Nom du produit"/>
+        <TextField fx:id="txtPrix" promptText="Prix ($)"/>
+        <TextField fx:id="txtStock" promptText="Stock"/>
+        <Button text="➕ Ajouter" onAction="#handleAjouter" style="-fx-background-color: #0984e3; -fx-text-fill: white;"/>
+        <Button text="🔄" onAction="#handleRefresh"/>
     </HBox>
 
-    <Label text="Available Products" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField fx:id="searchBar" promptText="🔍 Rechercher un produit..." prefWidth="300"/>
+        <ComboBox fx:id="sortComboBox" promptText="Trier par..." prefWidth="150"/>
+    </HBox>
 
-    <ScrollPane fx:id="scrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
-        <FlowPane fx:id="productFlowPane" hgap="15" vgap="15" styleClass="flow-pane"/>
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+        <FlowPane fx:id="productFlowPane" hgap="20" vgap="20" style="-fx-padding: 10;"/>
     </ScrollPane>
 
 </VBox>
-

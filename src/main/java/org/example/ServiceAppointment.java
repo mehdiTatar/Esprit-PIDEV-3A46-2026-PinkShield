@@ -21,6 +21,7 @@ public class ServiceAppointment {
     }
 
     public void ajouter(Appointment appointment) throws SQLException {
+        // On précise explicitement les colonnes, created_at sera géré par MySQL
         String req = "INSERT INTO appointment (patient_email, patient_name, doctor_email, doctor_name, appointment_date, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement pst = cnx.prepareStatement(req);
 
@@ -33,7 +34,7 @@ public class ServiceAppointment {
         pst.setString(7, appointment.getNotes());
 
         pst.executeUpdate();
-        System.out.println("Appointment ajoute avec succes !");
+        System.out.println("✅ Appointment ajoute avec succes !");
     }
 
     public void modifier(Appointment appointment) throws SQLException {
@@ -50,24 +51,21 @@ public class ServiceAppointment {
         pst.setInt(8, appointment.getId());
 
         pst.executeUpdate();
-        System.out.println("Appointment modifie avec succes !");
+        System.out.println("✅ Appointment modifie avec succes !");
     }
 
     public void supprimer(int id) throws SQLException {
         String req = "DELETE FROM appointment WHERE id = ?";
         PreparedStatement pst = cnx.prepareStatement(req);
-
         pst.setInt(1, id);
-
         pst.executeUpdate();
-        System.out.println("Appointment supprime avec succes !");
+        System.out.println("✅ Appointment supprime avec succes !");
     }
 
     public ArrayList<Appointment> afficherAll() throws SQLException {
         ArrayList<Appointment> list = new ArrayList<>();
         String req = "SELECT * FROM appointment";
         PreparedStatement pst = cnx.prepareStatement(req);
-
         ResultSet rs = pst.executeQuery();
 
         while (rs.next()) {
@@ -90,10 +88,8 @@ public class ServiceAppointment {
     public boolean isDoctorBooked(String doctorEmail, Timestamp appointmentDate) throws SQLException {
         String req = "SELECT COUNT(*) as count FROM appointment WHERE doctor_email = ? AND appointment_date = ? AND status != 'cancelled'";
         PreparedStatement pst = cnx.prepareStatement(req);
-
         pst.setString(1, doctorEmail);
         pst.setTimestamp(2, appointmentDate);
-
         ResultSet rs = pst.executeQuery();
         if (rs.next()) {
             return rs.getInt("count") > 0;
@@ -101,4 +97,3 @@ public class ServiceAppointment {
         return false;
     }
 }
-

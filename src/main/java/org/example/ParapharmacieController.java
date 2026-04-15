@@ -11,19 +11,16 @@ import javafx.scene.layout.VBox;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class ParapharmacieController {
 
-    @FXML
-    private TextField txtNom;
-    @FXML
-    private TextField txtPrix;
-    @FXML
-    private TextField txtStock;
-    @FXML
-    private TextField searchBar;
-    @FXML
-    private FlowPane productFlowPane;
+    @FXML private TextField txtNom;
+    @FXML private TextField txtPrix;
+    @FXML private TextField txtStock;
+    @FXML private TextField searchBar;
+    @FXML private ComboBox<String> sortComboBox;
+    @FXML private FlowPane productFlowPane;
 
     private ServiceParapharmacie service;
     private ServiceWishlist wishlistService;
@@ -35,44 +32,93 @@ public class ParapharmacieController {
         service = new ServiceParapharmacie();
         wishlistService = new ServiceWishlist();
 
+        // Initialisation des options de tri
+        if (sortComboBox != null) {
+            sortComboBox.setItems(FXCollections.observableArrayList(
+                    "Nom (A-Z)", "Nom (Z-A)", "Prix croissant", "Prix décroissant"
+            ));
+        }
+
         loadProducts();
-        setupRealTimeSearch();
+        setupSearchAndSort();
     }
 
     private void loadProducts() {
         try {
             ArrayList<Parapharmacie> products = service.afficherAll();
             productList = FXCollections.observableArrayList(products);
-            System.out.println("Successfully loaded " + products.size() + " products from database");
-            displayProducts(productList);
-        } catch (SQLException e) {
-            System.out.println("Database connection error - this is OK for testing: " + e.getMessage());
-            e.printStackTrace();
-            productList = FXCollections.observableArrayList();
-            displayProducts(productList);
-        } catch (NullPointerException e) {
-            System.out.println("Database not ready - this is OK: " + e.getMessage());
-            e.printStackTrace();
-            productList = FXCollections.observableArrayList();
-            displayProducts(productList);
+            System.out.println("Loaded " + products.size() + " products");
+
+            // On initialise la liste filtrée ici pour éviter les NullPointerException
+            if (filteredList == null) {
+                filteredList = new FilteredList<>(productList, p -> true);
+            } else {
+                // Si on refresh, on remet à jour la source
+                setupSearchAndSort();
+            }
+
+            updateFilterAndSort(); // Première passe d'affichage
         } catch (Exception e) {
-            System.out.println("Unexpected error loading products: " + e.getMessage());
+            System.out.println("Error loading products: " + e.getMessage());
             e.printStackTrace();
             productList = FXCollections.observableArrayList();
             displayProducts(productList);
         }
     }
 
+    private void setupSearchAndSort() {
+        if (productList == null) return;
+        filteredList = new FilteredList<>(productList, p -> true);
+
+        // Recherche en temps réel
+        searchBar.textProperty().addListener((obs, oldVal, newVal) -> updateFilterAndSort());
+
+        // Tri en temps réel
+        if (sortComboBox != null) {
+            sortComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilterAndSort());
+        }
+    }
+
+    private void updateFilterAndSort() {
+        if (productList == null) return;
+
+        // 1. Filtrage par recherche
+        String searchText = searchBar.getText() != null ? searchBar.getText().toLowerCase() : "";
+        filteredList.setPredicate(product -> {
+            if (searchText.isEmpty()) return true;
+            return product.getNom().toLowerCase().contains(searchText);
+        });
+
+        // 2. Tri
+        ObservableList<Parapharmacie> sortedList = FXCollections.observableArrayList(filteredList);
+        String sortOption = sortComboBox.getValue();
+
+        if (sortOption != null) {
+            switch (sortOption) {
+                case "Nom (A-Z)":
+                    sortedList.sort(Comparator.comparing(p -> p.getNom().toLowerCase()));
+                    break;
+                case "Nom (Z-A)":
+                    sortedList.sort((p1, p2) -> p2.getNom().toLowerCase().compareTo(p1.getNom().toLowerCase()));
+                    break;
+                case "Prix croissant":
+                    sortedList.sort(Comparator.comparingDouble(Parapharmacie::getPrix));
+                    break;
+                case "Prix décroissant":
+                    sortedList.sort((p1, p2) -> Double.compare(p2.getPrix(), p1.getPrix()));
+                    break;
+            }
+        }
+
+        // 3. Affichage
+        displayProducts(sortedList);
+    }
+
     private void displayProducts(ObservableList<Parapharmacie> products) {
         productFlowPane.getChildren().clear();
-        System.out.println("Displaying " + products.size() + " products");
-        if (products.isEmpty()) {
-            System.out.println("WARNING: No products to display!");
-        }
         for (Parapharmacie product : products) {
             VBox card = createProductCard(product);
             productFlowPane.getChildren().add(card);
-            System.out.println("Added product: " + product.getNom());
         }
     }
 
@@ -80,32 +126,21 @@ public class ParapharmacieController {
         VBox card = new VBox(10);
         card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         card.setPrefWidth(280);
-        card.setPrefHeight(220);
-        card.getStyleClass().add("product-card");
 
         Label nameLabel = new Label("📦 " + product.getNom());
         nameLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;");
         nameLabel.setWrapText(true);
-        nameLabel.getStyleClass().add("product-name");
 
         Label priceLabel = new Label("💰 Price: $" + String.format("%.2f", product.getPrix()));
-        priceLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #666;");
-        priceLabel.getStyleClass().add("product-price");
-
         Label stockLabel = new Label("📊 Stock: " + product.getStock());
-        stockLabel.setStyle("-fx-font-size: 14; -fx-text-fill: #666;");
-        stockLabel.getStyleClass().add("product-stock");
 
         Button wishlistButton = new Button("❤️ Add to Wishlist");
         wishlistButton.setStyle("-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-font-size: 12; -fx-background-radius: 5; -fx-padding: 8 15;");
-        wishlistButton.getStyleClass().add("wishlist-btn");
         wishlistButton.setOnAction(e -> addToWishlist(product));
         wishlistButton.setMaxWidth(Double.MAX_VALUE);
 
         card.getChildren().addAll(nameLabel, priceLabel, stockLabel, wishlistButton);
         VBox.setMargin(wishlistButton, new Insets(10, 0, 0, 0));
-        VBox.setVgrow(nameLabel, javafx.scene.layout.Priority.ALWAYS);
-
         return card;
     }
 
@@ -115,128 +150,37 @@ public class ParapharmacieController {
                 showWarningAlert("Already in Wishlist", "This product is already in your wishlist.");
                 return;
             }
-            Wishlist wishlist = new Wishlist(1, product.getId());
-            wishlistService.ajouter(wishlist);
+            wishlistService.ajouter(new Wishlist(1, product.getId()));
             showInfoAlert("Success", "Product added to wishlist!");
         } catch (SQLException e) {
-            showErrorAlert("Database Error", "Could not add to wishlist: " + e.getMessage());
+            showErrorAlert("Database Error", e.getMessage());
         }
-    }
-
-    private void setupRealTimeSearch() {
-        filteredList = new FilteredList<>(productList, p -> true);
-
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredList.setPredicate(product -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-
-                String lowerCaseFilter = newValue.toLowerCase();
-                return product.getNom().toLowerCase().contains(lowerCaseFilter);
-            });
-            displayProducts(filteredList);
-        });
     }
 
     @FXML
     public void handleAjouter() {
-        if (!validateInput()) {
-            return;
-        }
-
+        if (!validateInput()) return;
         try {
-            String nom = txtNom.getText();
-            double prix = Double.parseDouble(txtPrix.getText());
-            int stock = Integer.parseInt(txtStock.getText());
-            String description = "";
-
-            if (service.productExists(nom)) {
-                showErrorAlert("Duplicate Product", "A product with the name '" + nom + "' already exists in the database.");
-                return;
-            }
-
-            Parapharmacie parapharmacie = new Parapharmacie(nom, prix, stock, description);
-            service.ajouter(parapharmacie);
-            showInfoAlert("Success", "Product added successfully!");
-
+            service.ajouter(new Parapharmacie(txtNom.getText(), Double.parseDouble(txtPrix.getText()), Integer.parseInt(txtStock.getText()), ""));
+            showInfoAlert("Success", "Product added!");
             clearFields();
             loadProducts();
-
-        } catch (NumberFormatException e) {
-            showErrorAlert("Input Error", "Prix must be a decimal number and Stock must be an integer.");
-        } catch (SQLException e) {
-            showErrorAlert("Database Error", "Could not add product: " + e.getMessage());
+        } catch (Exception e) {
+            showErrorAlert("Error", e.getMessage());
         }
     }
 
-    @FXML
-    public void handleSupprimer() {
-        // Since no table, perhaps remove this or implement differently
-        showWarningAlert("Not Implemented", "Delete functionality is not available in card view. Use database directly.");
-    }
-
-    @FXML
-    public void handleRefresh() {
-        System.out.println("Refresh button clicked!");
-        loadProducts();
-        showInfoAlert("Refreshed", "Products reloaded from database!");
-    }
+    @FXML public void handleRefresh() { loadProducts(); }
 
     private boolean validateInput() {
-        String nom = txtNom.getText();
-        String prix = txtPrix.getText();
-        String stock = txtStock.getText();
-
-        if (nom.isEmpty() || prix.isEmpty() || stock.isEmpty()) {
-            showWarningAlert("Validation Error", "All fields are required. Please fill in all fields.");
-            return false;
-        }
-
-        try {
-            Double.parseDouble(prix);
-        } catch (NumberFormatException e) {
-            showWarningAlert("Validation Error", "Prix must be a valid decimal number.");
-            return false;
-        }
-
-        try {
-            Integer.parseInt(stock);
-        } catch (NumberFormatException e) {
-            showWarningAlert("Validation Error", "Stock must be a valid integer.");
-            return false;
-        }
-
-        return true;
+        return !txtNom.getText().isEmpty() && !txtPrix.getText().isEmpty() && !txtStock.getText().isEmpty();
     }
 
     private void clearFields() {
-        txtNom.clear();
-        txtPrix.clear();
-        txtStock.clear();
+        txtNom.clear(); txtPrix.clear(); txtStock.clear();
     }
 
-    private void showWarningAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void showErrorAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void showInfoAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
+    private void showWarningAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.WARNING); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
+    private void showErrorAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.ERROR); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
+    private void showInfoAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.INFORMATION); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
 }

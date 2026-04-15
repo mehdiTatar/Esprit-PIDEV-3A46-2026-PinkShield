@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.ParapharmacieUserController" spacing="20" stylesheets="@style.css" style="-fx-padding: 30; -fx-background-color: #f5f6fa;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.ParapharmacieController" spacing="15" style="-fx-padding: 20; -fx-background-color: #f4f4f9;">
+    <Label text="🌿 Parapharmacie" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
 
-    <Label text="Parapharmacie Catalog" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #e84393;"/>
-    <Label text="Browse our healthcare products and add them to your wishlist" style="-fx-font-size: 14; -fx-text-fill: #666;"/>
-
-    <!-- Search Bar -->
-    <TextField fx:id="searchBar" promptText="Search products by name..." prefHeight="35" styleClass="text-field"/>
-
-    <!-- Products Grid -->
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
-        <FlowPane fx:id="productFlowPane" hgap="20" vgap="20" style="-fx-padding: 10;"/>
-    </ScrollPane>
-
-    <!-- Action Buttons -->
-    <HBox spacing="15">
-        <Button text="Refresh Catalog" onAction="#handleRefresh" styleClass="btn-secondary"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label text="Click 'Add to Wishlist' on any product to save it!" style="-fx-text-fill: #666; -fx-font-size: 12;"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="txtNom" promptText="Nom"/>
+        <TextField fx:id="txtPrix" promptText="Prix"/>
+        <TextField fx:id="txtStock" promptText="Stock"/>
+        <Button text="Ajouter" onAction="#handleAjouter"/>
     </HBox>
 
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField fx:id="searchBar" promptText="🔍 Rechercher..." prefWidth="250"/>
+        <ComboBox fx:id="sortComboBox" promptText="Trier par..." prefWidth="150"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <FlowPane fx:id="productFlowPane" hgap="20" vgap="20"/>
+    </ScrollPane>
 </VBox>

@@ -1,131 +1,165 @@
 package org.example;
 
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.util.Comparator;
 
-public class ParapharmacieUserController implements Initializable {
+// Change la ligne 16 par :
+public class ParapharmacieUserController {
 
+    @FXML private TextField txtNom;
+    @FXML private TextField txtPrix;
+    @FXML private TextField txtStock;
     @FXML private TextField searchBar;
+    @FXML private ComboBox<String> sortComboBox;
     @FXML private FlowPane productFlowPane;
 
-    private ServiceParapharmacie serviceParapharmacie;
-    private ServiceWishlist serviceWishlist;
-    private ArrayList<Parapharmacie> allProducts;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        serviceParapharmacie = new ServiceParapharmacie();
-        serviceWishlist = new ServiceWishlist();
-        allProducts = new ArrayList<>();
-
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterProducts(newValue);
-        });
-
-        loadProducts();
-    }
+    private ServiceParapharmacie service;
+    private ServiceWishlist wishlistService;
+    private ObservableList<Parapharmacie> productList;
+    private FilteredList<Parapharmacie> filteredList;
 
     @FXML
-    public void handleRefresh() {
+    public void initialize() {
+        service = new ServiceParapharmacie();
+        wishlistService = new ServiceWishlist();
+
+        sortComboBox.setItems(FXCollections.observableArrayList(
+                "Nom (A-Z)", "Nom (Z-A)", "Prix croissant", "Prix décroissant"
+        ));
+
         loadProducts();
+        setupSearchAndSort();
     }
 
     private void loadProducts() {
         try {
-            allProducts = serviceParapharmacie.afficherAll();
-            displayProducts(allProducts);
-        } catch (SQLException e) {
-            System.err.println("Erreur Base : " + e.getMessage());
-            showAlert("Erreur", "Impossible de charger les produits.");
+            ArrayList<Parapharmacie> products = service.afficherAll();
+            productList = FXCollections.observableArrayList(products);
+            updateFilterAndSort();
+        } catch (Exception e) {
+            e.printStackTrace();
+            productList = FXCollections.observableArrayList();
+            displayProducts(productList);
         }
     }
 
-    private void displayProducts(ArrayList<Parapharmacie> products) {
-        productFlowPane.getChildren().clear();
+    private void setupSearchAndSort() {
+        filteredList = new FilteredList<>(productList, p -> true);
 
-        if (products == null || products.isEmpty()) {
-            Label noProductsLabel = new Label("Aucun produit trouvé.");
-            productFlowPane.getChildren().add(noProductsLabel);
-            return;
+        searchBar.textProperty().addListener((obs, oldVal, newVal) -> updateFilterAndSort());
+        sortComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateFilterAndSort());
+    }
+
+    private void updateFilterAndSort() {
+        if (productList == null) return;
+
+        String searchText = searchBar.getText().toLowerCase();
+        filteredList.setPredicate(product -> {
+            if (searchText == null || searchText.isEmpty()) return true;
+            return product.getNom().toLowerCase().contains(searchText);
+        });
+
+        ObservableList<Parapharmacie> sortedList = FXCollections.observableArrayList(filteredList);
+        String sortOption = sortComboBox.getValue();
+
+        if (sortOption != null) {
+            switch (sortOption) {
+                case "Nom (A-Z)":
+                    sortedList.sort(Comparator.comparing(p -> p.getNom().toLowerCase()));
+                    break;
+                case "Nom (Z-A)":
+                    sortedList.sort((p1, p2) -> p2.getNom().toLowerCase().compareTo(p1.getNom().toLowerCase()));
+                    break;
+                case "Prix croissant":
+                    sortedList.sort(Comparator.comparingDouble(Parapharmacie::getPrix));
+                    break;
+                case "Prix décroissant":
+                    sortedList.sort((p1, p2) -> Double.compare(p2.getPrix(), p1.getPrix()));
+                    break;
+            }
         }
+        displayProducts(sortedList);
+    }
 
+    private void displayProducts(ObservableList<Parapharmacie> products) {
+        productFlowPane.getChildren().clear();
         for (Parapharmacie product : products) {
-            productFlowPane.getChildren().add(createProductCard(product));
+            VBox card = createProductCard(product);
+            productFlowPane.getChildren().add(card);
         }
     }
 
     private VBox createProductCard(Parapharmacie product) {
         VBox card = new VBox(10);
-        card.setStyle("-fx-background-color: white; -fx-border-color: #e8e9f3; -fx-border-width: 1; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(232, 67, 147, 0.15), 10, 0, 0, 4);");
+        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
         card.setPrefWidth(280);
-        card.setMinHeight(220);
-        card.setAlignment(Pos.TOP_LEFT);
 
-        Label nameLabel = new Label(product.getNom());
-        nameLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
-        nameLabel.setWrapText(true);
+        Label nameLabel = new Label("📦 " + product.getNom());
+        nameLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
 
-        Label priceLabel = new Label(String.format("%.2f DT", product.getPrix()));
-        priceLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20));
-        priceLabel.setTextFill(Color.web("#e84393"));
+        Label priceLabel = new Label("💰 Price: $" + String.format("%.2f", product.getPrix()));
+        Label stockLabel = new Label("📊 Stock: " + product.getStock());
 
-        Label stockLabel = new Label("Stock: " + product.getStock());
-        stockLabel.setTextFill(product.getStock() > 0 ? Color.web("#27ae60") : Color.web("#e74c3c"));
+        Button wishlistButton = new Button("❤️ Add to Wishlist");
+        wishlistButton.setStyle("-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 5;");
+        wishlistButton.setOnAction(e -> addToWishlist(product));
+        wishlistButton.setMaxWidth(Double.MAX_VALUE);
 
-        Label descLabel = new Label(product.getDescription());
-        descLabel.setWrapText(true);
-        descLabel.setMaxHeight(50);
-
-        Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
-
-        Button wishlistBtn = new Button("Ajouter à la Wishlist");
-        wishlistBtn.setStyle("-fx-background-color: #e84393; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 25; -fx-cursor: hand;");
-        wishlistBtn.setMaxWidth(Double.MAX_VALUE);
-        wishlistBtn.setOnAction(e -> addToWishlist(product));
-
-        card.getChildren().addAll(nameLabel, priceLabel, stockLabel, descLabel, spacer, wishlistBtn);
+        card.getChildren().addAll(nameLabel, priceLabel, stockLabel, wishlistButton);
         return card;
     }
 
     private void addToWishlist(Parapharmacie product) {
         try {
-            serviceWishlist.ajouter(new Wishlist(1, product.getId()));
-            showAlert("Succès", "Ajouté à la wishlist !");
+            if (wishlistService.wishlistItemExists(1, product.getId())) {
+                showWarningAlert("Already in Wishlist", "This product is already in your wishlist.");
+                return;
+            }
+            wishlistService.ajouter(new Wishlist(1, product.getId()));
+            showInfoAlert("Success", "Product added to wishlist!");
         } catch (SQLException e) {
-            showAlert("Info", "Déjà dans la wishlist ou erreur.");
+            showErrorAlert("Error", e.getMessage());
         }
     }
 
-    private void filterProducts(String searchText) {
-        if (searchText == null || searchText.isEmpty()) {
-            displayProducts(allProducts);
-            return;
+    @FXML
+    public void handleAjouter() {
+        if (!validateInput()) return;
+        try {
+            if (service.productExists(txtNom.getText())) {
+                showErrorAlert("Duplicate", "Product already exists.");
+                return;
+            }
+            service.ajouter(new Parapharmacie(txtNom.getText(), Double.parseDouble(txtPrix.getText()), Integer.parseInt(txtStock.getText()), ""));
+            showInfoAlert("Success", "Added!");
+            clearFields();
+            loadProducts();
+        } catch (Exception e) {
+            showErrorAlert("Error", e.getMessage());
         }
-        ArrayList<Parapharmacie> filtered = new ArrayList<>();
-        for (Parapharmacie p : allProducts) {
-            if (p.getNom().toLowerCase().contains(searchText.toLowerCase())) filtered.add(p);
-        }
-        displayProducts(filtered);
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    @FXML public void handleRefresh() { loadProducts(); }
+
+    private boolean validateInput() {
+        return !txtNom.getText().isEmpty() && !txtPrix.getText().isEmpty() && !txtStock.getText().isEmpty();
     }
+
+    private void clearFields() {
+        txtNom.clear(); txtPrix.clear(); txtStock.clear();
+    }
+
+    private void showWarningAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.WARNING); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
+    private void showErrorAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.ERROR); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
+    private void showInfoAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.INFORMATION); a.setTitle(t); a.setContentText(c); a.showAndWait(); }
 }
