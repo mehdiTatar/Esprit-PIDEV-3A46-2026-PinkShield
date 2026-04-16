@@ -1,0 +1,164 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ title }} - PinkShield{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="mb-4">{{ title }}</h2>
+
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form._token) }}
+                    {% if form.vars.errors|length > 0 %}
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Please fix the following errors:</strong>
+                            <ul class="mb-0">
+                                {% for error in form.vars.errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'class': form.email.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'data-validate': 'email'}}) }}
+                        {% if form.email.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.vars.errors %}
+                                    {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.firstName) }}
+                            {{ form_widget(form.firstName, {'attr': {'class': form.firstName.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'data-validate': 'name'}}) }}
+                            {% if form.firstName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.firstName.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.lastName) }}
+                            {{ form_widget(form.lastName, {'attr': {'class': form.lastName.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control', 'data-validate': 'name'}}) }}
+                            {% if form.lastName.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.lastName.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.speciality) }}
+                        {% set specialityClass = form.speciality.vars.errors|length > 0 ? 'form-select is-invalid' : 'form-select' %}
+                        <select name="{{ form.speciality.vars.full_name }}" id="{{ form.speciality.vars.id }}" class="{{ specialityClass }}">
+                            <option value="">Select a speciality...</option>
+                            {% for choice in form.speciality.vars.choices %}
+                                <option value="{{ choice.value }}" {% if choice.value == form.speciality.vars.value %}selected{% endif %}>{{ choice.label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.speciality.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.speciality.vars.errors %}
+                                    {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.address) }}
+                        {% set addressClass = form.address.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control' %}
+                        <input type="text" name="{{ form.address.vars.full_name }}" id="{{ form.address.vars.id }}" class="{{ addressClass }}" value="{{ form.address.vars.value }}">
+                        {% if form.address.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.address.vars.errors %}
+                                    {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.phone) }}
+                        {% set phoneClass = form.phone.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control' %}
+                        <input type="text" name="{{ form.phone.vars.full_name }}" id="{{ form.phone.vars.id }}" class="{{ phoneClass }}" value="{{ form.phone.vars.value }}">
+                        {% if form.phone.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.phone.vars.errors %}
+                                    {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.password) }}
+                        {% set passwordClass = form.password.vars.errors|length > 0 ? 'form-control is-invalid' : 'form-control' %}
+                        <input type="password" name="{{ form.password.vars.full_name }}" id="{{ form.password.vars.id }}" class="{{ passwordClass }}">
+                        {% if form.password.vars.errors|length > 0 %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.vars.errors %}
+                                    {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="{% if form.vars.data.id %}{{ path('doctor_index') }}{% else %}{{ path('login') }}{% endif %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                {{ form_end(form, {'render_rest': false}) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Error messages handled by AJAX only */
+    .invalid-feedback {
+        display: none !important;
+    }
+
+    .ajax-error {
+        display: none;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .ajax-error.d-block {
+        display: block !important;
+    }
+
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        background-color: #B8E6DB;
+    }
+
+    .form-control.is-invalid:focus,
+    .form-select.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+</style>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

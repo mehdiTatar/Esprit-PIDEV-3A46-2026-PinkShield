@@ -1,0 +1,414 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->Doctor Registration â€” PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    /* â”€â”€ Page shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .navbar { position: static !important; }
+    aside.sidebar { display: none !important; }
+    footer { display: none !important; }
+
+    body {
+        background: #030f0e !important;
+        background-image:
+            radial-gradient(ellipse at 20% 0%, rgba(20,184,166,0.12) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.06) 0%, transparent 50%) !important;
+        min-height: 100vh;
+    }
+
+    main {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        width: 100% !important;
+        min-height: calc(100vh - 64px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        background: transparent; /* Changed to transparent to allow body background to show */
+    }
+
+    footer, .site-footer {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    /* â”€â”€ Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-card-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 20px;
+        margin: auto;
+    }
+
+    .reg-card {
+        display: grid; grid-template-columns: 380px 1fr;
+        max-width: 1000px; width: 100%;
+        background: rgba(3,15,14,0.97);
+        border: 1px solid rgba(20,184,166,0.2);
+        border-radius: 20px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+        overflow: hidden; backdrop-filter: blur(20px);
+    }
+
+    /* â”€â”€ Left panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-panel {
+        background: linear-gradient(145deg, rgba(20,184,166,0.15) 0%, rgba(3,15,14,0.97) 100%);
+        border-right: 1px solid rgba(20,184,166,0.15);
+        padding: 52px 40px;
+        display: flex; flex-direction: column;
+        justify-content: space-between; color: #fff;
+    }
+
+    .reg-panel-logo { display: flex; align-items: center; gap: 12px; }
+    .reg-panel-logo img { height: 38px; filter: brightness(0) invert(1); }
+    .reg-panel-logo span { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
+
+    .reg-panel-hero { text-align: center; padding: 20px 0; }
+    .reg-panel-hero .hero-icon {
+        width: 88px; height: 88px;
+        background: rgba(255,255,255,0.18);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem;
+        margin: 0 auto 22px;
+        backdrop-filter: blur(6px);
+    }
+    .reg-panel-hero h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.4px; }
+    .reg-panel-hero p { font-size: 0.95rem; opacity: 0.85; line-height: 1.6; }
+
+    .reg-panel-benefits { display: flex; flex-direction: column; gap: 14px; }
+    .benefit {
+        display: flex; align-items: center; gap: 12px;
+        background: rgba(20,184,166,0.06);
+        border: 1px solid rgba(20,184,166,0.1);
+        border-radius: 10px; padding: 11px 14px;
+        font-size: 0.88rem; font-weight: 500;
+    }
+    .benefit i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+    /* â”€â”€ Right form panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-form-panel {
+        padding: 48px 44px; overflow-y: auto;
+        max-height: 90vh;
+        background: rgba(3,12,20,0.85);
+    }
+    .reg-form-header { margin-bottom: 28px; }
+    .reg-form-header h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.4rem; font-weight: 800;
+        color: #fff; letter-spacing: 0.3px; margin-bottom: 4px;
+    }
+    .reg-form-header p { font-size: 0.9rem; color: rgba(255,255,255,0.3); }
+
+    /* â”€â”€ Form fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .field { margin-bottom: 16px; }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: flex; align-items: center; gap: 7px;
+        font-size: 0.85rem; font-weight: 600;
+        color: rgba(255,255,255,0.45); margin-bottom: 6px;
+    }
+    .field label i { color: #2dd4bf; font-size: 0.8rem; width: 14px; }
+
+    .field input,
+    .field select {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px; font-size: 0.92rem;
+        background: rgba(255,255,255,0.04); color: #fff;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        appearance: none; -webkit-appearance: none;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.2); }
+    .field input:focus, .field select:focus {
+        outline: none; border-color: rgba(20,184,166,0.5);
+        background: rgba(255,255,255,0.05);
+        box-shadow: 0 0 0 3px rgba(20,184,166,0.12);
+    }
+    .field input.is-invalid, .field select.is-invalid { border-color: #ef4444; }
+    .field input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+
+    /* password wrapper */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle {
+        position: absolute;
+        right: 12px; top: 50%;
+        transform: translateY(-50%);
+        background: none; border: none;
+        color: #9ca3af; cursor: pointer;
+        font-size: 0.9rem;
+        padding: 2px 4px;
+        transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: #2dd4bf; }
+
+    /* select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 14px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        font-size: 0.75rem;
+    }
+
+    /* error messages */
+    .field-error {
+        color: #ef4444;
+        font-size: 0.80rem;
+        margin-top: 4px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* â”€â”€ Alerts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-alert {
+        background: rgba(239,68,68,0.1);
+        border: 1px solid rgba(239,68,68,0.25);
+        border-left: 4px solid #ef4444; border-radius: 10px;
+        padding: 14px 16px; margin-bottom: 20px;
+        color: #f87171; font-size: 0.88rem;
+    }
+    .reg-alert ul { margin: 6px 0 0 16px; }
+
+    /* â”€â”€ Divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .section-divider {
+        display: flex; align-items: center; gap: 10px;
+        margin: 6px 0 16px; color: rgba(255,255,255,0.2);
+        font-size: 0.72rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+    .section-divider::before, .section-divider::after {
+        content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06);
+    }
+
+    /* â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-submit {
+        width: 100%; padding: 13px;
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        color: #fff; border: none; border-radius: 10px;
+        font-size: 0.95rem; font-weight: 700; cursor: pointer;
+        transition: all 0.25s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #0a7a70, #0d9488);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(20,184,166,0.4);
+    }
+    .btn-back-link {
+        display: flex; align-items: center; justify-content: center;
+        gap: 8px; width: 100%; padding: 11px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px; font-size: 0.88rem; font-weight: 600;
+        color: rgba(255,255,255,0.4); text-decoration: none;
+        transition: all 0.2s; background: rgba(255,255,255,0.03);
+    }
+    .btn-back-link:hover { border-color: rgba(20,184,166,0.35); color: #2dd4bf; background: rgba(20,184,166,0.06); }
+
+    /* â”€â”€ Footer login link â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .reg-login-row {
+        margin-top: 24px; padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        text-align: center; font-size: 0.87rem; color: rgba(255,255,255,0.3);
+    }
+    .reg-login-row a { color: #2dd4bf; font-weight: 600; text-decoration: none; }
+    .reg-login-row a:hover { color: #fff; }
+
+    /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    @media (max-width: 860px) {
+        .reg-card { grid-template-columns: 1fr; }
+        .reg-panel { padding: 36px 28px; }
+        .reg-panel-benefits { display: none; }
+        .reg-form-panel { padding: 36px 28px; max-height: none; }
+    }
+    @media (max-width: 560px) {
+        .field-row { grid-template-columns: 1fr; gap: 0; }
+        main { padding: 20px 12px; }
+    }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="reg-card-wrapper">
+<div class="reg-card">
+
+    
+    <div class="reg-panel">
+        <div class="reg-panel-logo">
+            <img src="__TWIG_EXPR__" alt="PinkShield">
+            <span>PinkShield</span>
+        </div>
+
+        <div class="reg-panel-hero">
+            <div class="hero-icon"><i class="fas fa-stethoscope"></i></div>
+            <h2>Join as a Doctor</h2>
+            <p>Connect with patients, manage appointments, and deliver exceptional care through our platform.</p>
+        </div>
+
+        <div class="reg-panel-benefits">
+            <div class="benefit"><i class="fas fa-shield-alt"></i> Secure & HIPAA-compliant</div>
+            <div class="benefit"><i class="fas fa-users"></i> Grow your patient base</div>
+            <div class="benefit"><i class="fas fa-calendar-check"></i> Smart appointment scheduling</div>
+            <div class="benefit"><i class="fas fa-chart-line"></i> Practice analytics dashboard</div>
+        </div>
+    </div>
+
+    
+    <div class="reg-form-panel">
+        <div class="reg-form-header">
+            <h3>Create your account</h3>
+            <p>Fill in the details below to register as a licensed practitioner.</p>
+        </div>
+
+        <!-- TWIG: {%%} -->
+            <div class="reg-alert">
+                <strong><i class="fas fa-exclamation-circle me-2"></i>Please fix the following errors:</strong>
+                <ul>
+                    <!-- TWIG: {%%} -->
+                        <li>__TWIG_EXPR__</li>
+                    <!-- TWIG: {%%} -->
+                </ul>
+            </div>
+        <!-- TWIG: {%%} -->
+
+        __TWIG_EXPR__) }}
+        __TWIG_EXPR__
+
+        
+        <div class="field">
+            <label for="doctor_email"><i class="fas fa-envelope"></i> Email Address</label>
+            __TWIG_EXPR__
+        </div>
+
+        
+        <div class="field-row">
+            <div class="field" style="margin-bottom:0">
+                <label for="doctor_firstName"><i class="fas fa-user"></i> First Name</label>
+                __TWIG_EXPR__
+            </div>
+            <div class="field" style="margin-bottom:0">
+                <label for="doctor_lastName"><i class="fas fa-user"></i> Last Name</label>
+                __TWIG_EXPR__
+            </div>
+        </div>
+
+        
+        <div class="field">
+            <label for="doctor_speciality"><i class="fas fa-stethoscope"></i> Medical Speciality</label>
+            <div class="select-wrap">
+                __TWIG_EXPR__
+            </div>
+        </div>
+
+        
+        <!-- TWIG: {%%} -->
+        <div class="field">
+            <label for="doctor_address"><i class="fas fa-map-marker-alt"></i> Clinic / Office Address <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+            __TWIG_EXPR__
+        </div>
+        <!-- TWIG: {%%} -->
+
+        
+        <!-- TWIG: {%%} -->
+        <div class="field">
+            <label for="doctor_phone"><i class="fas fa-phone"></i> Phone Number <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+            __TWIG_EXPR__
+        </div>
+        <!-- TWIG: {%%} -->
+
+        <div class="section-divider">Security</div>
+
+        
+        <div class="field">
+            <label for="doctor_password"><i class="fas fa-lock"></i> Password</label>
+            <div class="pw-wrap">
+                __TWIG_EXPR__
+                <button type="button" class="pw-toggle" id="doctorPwToggle" aria-label="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="reg-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-user-check"></i> Create Doctor Account
+            </button>
+            <a href="__TWIG_EXPR__" class="btn-back-link">
+                <i class="fas fa-arrow-left"></i> Back to account type selection
+            </a>
+        </div>
+
+        __TWIG_EXPR__
+
+        <div class="reg-login-row">
+            Already have an account? <a href="__TWIG_EXPR__">Sign in</a>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<script>
+(function () {
+    const pwBtn = document.getElementById('doctorPwToggle');
+    const pwInput = document.getElementById('doctor_password');
+    if (pwBtn && pwInput) {
+        pwBtn.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                pwInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    }
+
+    const form = document.getElementById('doctorRegForm');
+    if (form) {
+        AjaxValidator.attachBlur(form);
+        AjaxValidator.attachSubmit(form);
+    }
+})();
+</script>
+<!-- TWIG: {%%} -->
+

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.controllers.DailyTrackingController"
+      alignment="TOP_CENTER"
+      maxWidth="1160"
+      spacing="20"
+      styleClass="content-area">
+    <padding>
+        <Insets top="0" right="0" bottom="0" left="0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="hero-panel">
+        <VBox spacing="6">
+            <Label fx:id="titleLabel" text="Daily Check In" styleClass="dashboard-title" />
+            <Label fx:id="subtitleLabel" text="Review the latest health progress and weekly averages." styleClass="dashboard-copy" wrapText="true" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="modeBadgeLabel" text="PERSONAL" styleClass="auth-status-pill" />
+    </HBox>
+
+    <VBox fx:id="logFormCard" spacing="16" styleClass="panel-card">
+        <VBox spacing="4">
+            <Label fx:id="formHeadingLabel" text="Log check-in for today" styleClass="section-title" />
+            <Label fx:id="formHelperLabel" text="Save your daily health metrics and notes." styleClass="dashboard-copy" wrapText="true" />
+            <Label fx:id="formFeedbackLabel" text="" visible="false" managed="false" styleClass="feedback-label" />
+        </VBox>
+
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="DATE" styleClass="field-label" />
+                <DatePicker fx:id="entryDatePicker" />
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="MEDICATION" styleClass="field-label" />
+                <CheckBox fx:id="medicationTakenCheckBox" text="Medication taken on this day" styleClass="check-box tracking-check-box" />
+            </VBox>
+        </HBox>
+
+        <Label text="CORE METRICS" styleClass="tracking-section-label" />
+        <FlowPane hgap="16" vgap="16">
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Mood" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="moodValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="moodSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Stress" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="stressValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="stressSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+        </FlowPane>
+
+        <Label text="WELLBEING" styleClass="tracking-section-label" />
+        <FlowPane hgap="16" vgap="16">
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Energy level" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="energyValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="energySlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Sleep hours" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="sleepValueLabel" text="7 h" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="sleepSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="0" max="24" value="7" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Focus level" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="focusValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="focusSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+        </FlowPane>
+
+        <Label text="MENTAL HEALTH" styleClass="tracking-section-label" />
+        <FlowPane hgap="16" vgap="16">
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Anxiety level" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="anxietyValueLabel" text="3" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="anxietySlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="3" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Motivation level" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="motivationValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="motivationSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Social interaction" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="socialValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="socialSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+        </FlowPane>
+
+        <Label text="LIFESTYLE" styleClass="tracking-section-label" />
+        <FlowPane hgap="16" vgap="16">
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Appetite level" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="appetiteValueLabel" text="5" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="appetiteSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="5" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Water intake" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="waterValueLabel" text="150 cl" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="waterSlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="0" max="500" value="150" majorTickUnit="10" minorTickCount="0" snapToTicks="true" blockIncrement="10" />
+            </VBox>
+
+            <VBox minWidth="340" prefWidth="340" maxWidth="340" spacing="8" styleClass="tracking-input-card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Physical activity" styleClass="tracking-input-title" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="activityValueLabel" text="3" styleClass="pill-badge" />
+                </HBox>
+                <Slider fx:id="activitySlider" styleClass="slider tracking-slider" minWidth="300" prefWidth="300" maxWidth="300" min="1" max="10" value="3" majorTickUnit="1" minorTickCount="0" snapToTicks="true" blockIncrement="1" />
+            </VBox>
+        </FlowPane>
+
+        <Label text="NOTES" styleClass="tracking-section-label" />
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="ACTIVITIES" styleClass="field-label" />
+                <TextArea fx:id="activitiesArea" promptText="e.g. walking, yoga, reading" prefRowCount="4" wrapText="true" />
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="SYMPTOMS OR NOTES" styleClass="field-label" />
+                <TextArea fx:id="symptomsArea" promptText="e.g. headache, fatigue, concerns" prefRowCount="4" wrapText="true" />
+            </VBox>
+        </HBox>
+
+        <HBox spacing="12">
+            <Button fx:id="saveCheckInButton" text="Save check-in" onAction="#handleSaveCheckIn" styleClass="button" />
+        </HBox>
+    </VBox>
+
+    <VBox spacing="16" styleClass="panel-card">
+        <VBox spacing="4">
+            <Label text="Latest Daily Progress" styleClass="section-title" />
+            <Label fx:id="latestContextLabel" text="No daily check-in data available yet." styleClass="table-meta" />
+        </VBox>
+
+        <HBox spacing="16">
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="MOOD" styleClass="metric-label" />
+                <Label fx:id="latestMoodLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="STRESS" styleClass="metric-label" />
+                <Label fx:id="latestStressLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="ENERGY" styleClass="metric-label" />
+                <Label fx:id="latestEnergyLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="SLEEP" styleClass="metric-label" />
+                <Label fx:id="latestSleepLabel" text="-" styleClass="metric-value" />
+            </VBox>
+        </HBox>
+
+        <HBox spacing="16">
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="WATER" styleClass="metric-label" />
+                <Label fx:id="latestWaterLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="ACTIVITY" styleClass="metric-label" />
+                <Label fx:id="latestActivityLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox styleClass="metric-card" HBox.hgrow="ALWAYS">
+                <Label text="MEDICATION" styleClass="metric-label" />
+                <Label fx:id="latestMedicationLabel" text="-" styleClass="metric-value" />
+            </VBox>
+        </HBox>
+
+        <VBox spacing="6">
+            <Label text="ACTIVITIES" styleClass="field-label" />
+            <Label fx:id="activitiesLabel" text="No activities recorded." wrapText="true" styleClass="dashboard-copy" />
+        </VBox>
+
+        <VBox spacing="6">
+            <Label text="SYMPTOMS / NOTES" styleClass="field-label" />
+            <Label fx:id="symptomsLabel" text="No symptoms recorded." wrapText="true" styleClass="dashboard-copy" />
+        </VBox>
+    </VBox>
+
+    <VBox spacing="16" styleClass="panel-card">
+        <VBox spacing="4">
+            <Label text="Weekly Health Stats" styleClass="section-title" />
+            <Label fx:id="weeklyEntriesLabel" text="0 check-in(s) in the last 7 days" styleClass="table-meta" />
+        </VBox>
+
+        <FlowPane hgap="16" vgap="16">
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG MOOD" styleClass="metric-label" />
+                <Label fx:id="avgMoodLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG STRESS" styleClass="metric-label" />
+                <Label fx:id="avgStressLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG ENERGY" styleClass="metric-label" />
+                <Label fx:id="avgEnergyLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG SLEEP" styleClass="metric-label" />
+                <Label fx:id="avgSleepLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG WATER" styleClass="metric-label" />
+                <Label fx:id="avgWaterLabel" text="-" styleClass="metric-value" />
+            </VBox>
+            <VBox prefWidth="180" styleClass="metric-card">
+                <Label text="AVG ACTIVITY" styleClass="metric-label" />
+                <Label fx:id="avgActivityLabel" text="-" styleClass="metric-value" />
+            </VBox>
+        </FlowPane>
+    </VBox>
+
+    <VBox spacing="16" styleClass="panel-card">
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Recent Check-Ins" styleClass="section-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="recentEntriesLabel" text="0 recent check-in(s)" styleClass="table-meta" />
+        </HBox>
+        <VBox fx:id="recentEntriesBox" spacing="10" />
+    </VBox>
+
+    <VBox spacing="16" styleClass="panel-card">
+        <VBox spacing="4">
+            <Label text="Check-In Trend" styleClass="section-title" />
+            <Label fx:id="trendChartContextLabel" text="Mood and stress trend over your last 7 days of check-ins" styleClass="table-meta" />
+        </VBox>
+
+        <Label fx:id="trendEmptyLabel" text="Not enough check-in data to draw the graph yet." visible="false" managed="false" styleClass="dashboard-copy" />
+
+        <LineChart fx:id="trendChart" animated="false" createSymbols="true" legendVisible="true" minHeight="320" prefHeight="320" styleClass="chart tracking-chart">
+            <xAxis>
+                <CategoryAxis label="Date" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="trendYAxis" label="Score" autoRanging="false" lowerBound="0.0" upperBound="10.0" tickUnit="1.0" />
+            </yAxis>
+        </LineChart>
+    </VBox>
+</VBox>

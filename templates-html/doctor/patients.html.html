@@ -1,0 +1,304 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->My Patients â€” PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+/* â”€â”€ Doctor Patients Page â€” Teal Clinical Theme â”€â”€ */
+:root {
+    --doc-teal:       #0f766e;
+    --doc-teal-mid:   #0d9488;
+    --doc-teal-light: #14b8a6;
+    --doc-teal-bg:    rgba(20,184,166,0.1);
+    --doc-surface:    #f0fdfa;
+    --doc-border:     #ccfbf1;
+    --doc-navy:       #134e4a;
+}
+body { background: var(--doc-surface) !important; }
+
+/* â”€â”€ Header â”€â”€ */
+.patients-header {
+    background: linear-gradient(135deg, var(--doc-teal) 0%, var(--doc-navy) 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 30px 36px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(15,118,110,0.25);
+    position: relative;
+    overflow: hidden;
+}
+.patients-header::after {
+    content: '\f0f0';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 36px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 7rem;
+    opacity: 0.06;
+    pointer-events: none;
+}
+.patients-header > * { position: relative; z-index: 1; }
+.header-icon {
+    width: 58px; height: 58px;
+    background: rgba(255,255,255,0.15);
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0;
+}
+.patients-header h1 { font-size:1.7rem; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.3px; }
+.patients-header p  { margin: 0; opacity: 0.75; font-size: 0.88rem; }
+.header-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 10px 20px;
+    text-align: center;
+}
+.header-badge .num { font-size: 2rem; font-weight: 800; line-height: 1; }
+.header-badge .lbl { font-size: 0.77rem; opacity: 0.8; margin-top: 2px; }
+
+/* â”€â”€ Back button â”€â”€ */
+.back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px;
+    background: var(--doc-teal-bg); color: var(--doc-teal);
+    border-radius: 9px; font-size: 0.85rem; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+    margin-bottom: 18px;
+}
+.back-btn:hover { background: var(--doc-teal); color: #fff; }
+
+/* â”€â”€ Table card â”€â”€ */
+.patients-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+    overflow: hidden;
+}
+.patients-card-header {
+    background: linear-gradient(135deg, var(--doc-teal) 0%, var(--doc-teal-mid) 100%);
+    color: #fff;
+    padding: 16px 22px;
+    display: flex; align-items: center; gap: 12px;
+}
+.patients-card-header i { font-size: 1.2rem; opacity: 0.9; }
+.patients-card-header h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+.patients-card-header small { opacity: 0.75; font-size: 0.78rem; display: block; margin-top: 2px; }
+.search-box {
+    margin-left: auto;
+    display: flex; gap: 8px;
+}
+.search-box input {
+    padding: 6px 14px;
+    border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15); color: #fff;
+    font-size: 0.85rem; outline: none; min-width: 200px;
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.6); }
+.search-box input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.22); }
+
+/* â”€â”€ Patients table â”€â”€ */
+.patients-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+
+.patients-table thead tr {
+    background: linear-gradient(135deg, #f0fdfa, #e0f7f4);
+    border-bottom: 2px solid var(--doc-border);
+}
+.patients-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--doc-teal);
+}
+.patients-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0fdfa;
+    color: #334155;
+    vertical-align: middle;
+}
+.patients-table tr:last-child td { border-bottom: none; }
+.patients-table tbody tr:hover td { background: #f0fdfa; }
+
+/* â”€â”€ Patient avatar â”€â”€ */
+.patient-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--doc-teal-bg);
+    color: var(--doc-teal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; font-weight: 700;
+    flex-shrink: 0;
+}
+.patient-info { display: flex; align-items: center; gap: 12px; }
+.patient-name { font-weight: 700; font-size: 0.9rem; color: var(--doc-navy); }
+.patient-email { font-size: 0.78rem; color: #64748b; margin-top: 1px; }
+
+/* â”€â”€ Stat pills â”€â”€ */
+.stat-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 700;
+}
+.pill-confirmed { background: rgba(22,163,74,0.1); color: #166534; }
+.pill-pending   { background: rgba(245,158,11,0.1); color: #92400e; }
+.pill-cancelled { background: rgba(239,68,68,0.1);  color: #b91c1c; }
+.pill-total     { background: var(--doc-teal-bg); color: var(--doc-teal); }
+
+/* â”€â”€ Action button â”€â”€ */
+.apt-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 0.8rem; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+    background: var(--doc-teal-bg); color: var(--doc-teal);
+    border: none; cursor: pointer;
+}
+.apt-btn:hover { background: var(--doc-teal); color: #fff; }
+
+/* â”€â”€ Empty state â”€â”€ */
+.empty-state {
+    text-align: center; padding: 4rem 1rem; color: #94a3b8;
+}
+.empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
+.empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; color: #64748b; }
+.empty-state p  { font-size: 0.88rem; margin: 0; }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+
+
+<a href="__TWIG_EXPR__" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+
+
+<div class="patients-header">
+    <div class="header-icon"><i class="fas fa-user-injured"></i></div>
+    <div>
+        <h1>My Patients</h1>
+        <p>All unique patients who have booked appointments with you</p>
+    </div>
+    <div class="header-badge">
+        <div class="num">__TWIG_EXPR__</div>
+        <div class="lbl">Total Patients</div>
+    </div>
+</div>
+
+
+<div class="patients-card">
+    <div class="patients-card-header">
+        <i class="fas fa-users"></i>
+        <div>
+            <h2>Patient Directory</h2>
+            <small>Sorted by most recent visit</small>
+        </div>
+        <div class="search-box">
+            <input type="text" id="patientSearch" placeholder="ðŸ” Search patientsâ€¦">
+        </div>
+    </div>
+
+    <!-- TWIG: {%%} -->
+    <div style="overflow-x:auto;">
+        <table class="patients-table" id="patientsTable">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Appointments</th>
+                    <th>Last Visit</th>
+                    <th>Status Breakdown</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- TWIG: {%%} -->
+                <tr>
+                    <td>
+                        <div class="patient-info">
+                            <div class="patient-avatar">
+                                __TWIG_EXPR__
+                            </div>
+                            <div>
+                                <div class="patient-name">__TWIG_EXPR__</div>
+                                <div class="patient-email">__TWIG_EXPR__</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="stat-pill pill-total">
+                            <i class="fas fa-calendar"></i>
+                            __TWIG_EXPR__ visit__TWIG_EXPR__
+                        </span>
+                    </td>
+                    <td>
+                        <!-- TWIG: {%%} -->
+                            <div style="font-weight:600;font-size:0.85rem;">__TWIG_EXPR__</div>
+                            <div style="font-size:0.75rem;color:#94a3b8;">__TWIG_EXPR__</div>
+                        <!-- TWIG: {%%} -->
+                            <span style="color:#94a3b8;">â€”</span>
+                        <!-- TWIG: {%%} -->
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                            <!-- TWIG: {%%} -->
+                            <span class="stat-pill pill-confirmed">
+                                <i class="fas fa-check"></i> __TWIG_EXPR__ done
+                            </span>
+                            <!-- TWIG: {%%} -->
+                            <!-- TWIG: {%%} -->
+                            <span class="stat-pill pill-pending">
+                                <i class="fas fa-clock"></i> __TWIG_EXPR__ pending
+                            </span>
+                            <!-- TWIG: {%%} -->
+                            <!-- TWIG: {%%} -->
+                            <span class="stat-pill pill-cancelled">
+                                <i class="fas fa-times"></i> __TWIG_EXPR__ cancelled
+                            </span>
+                            <!-- TWIG: {%%} -->
+                        </div>
+                    </td>
+                    <td>
+                        <a href="__TWIG_EXPR__?patient=__TWIG_EXPR__"
+                           class="apt-btn" title="View all appointments with this patient">
+                            <i class="fas fa-calendar-alt"></i> View Appointments
+                        </a>
+                    </td>
+                </tr>
+                <!-- TWIG: {%%} -->
+            </tbody>
+        </table>
+    </div>
+    <!-- TWIG: {%%} -->
+    <div class="empty-state">
+        <i class="fas fa-user-friends"></i>
+        <h3>No patients yet</h3>
+        <p>Your patient list will appear here once patients book appointments with you.</p>
+    </div>
+    <!-- TWIG: {%%} -->
+</div>
+
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<script>
+/* Client-side patient search */
+const searchInput = document.getElementById('patientSearch');
+if (searchInput) {
+    searchInput.addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('#patientsTable tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+        });
+    });
+}
+</script>
+<!-- TWIG: {%%} -->
+

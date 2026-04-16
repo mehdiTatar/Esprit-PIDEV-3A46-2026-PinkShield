@@ -1,0 +1,452 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->Parapharmacy Products - PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    .products-header {
+        margin-bottom: 40px;
+    }
+
+    .products-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .products-header h1 i {
+        color: var(--primary);
+    }
+
+    .products-header p {
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    .search-filter-bar {
+        margin-bottom: 30px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .product-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        border-color: var(--primary);
+    }
+
+    .product-header {
+        background: linear-gradient(135deg, rgba(196, 30, 58, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%);
+        padding: 25px 20px;
+        border-bottom: 2px solid var(--border);
+        text-align: center;
+    }
+
+    .product-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
+
+    .product-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .product-body {
+        padding: 20px;
+    }
+
+    .product-description {
+        color: #6b7280;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        min-height: 45px;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
+    }
+
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .product-unit {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+
+    .btn-view {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-view:hover {
+        background-color: #8B1428;
+        transform: scale(1.05);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-wishlist {
+        background-color: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-wishlist:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .btn-wishlist.in-wishlist {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border);
+        padding-top: 15px;
+        gap: 8px;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 40px;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-text {
+        color: #9ca3af;
+        font-size: 1rem;
+    }
+
+    .stats-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        min-width: 150px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 5px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .products-header h1 {
+            font-size: 1.6rem;
+        }
+
+        .search-filter-bar {
+            flex-direction: column;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+    }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="products-header">
+    <h1><i class="fas fa-pills"></i> Parapharmacy Products</h1>
+    <p>Browse and manage pharmaceutical products and medical supplies</p>
+</div>
+
+<!-- Statistics -->
+<div class="stats-bar">
+    <div class="stat-card">
+        <div class="stat-value">__TWIG_EXPR__</div>
+        <div class="stat-label">Total Products</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">__TWIG_EXPR__</div>
+        <div class="stat-label">Starting Price</div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-filter-bar">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search products by name...">
+    </div>
+</div>
+
+<!-- TWIG: {%%} -->
+    <!-- Products Grid -->
+    <div class="products-grid" id="productsGrid">
+        <!-- TWIG: {%%} -->
+            <div class="product-card" data-product-name="__TWIG_EXPR__" data-product-id="__TWIG_EXPR__">
+                <div class="product-header">
+                    <div class="product-icon">
+                        <i class="fas fa-capsules"></i>
+                    </div>
+                    <h3 class="product-name">__TWIG_EXPR__</h3>
+                </div>
+                <div class="product-body">
+                    <p class="product-description">
+                        __TWIG_EXPR____TWIG_EXPR__
+                    </p>
+                    <div class="product-footer">
+                        <div>
+                            <div class="product-price">$__TWIG_EXPR__</div>
+                            <div class="product-unit">per unit</div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn-view" onclick="showProductDetails('__TWIG_EXPR__', '__TWIG_EXPR__', '__TWIG_EXPR__', '__TWIG_EXPR__')">
+                                <i class="fas fa-eye me-1"></i> View
+                            </button>
+                            <!-- TWIG: {%%} -->
+                                <button class="btn-wishlist wishlist-btn" data-product-id="__TWIG_EXPR__" onclick="toggleWishlist(this, __TWIG_EXPR__)">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            <!-- TWIG: {%%} -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- TWIG: {%%} -->
+    </div>
+<!-- TWIG: {%%} -->
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-inbox"></i>
+        </div>
+        <h3 class="empty-state-title">No Products Available</h3>
+        <p class="empty-state-text">Products will appear here once they are added to the parapharmacy catalog.</p>
+    </div>
+<!-- TWIG: {%%} -->
+
+<!-- Product Details Modal (Optional) -->
+<div id="productModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px;">
+    <div style="background: white; border-radius: 12px; max-width: 500px; margin: 50px auto; padding: 30px; position: relative;">
+        <button onclick="closeProductDetails()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">Ã—</button>
+        <h2 id="modalTitle" style="color: var(--primary); margin-top: 0;"></h2>
+        <p id="modalDescription" style="color: #6b7280; line-height: 1.6;"></p>
+        <div style="border-top: 2px solid var(--border); padding-top: 20px; margin-top: 20px;">
+            <label style="color: #6b7280; font-size: 0.9rem; font-weight: 600;">Price</label>
+            <div id="modalPrice" style="font-size: 2rem; font-weight: 800; color: var(--primary);"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const products = document.querySelectorAll('.product-card');
+        
+        products.forEach(product => {
+            const productName = product.getAttribute('data-product-name');
+            if (productName.includes(searchTerm)) {
+                product.style.display = '';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    });
+
+    // Modal functions
+    function showProductDetails(id, name, price, description) {
+        document.getElementById('modalTitle').textContent = name;
+        document.getElementById('modalDescription').textContent = description;
+        document.getElementById('modalPrice').textContent = '$' + price;
+        document.getElementById('productModal').style.display = 'block';
+    }
+
+    function closeProductDetails() {
+        document.getElementById('productModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('productModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    // Wishlist functionality
+    function toggleWishlist(button, productId) {
+        // Prevent multiple clicks during request
+        if (button.disabled) return;
+        
+        button.disabled = true;
+        const isInWishlist = button.classList.contains('in-wishlist');
+        const url = isInWishlist 
+            ? `__TWIG_EXPR__`.replace('0', productId)
+            : `__TWIG_EXPR__`.replace('0', productId);
+        
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (isInWishlist) {
+                    button.classList.remove('in-wishlist');
+                } else {
+                    button.classList.add('in-wishlist');
+                }
+            } else {
+                console.error('Error:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Revert on error
+            if (isInWishlist) {
+                button.classList.add('in-wishlist');
+            } else {
+                button.classList.remove('in-wishlist');
+            }
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
+    }
+
+    // Initialize wishlist buttons on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+        wishlistButtons.forEach(button => {
+            const productId = button.dataset.productId;
+            fetch(`__TWIG_EXPR__`.replace('0', productId))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.inWishlist) {
+                        button.classList.add('in-wishlist');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+<!-- TWIG: {%%} -->
+

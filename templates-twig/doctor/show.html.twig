@@ -1,0 +1,58 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Doctor Details - PinkShield{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="mb-4">Doctor Details</h2>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID:</strong></label>
+                    <p>{{ doctor.id }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Email:</strong></label>
+                    <p>{{ doctor.email }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Full Name:</strong></label>
+                    <p>{{ doctor.fullName }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Speciality:</strong></label>
+                    <p>{{ doctor.speciality }}</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-4">
+                    <a href="{{ path('doctor_edit', {id: doctor.id}) }}" class="btn btn-warning">Edit Profile</a>
+                    
+                    {% if doctor.status == 'active' %}
+                        <button type="button" class="btn btn-outline-warning"
+                                onclick="postAction('{{ path('doctor_deactivate', {id: doctor.id}) }}', 'Deactivate this doctor?', '{{ csrf_token('deactivate' ~ doctor.id) }}')">
+                            <i class="fas fa-ban me-1"></i> Deactivate
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-success"
+                                onclick="postAction('{{ path('doctor_activate', {id: doctor.id}) }}', 'Activate this doctor?', '{{ csrf_token('activate' ~ doctor.id) }}')">
+                            <i class="fas fa-check me-1"></i> Activate
+                        </button>
+                    {% endif %}
+                    
+                    <button type="button" class="btn btn-outline-danger"
+                            onclick="postAction('{{ path('doctor_delete', {id: doctor.id}) }}', 'Permanently delete this doctor? This cannot be undone.', '{{ csrf_token('delete' ~ doctor.id) }}')">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </button>
+                    
+                    <a href="{{ path('doctor_index') }}" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

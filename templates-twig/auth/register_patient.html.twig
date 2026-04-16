@@ -1,0 +1,622 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Patient Registration — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Page shell ──────────────────────────────────────────── */
+    .navbar { position: static !important; }
+    aside.sidebar { display: none !important; }
+    footer { display: none !important; }
+
+    body {
+        background: #060e1c !important;
+        background-image:
+            radial-gradient(ellipse at 20% 0%, rgba(192,57,107,0.12) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 100%, rgba(59,130,246,0.07) 0%, transparent 50%) !important;
+        min-height: 100vh;
+    }
+
+    main {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        width: 100% !important;
+        min-height: calc(100vh - 64px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        background: radial-gradient(circle at 10% 20%, rgba(192, 57, 107, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(192, 57, 107, 0.05) 0%, transparent 40%);
+    }
+
+    footer, .site-footer {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .container-desktop {
+        max-width: 100% !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .reg-card-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 20px;
+        margin: auto;
+    }
+
+    .reg-card {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        max-width: 1000px; width: 100%;
+        background: rgba(8,16,30,0.97);
+        border: 1px solid rgba(192,57,107,0.2);
+        border-radius: 20px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+
+    /* ── Left panel ──────────────────────────────────────────── */
+    .reg-panel {
+        background: linear-gradient(145deg, rgba(192,57,107,0.18) 0%, rgba(9,23,43,0.95) 100%);
+        border-right: 1px solid rgba(192,57,107,0.15);
+        padding: 52px 40px;
+        display: flex; flex-direction: column;
+        justify-content: space-between; color: #fff;
+    }
+
+    .reg-panel-logo { display: flex; align-items: center; gap: 12px; }
+    .reg-panel-logo img { height: 38px; filter: brightness(0) invert(1); }
+    .reg-panel-logo span { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
+
+    .reg-panel-hero { text-align: center; padding: 20px 0; }
+    .reg-panel-hero .hero-icon {
+        width: 88px; height: 88px;
+        background: rgba(255,255,255,0.18);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem;
+        margin: 0 auto 22px;
+        backdrop-filter: blur(6px);
+    }
+    .reg-panel-hero h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.4px; }
+    .reg-panel-hero p { font-size: 0.95rem; opacity: 0.85; line-height: 1.6; }
+
+    .reg-panel-benefits { display: flex; flex-direction: column; gap: 14px; }
+    .benefit {
+        display: flex; align-items: center; gap: 12px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px; padding: 11px 14px;
+        font-size: 0.88rem; font-weight: 500;
+    }
+    .benefit i { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+    /* ── Right form panel ────────────────────────────────────── */
+    .reg-form-panel {
+        padding: 48px 44px; overflow-y: auto;
+        max-height: 90vh;
+        background: rgba(6,14,28,0.8);
+    }
+    .reg-form-header { margin-bottom: 28px; }
+    .reg-form-header h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.4rem; font-weight: 800;
+        color: #fff; letter-spacing: 0.3px; margin-bottom: 4px;
+    }
+    .reg-form-header p { font-size: 0.9rem; color: rgba(255,255,255,0.3); }
+
+    /* ── Form fields ─────────────────────────────────────────── */
+    .field { margin-bottom: 16px; }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: flex; align-items: center; gap: 7px;
+        font-size: 0.85rem; font-weight: 600;
+        color: rgba(255,255,255,0.5); margin-bottom: 6px;
+    }
+    .field label i { color: #ff6ba8; font-size: 0.8rem; width: 14px; }
+
+    .field input,
+    .field select,
+    .field textarea {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        font-size: 0.92rem;
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        appearance: none; -webkit-appearance: none;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .field input:focus, .field select:focus, .field textarea:focus {
+        outline: none;
+        border-color: rgba(192,57,107,0.5);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 0 0 3px rgba(192,57,107,0.12);
+    }
+    .field input.is-invalid { border-color: #ef4444; }
+    .field input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+
+    /* password wrapper */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle { position: absolute; right: 12px; top: 50%;
+        transform: translateY(-50%); background: none; border: none;
+        color: rgba(255,255,255,0.3); cursor: pointer; font-size: 0.9rem;
+        padding: 2px 4px; transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: #ff6ba8; }
+    .field-error { color: #f87171; font-size: 0.80rem; margin-top: 4px;
+        font-weight: 500; display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ── Alerts ──────────────────────────────────────────────── */
+    .reg-alert {
+        background: rgba(239,68,68,0.1);
+        border: 1px solid rgba(239,68,68,0.25);
+        border-left: 4px solid #ef4444;
+        border-radius: 10px;
+        padding: 14px 16px; margin-bottom: 20px;
+        color: #f87171; font-size: 0.88rem;
+    }
+    .reg-alert ul { margin: 6px 0 0 16px; }
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .section-divider {
+        display: flex; align-items: center; gap: 10px;
+        margin: 6px 0 16px;
+        color: rgba(255,255,255,0.2); font-size: 0.72rem;
+        font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .section-divider::before, .section-divider::after {
+        content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06);
+    }
+
+    /* ── Actions ─────────────────────────────────────────────── */
+    .reg-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-submit {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--primary, #c0396b), #e8557a);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #9b2553, #c0396b);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(192,57,107,0.35);
+    }
+
+    .btn-back-link {
+        display: flex; align-items: center; justify-content: center;
+        gap: 8px; width: 100%; padding: 11px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px; font-size: 0.88rem; font-weight: 600;
+        color: rgba(255,255,255,0.4); text-decoration: none;
+        transition: all 0.2s; background: rgba(255,255,255,0.03);
+    }
+    .btn-back-link:hover {
+        border-color: rgba(192,57,107,0.35); color: #ff6ba8;
+        background: rgba(192,57,107,0.06);
+    }
+
+    /* ── Footer login link ───────────────────────────────────── */
+    .reg-login-row {
+        margin-top: 24px; padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+        text-align: center; font-size: 0.87rem; color: rgba(255,255,255,0.3);
+    }
+    .reg-login-row a { color: #ff6ba8; font-weight: 600; text-decoration: none; }
+    .reg-login-row a:hover { color: #fff; }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 860px) {
+        .reg-card { grid-template-columns: 1fr; }
+        .reg-panel { padding: 36px 28px; }
+        .reg-panel-benefits { display: none; }
+        .reg-form-panel { padding: 36px 28px; max-height: none; }
+    }
+    @media (max-width: 560px) {
+        .field-row { grid-template-columns: 1fr; gap: 0; }
+        main { padding: 20px 12px; }
+    }
+    .face-section {
+        margin: 20px 0; padding: 20px;
+        background: rgba(192,57,107,0.06);
+        border: 1px solid rgba(192,57,107,0.15);
+        border-radius: 14px;
+    }
+    .face-section-title {
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.92rem; font-weight: 700; color: #ff6ba8;
+        margin-bottom: 14px;
+    }
+    .face-section-title i { font-size: 1rem; }
+    .face-badge {
+        display: inline-block;
+        background: rgba(192,57,107,0.15); color: #ff6ba8;
+        font-size: 0.72rem; font-weight: 700;
+        padding: 2px 8px; border-radius: 20px; letter-spacing: 0.4px;
+        margin-left: auto;
+    }
+    .face-preview-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+    .webcam-box { flex: 1; min-width: 200px; }
+    #webcamVideo, #capturedCanvas {
+        width: 100%; border-radius: 10px;
+        background: #030c18; display: block;
+        max-height: 180px; object-fit: cover;
+    }
+    #capturedCanvas { display: none; }
+    .face-controls { display: flex; flex-direction: column; gap: 8px; min-width: 140px; }
+    .btn-face {
+        padding: 9px 16px; border-radius: 9px; border: none;
+        font-size: 0.82rem; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; gap: 7px;
+        transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-face-open    { background: linear-gradient(135deg, #c0396b, #e8557a); color: #fff; }
+    .btn-face-open:hover { opacity: 0.9; }
+    .btn-face-capture { background: #22c55e; color: #fff; }
+    .btn-face-capture:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+    .btn-face-capture:not(:disabled):hover { background: #16a34a; }
+    .btn-face-retake  { background: #f59e0b; color: #fff; }
+    .btn-face-retake:hover { background: #d97706; }
+    .btn-face-upload  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
+    .btn-face-upload:hover { border-color: rgba(192,57,107,0.3); color: #ff6ba8; }
+    .face-hint { font-size: 0.77rem; color: rgba(255,255,255,0.3); margin-top: 10px; line-height: 1.5; }
+    .face-status { font-size: 0.8rem; font-weight: 600; margin-top: 8px; padding: 6px 10px; border-radius: 8px; display: none; }
+    .face-status.captured { display: flex; align-items: center; gap: 6px; background: rgba(34,197,94,0.1); color: #4ade80; }
+
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="reg-card-wrapper">
+<div class="reg-card">
+
+    {# ── Left branding panel ───────────────────────────────────── #}
+    <div class="reg-panel">
+        <div class="reg-panel-logo">
+            <img src="{{ asset('images/colored-logo.png') }}" alt="PinkShield">
+            <span>PinkShield</span>
+        </div>
+
+        <div class="reg-panel-hero">
+            <div class="hero-icon"><i class="fas fa-heartbeat"></i></div>
+            <h2>Join as a Patient</h2>
+            <p>Take control of your health — track vitals, connect with doctors, and access your medical history anytime.</p>
+        </div>
+
+        <div class="reg-panel-benefits">
+            <div class="benefit"><i class="fas fa-shield-alt"></i> Privacy & data protection</div>
+            <div class="benefit"><i class="fas fa-stethoscope"></i> Direct access to doctors</div>
+            <div class="benefit"><i class="fas fa-file-medical"></i> Centralized health records</div>
+            <div class="benefit"><i class="fas fa-bell"></i> Health reminders & alerts</div>
+        </div>
+    </div>
+
+    {# ── Right form panel ──────────────────────────────────────── #}
+    <div class="reg-form-panel">
+        <div class="reg-form-header">
+            <h3>Create your account</h3>
+            <p>Start managing your health today — registration takes less than a minute.</p>
+        </div>
+
+        {% if form.vars.errors|length > 0 %}
+            <div class="reg-alert">
+                <strong><i class="fas fa-exclamation-circle me-2"></i>Please fix the following errors:</strong>
+                <ul>
+                    {% for error in form.vars.errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {{ form_start(form, {'attr': {
+            'novalidate': 'novalidate',
+            'autocomplete': 'off',
+            'id': 'patientRegForm',
+            'enctype': 'multipart/form-data'
+        }}) }}
+
+        {# Email #}
+        <div class="field">
+            <label for="patient_email"><i class="fas fa-envelope"></i> Email Address</label>
+            {{ form_widget(form.email, {
+                'attr': {'class': 'form-control', 'placeholder': 'you@example.com',
+                         'id': 'patient_email', 'data-ajax-validate': 'email'}
+            }) }}
+        </div>
+
+        {# First / Last name #}
+        <div class="field-row">
+            <div class="field" style="margin-bottom:0">
+                <label for="patient_firstName"><i class="fas fa-user"></i> First Name</label>
+                {{ form_widget(form.firstName, {
+                    'attr': {'class': 'form-control', 'placeholder': 'First name',
+                             'id': 'patient_firstName', 'data-ajax-validate': 'firstName'}
+                }) }}
+            </div>
+            <div class="field" style="margin-bottom:0">
+                <label for="patient_lastName"><i class="fas fa-user"></i> Last Name</label>
+                {{ form_widget(form.lastName, {
+                    'attr': {'class': 'form-control', 'placeholder': 'Last name',
+                             'id': 'patient_lastName', 'data-ajax-validate': 'lastName'}
+                }) }}
+            </div>
+        </div>
+
+        {# Phone #}
+        {% if form.phone is defined %}
+        <div class="field">
+            <label for="patient_phone"><i class="fas fa-phone"></i> Phone Number</label>
+            {{ form_widget(form.phone, {
+                'attr': {'class': 'form-control', 'placeholder': '+213 5XX XXX XXX',
+                         'id': 'patient_phone', 'data-ajax-validate': 'phone'}
+            }) }}
+        </div>
+        {% endif %}
+
+        {# Address #}
+        {% if form.address is defined %}
+        <div class="field">
+            <label for="patient_address"><i class="fas fa-map-marker-alt"></i> Address <span style="color:#9ca3af;font-weight:400">(optional)</span></label>
+            {{ form_widget(form.address, {
+                'attr': {'class': 'form-control', 'placeholder': 'e.g. 12 Rue Didouche, Alger',
+                         'id': 'patient_address', 'data-ajax-validate': 'address'}
+            }) }}
+        </div>
+        {% endif %}
+
+        <div class="section-divider">Security</div>
+
+        {# Password #}
+        <div class="field">
+            <label for="patient_password"><i class="fas fa-lock"></i> Password</label>
+            <div class="pw-wrap">
+                {{ form_widget(form.password, {
+                    'attr': {'class': 'form-control', 'id': 'patient_password',
+                             'placeholder': 'Min. 8 characters', 'data-ajax-validate': 'password'}
+                }) }}
+                <button type="button" class="pw-toggle" id="patientPwToggle" aria-label="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        {# ── Face Recognition Section ─────────────────────────────────── #}
+        <div class="section-divider">Face Recognition</div>
+
+        <div class="face-section">
+            <div class="face-section-title">
+                <i class="fas fa-camera"></i>
+                Facial Identity Capture
+                <span class="face-badge">OPTIONAL</span>
+            </div>
+
+            <div class="face-preview-row">
+                <div class="webcam-box">
+                    <video id="webcamVideo" autoplay playsinline muted></video>
+                    <canvas id="capturedCanvas"></canvas>
+                </div>
+                <div class="face-controls">
+                    <button type="button" class="btn-face btn-face-open" id="btnOpenCamera">
+                        <i class="fas fa-video"></i> Open Camera
+                    </button>
+                    <button type="button" class="btn-face btn-face-capture" id="btnCapture" disabled>
+                        <i class="fas fa-circle"></i> Capture
+                    </button>
+                    <button type="button" class="btn-face btn-face-retake" id="btnRetake" style="display:none">
+                        <i class="fas fa-redo"></i> Retake
+                    </button>
+                    <label class="btn-face btn-face-upload" style="cursor:pointer">
+                        <i class="fas fa-upload"></i> Upload Photo
+                        <input type="file" id="faceFileInput" accept="image/*" style="display:none">
+                    </label>
+                </div>
+            </div>
+
+            {# Hidden real file input that will carry the photo to the server #}
+            <input type="file" name="face_photo" id="facePhotoHidden" style="display:none" accept="image/*">
+
+            <div class="face-status" id="faceStatus">
+                <i class="fas fa-check-circle"></i> Photo captured — ready for registration
+            </div>
+            <p class="face-hint">
+                <i class="fas fa-info-circle"></i>
+                Look directly at the camera, ensure good lighting. Skipping face capture is allowed —
+                you can add it later from your profile.
+            </p>
+        </div>
+        {# ──────────────────────────────────────────────────────────────── #}
+
+        {# Actions #}
+        <div class="reg-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-user-check"></i> Create Patient Account
+            </button>
+            <a href="{{ path('register') }}" class="btn-back-link">
+                <i class="fas fa-arrow-left"></i> Back to account type selection
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+
+        <div class="reg-login-row">
+            Already have an account? <a href="{{ path('login') }}">Sign in</a>
+        </div>
+    </div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function () {
+    // ── Password toggle ───────────────────────────────────────────
+    const pwBtn   = document.getElementById('patientPwToggle');
+    const pwInput = document.getElementById('patient_password');
+    if (pwBtn && pwInput) {
+        pwBtn.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                pwInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    }
+
+    // ── AjaxValidator ────────────────────────────────────────────
+    const form = document.getElementById('patientRegForm');
+    if (form) {
+        AjaxValidator.attachBlur(form);
+        AjaxValidator.attachSubmit(form);
+    }
+
+    // ── Face Recognition ─────────────────────────────────────────
+    const video          = document.getElementById('webcamVideo');
+    const canvas         = document.getElementById('capturedCanvas');
+    const btnOpen        = document.getElementById('btnOpenCamera');
+    const btnCapture     = document.getElementById('btnCapture');
+    const btnRetake      = document.getElementById('btnRetake');
+    const faceFileInput  = document.getElementById('faceFileInput');   // manual upload
+    const hiddenInput    = document.getElementById('facePhotoHidden'); // sent to server
+    const faceStatus     = document.getElementById('faceStatus');
+    let   stream         = null;
+
+    /** Convert a canvas/blob to a File and inject into the hidden input */
+    function attachFileToHidden(blob, name) {
+        const file = new File([blob], name, { type: 'image/jpeg' });
+        const dt   = new DataTransfer();
+        dt.items.add(file);
+        hiddenInput.files = dt.files;
+        faceStatus.className = 'face-status captured';
+        faceStatus.style.display = '';
+    }
+
+    function stopStream() {
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+        }
+    }
+
+    function showCanvasCapture() {
+        video.style.display   = 'none';
+        canvas.style.display  = 'block';
+        btnCapture.style.display = 'none';
+        btnRetake.style.display  = 'inline-flex';
+        btnOpen.style.display    = 'none';
+        stopStream();
+    }
+
+    function showVideo() {
+        video.style.display   = 'block';
+        canvas.style.display  = 'none';
+        btnCapture.style.display = 'inline-flex';
+        btnRetake.style.display  = 'none';
+    }
+
+    /** Open webcam */
+    btnOpen.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            btnCapture.disabled = false;
+            btnOpen.innerHTML = '<i class="fas fa-video"></i> Camera On';
+            btnOpen.style.opacity = '0.6';
+        } catch (err) {
+            alert('Unable to access camera: ' + err.message + '\n\nPlease use the "Upload Photo" button instead.');
+        }
+    });
+
+    /** Capture frame from webcam */
+    btnCapture.addEventListener('click', () => {
+        canvas.width  = video.videoWidth  || 320;
+        canvas.height = video.videoHeight || 240;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        showCanvasCapture();
+        canvas.toBlob(blob => attachFileToHidden(blob, 'webcam_capture.jpg'), 'image/jpeg', 0.92);
+    });
+
+    /** Retake — restart camera */
+    btnRetake.addEventListener('click', async () => {
+        hiddenInput.value = '';
+        faceStatus.style.display = 'none';
+        showVideo();
+        btnCapture.disabled = true;
+        btnOpen.innerHTML = '<i class="fas fa-video"></i> Open Camera';
+        btnOpen.style.opacity = '';
+        // re-open camera
+        btnOpen.click();
+    });
+
+    /** Manual file upload fallback */
+    faceFileInput.addEventListener('change', () => {
+        if (!faceFileInput.files.length) return;
+        const file = faceFileInput.files[0];
+        // Show preview in canvas
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                canvas.width  = img.width;
+                canvas.height = img.height;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                showCanvasCapture();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        // Attach directly to hidden input
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        hiddenInput.files = dt.files;
+        faceStatus.className = 'face-status captured';
+        faceStatus.style.display = '';
+    });
+})();
+</script>
+{% endblock %}
+

@@ -1,0 +1,591 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Admin Command Center · PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ─── Admin Command Center ─────────────────────────── */
+    :root {
+        --adm-blue:      #3b82f6;
+        --adm-blue-d:    #1d4ed8;
+        --adm-blue-g:    rgba(59,130,246,0.15);
+        --adm-cyan:      #06b6d4;
+        --adm-purple:    #8b5cf6;
+        --adm-red:       #ef4444;
+        --adm-green:     #22c55e;
+        --adm-yellow:    #f59e0b;
+    }
+
+    body {
+        background: #020c18 !important;
+        background-image:
+            radial-gradient(ellipse at 0% 0%, rgba(59,130,246,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse at 100% 100%, rgba(139,92,246,0.06) 0%, transparent 55%) !important;
+    }
+
+    /* Sidebar admin accent override */
+    [data-sidebar-role='admin'] .sidebar-toggle-btn {
+        background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    }
+    [data-sidebar-role='admin'] .sidebar {
+        background: linear-gradient(180deg, #040c1e 0%, #07122a 100%);
+        border-right-color: rgba(59,130,246,0.15);
+    }
+
+    /* ─── Page Header ──────────────────────────────────── */
+    .adm-header {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(59,130,246,0.12);
+    }
+    .adm-header-left {}
+    .adm-greeting {
+        font-size: 0.78rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 2px;
+        color: var(--adm-blue); margin-bottom: 4px;
+    }
+    .adm-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.9rem; font-weight: 900;
+        color: #fff; line-height: 1.1;
+        text-shadow: 0 0 40px rgba(59,130,246,0.3);
+    }
+    .adm-title span { color: var(--adm-blue); }
+    .adm-subtitle {
+        color: rgba(255,255,255,0.35); font-size: 0.85rem; margin-top: 4px;
+    }
+    .adm-header-actions { display: flex; gap: 10px; }
+    .adm-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 10px;
+        font-weight: 600; font-size: 0.85rem;
+        cursor: pointer; transition: all 0.22s; text-decoration: none;
+        border: none;
+    }
+    .adm-btn-primary {
+        background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+    }
+    .adm-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.5); color: #fff; }
+    .adm-btn-ghost {
+        background: rgba(59,130,246,0.08);
+        border: 1px solid rgba(59,130,246,0.25);
+        color: var(--adm-blue);
+    }
+    .adm-btn-ghost:hover { background: rgba(59,130,246,0.15); color: #fff; }
+
+    /* ─── Live Indicator ───────────────────────────────── */
+    .live-indicator {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(34,197,94,0.1);
+        border: 1px solid rgba(34,197,94,0.25);
+        padding: 5px 12px; border-radius: 20px;
+        font-size: 0.72rem; font-weight: 700;
+        color: #4ade80; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .live-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #4ade80; animation: livePulse 1.5s infinite;
+    }
+    @keyframes livePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+
+    /* ─── KPI Cards ─────────────────────────────────────── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .kpi-card {
+        background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px; padding: 22px 20px;
+        position: relative; overflow: hidden;
+        cursor: default;
+    }
+    .kpi-card::before {
+        content: ''; position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+    }
+    .kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .kpi-card.blue::before   { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+    .kpi-card.cyan::before   { background: linear-gradient(90deg, #0891b2, #06b6d4); }
+    .kpi-card.purple::before { background: linear-gradient(90deg, #7c3aed, #8b5cf6); }
+    .kpi-card.green::before  { background: linear-gradient(90deg, #15803d, #22c55e); }
+    .kpi-card.yellow::before { background: linear-gradient(90deg, #ca8a04, #f59e0b); }
+    .kpi-card.blue   { border-color: rgba(59,130,246,0.15); }
+    .kpi-card.cyan   { border-color: rgba(6,182,212,0.15); }
+    .kpi-card.purple { border-color: rgba(139,92,246,0.15); }
+    .kpi-card.green  { border-color: rgba(34,197,94,0.15); }
+    .kpi-card.yellow { border-color: rgba(245,158,11,0.15); }
+
+    .kpi-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem; margin-bottom: 14px;
+    }
+    .kpi-card.blue   .kpi-icon { background: rgba(59,130,246,0.15); color: var(--adm-blue); }
+    .kpi-card.cyan   .kpi-icon { background: rgba(6,182,212,0.15); color: var(--adm-cyan); }
+    .kpi-card.purple .kpi-icon { background: rgba(139,92,246,0.15); color: var(--adm-purple); }
+    .kpi-card.green  .kpi-icon { background: rgba(34,197,94,0.15); color: var(--adm-green); }
+    .kpi-card.yellow .kpi-icon { background: rgba(245,158,11,0.15); color: var(--adm-yellow); }
+
+    .kpi-value {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2rem; font-weight: 900; color: #fff;
+        line-height: 1; margin-bottom: 4px;
+    }
+    .kpi-label { font-size: 0.78rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; }
+    .kpi-trend {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 0.72rem; font-weight: 700;
+        padding: 3px 8px; border-radius: 8px;
+        margin-top: 10px;
+    }
+    .kpi-trend.up   { color: #4ade80; background: rgba(34,197,94,0.1); }
+    .kpi-trend.down { color: #f87171; background: rgba(239,68,68,0.1); }
+    .kpi-bg-icon {
+        position: absolute; right: -8px; bottom: -8px;
+        font-size: 4rem; opacity: 0.04;
+    }
+
+    /* ─── Grid Layout ────────────────────────────────────── */
+    .adm-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .adm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 24px; }
+
+    /* ─── Panel ─────────────────────────────────────────── */
+    .adm-panel {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px; overflow: hidden;
+    }
+    .adm-panel-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .adm-panel-title {
+        font-size: 0.85rem; font-weight: 700;
+        color: #fff; display: flex; align-items: center; gap: 8px;
+    }
+    .adm-panel-title i { color: var(--adm-blue); }
+    .adm-panel-action {
+        font-size: 0.75rem; color: var(--adm-blue); text-decoration: none;
+        font-weight: 600; padding: 4px 10px;
+        background: rgba(59,130,246,0.1); border-radius: 6px;
+        transition: all 0.2s;
+    }
+    .adm-panel-action:hover { background: rgba(59,130,246,0.2); }
+    .adm-panel-body { padding: 18px 22px; }
+
+    /* ─── Chart ──────────────────────────────────────────── */
+    .chart-container { position: relative; height: 220px; }
+
+    /* ─── Data Table ─────────────────────────────────────── */
+    .adm-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .adm-table th {
+        padding: 10px 14px; text-align: left;
+        font-size: 0.68rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        color: rgba(255,255,255,0.25);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .adm-table td {
+        padding: 12px 14px; color: rgba(255,255,255,0.75);
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        vertical-align: middle;
+    }
+    .adm-table tr:last-child td { border-bottom: none; }
+    .adm-table tr:hover td { background: rgba(59,130,246,0.04); }
+
+    /* Avatar cell */
+    .adm-avatar {
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.75rem; font-weight: 700; color: #fff;
+        flex-shrink: 0;
+    }
+    .adm-cell { display: flex; align-items: center; gap: 10px; }
+    .adm-cell-name { font-weight: 600; color: #fff; font-size: 0.84rem; }
+    .adm-cell-sub  { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+
+    /* Status badges */
+    .adm-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 20px;
+        font-size: 0.7rem; font-weight: 700;
+    }
+    .adm-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+    .adm-badge-active   { background: rgba(34,197,94,0.12); color: #4ade80; }
+    .adm-badge-active::before   { background: #4ade80; }
+    .adm-badge-pending  { background: rgba(245,158,11,0.12); color: #fbbf24; }
+    .adm-badge-pending::before  { background: #fbbf24; }
+    .adm-badge-inactive { background: rgba(239,68,68,0.12); color: #f87171; }
+    .adm-badge-inactive::before { background: #f87171; }
+
+    /* ─── Quick Actions ──────────────────────────────────── */
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .qa-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 16px; border-radius: 12px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        cursor: pointer; transition: all 0.22s; text-decoration: none;
+    }
+    .qa-item:hover { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); transform: translateY(-2px); }
+    .qa-icon {
+        width: 38px; height: 38px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.95rem; flex-shrink: 0;
+    }
+    .qa-label { font-size: 0.8rem; font-weight: 600; color: #fff; }
+    .qa-desc  { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+    /* ─── System Status ──────────────────────────────────── */
+    .sys-status-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .sys-status-item:last-child { border-bottom: none; }
+    .sys-status-left { display: flex; align-items: center; gap: 10px; }
+    .sys-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sys-dot.ok     { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+    .sys-dot.warn   { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+    .sys-dot.error  { background: #f87171; box-shadow: 0 0 8px #f87171; }
+    .sys-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.75); }
+    .sys-status-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ─── Animated scan line ─────────────────────────────── */
+    .scan-line {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(59,130,246,0.6), transparent);
+        animation: scan 3s linear infinite;
+        margin: 0;
+        pointer-events: none;
+        z-index: 1000;
+    }
+    @keyframes scan {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media (max-width: 1400px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 900px)  { .adm-grid, .adm-grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } .quick-actions { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Scan line effect -->
+<div class="scan-line"></div>
+
+<!-- ── Header ─────────────────────────────────────────── -->
+<div class="adm-header">
+    <div class="adm-header-left">
+        <div class="adm-greeting">⚡ System Administrator</div>
+        <h1 class="adm-title">Command <span>Center</span></h1>
+        <div class="adm-subtitle">PinkShield Platform Overview · {{ "now"|date("D, d M Y") }}</div>
+    </div>
+    <div class="adm-header-actions">
+        <span class="live-indicator"><span class="live-dot"></span>Live</span>
+        <a href="{{ path('admin_index') }}" class="adm-btn adm-btn-ghost">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{{ path('blog_index') }}" class="adm-btn adm-btn-primary">
+            <i class="fas fa-newspaper"></i> Blog
+        </a>
+    </div>
+</div>
+
+<!-- ── KPI Cards ──────────────────────────────────────── -->
+<div class="kpi-grid">
+    <div class="kpi-card blue">
+        <div class="kpi-icon"><i class="fas fa-users"></i></div>
+        <div class="kpi-value">{{ totalUsers ?? '—' }}</div>
+        <div class="kpi-label">Total Users</div>
+        <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> +6% monthly</div>
+        <i class="fas fa-users kpi-bg-icon"></i>
+    </div>
+    <div class="kpi-card cyan">
+        <div class="kpi-icon"><i class="fas fa-user-md"></i></div>
+        <div class="kpi-value">{{ totalDoctors ?? '—' }}</div>
+        <div class="kpi-label">Doctors</div>
+        <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> +2 this month</div>
+        <i class="fas fa-stethoscope kpi-bg-icon"></i>
+    </div>
+    <div class="kpi-card purple">
+        <div class="kpi-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="kpi-value">{{ totalAppointments ?? '—' }}</div>
+        <div class="kpi-label">Appointments</div>
+        <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> +12% this week</div>
+        <i class="fas fa-calendar kpi-bg-icon"></i>
+    </div>
+    <div class="kpi-card green">
+        <div class="kpi-icon"><i class="fas fa-heart"></i></div>
+        <div class="kpi-value">{{ totalPatients ?? (totalUsers is defined ? totalUsers - (totalDoctors ?? 0) : '—') }}</div>
+        <div class="kpi-label">Patients</div>
+        <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> +18% this month</div>
+        <i class="fas fa-heartbeat kpi-bg-icon"></i>
+    </div>
+    <div class="kpi-card yellow">
+        <div class="kpi-icon"><i class="fas fa-comments"></i></div>
+        <div class="kpi-value">{{ totalComments ?? '—' }}</div>
+        <div class="kpi-label">Comments</div>
+        <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> +45 total</div>
+        <i class="fas fa-comment-dots kpi-bg-icon"></i>
+    </div>
+</div>
+
+<!-- ── Main Grid ──────────────────────────────────────── -->
+<div class="adm-grid">
+    <!-- Activity Chart -->
+    <div class="adm-panel">
+        <div class="adm-panel-header">
+            <div class="adm-panel-title"><i class="fas fa-chart-area"></i> Platform Activity</div>
+            <span class="live-indicator" style="font-size:0.65rem;padding:3px 8px;"><span class="live-dot"></span>Live</span>
+        </div>
+        <div class="adm-panel-body">
+            <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="adm-panel">
+        <div class="adm-panel-header">
+            <div class="adm-panel-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+        </div>
+        <div class="adm-panel-body">
+            <div class="quick-actions">
+                <a href="{{ path('admin_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6;"><i class="fas fa-users"></i></div>
+                    <div><div class="qa-label">Users</div><div class="qa-desc">Manage accounts</div></div>
+                </a>
+                <a href="{{ path('doctor_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4;"><i class="fas fa-user-md"></i></div>
+                    <div><div class="qa-label">Doctors</div><div class="qa-desc">Medical staff</div></div>
+                </a>
+                <a href="{{ path('appointment_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><i class="fas fa-calendar"></i></div>
+                    <div><div class="qa-label">Appointments</div><div class="qa-desc">Schedule view</div></div>
+                </a>
+                <a href="{{ path('blog_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><i class="fas fa-newspaper"></i></div>
+                    <div><div class="qa-label">Blog</div><div class="qa-desc">Content hub</div></div>
+                </a>
+                <a href="{{ path('parapharmacy_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;"><i class="fas fa-pills"></i></div>
+                    <div><div class="qa-label">Pharmacy</div><div class="qa-desc">Products</div></div>
+                </a>
+                <a href="{{ path('notifications_index') }}" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fas fa-bell"></i></div>
+                    <div><div class="qa-label">Alerts</div><div class="qa-desc">Notifications</div></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Users Table + System Status ───────────────────── -->
+<div class="adm-grid">
+    <!-- Recent Users Table -->
+    <div class="adm-panel">
+        <div class="adm-panel-header">
+            <div class="adm-panel-title"><i class="fas fa-user-shield"></i> Recent Users</div>
+            <a href="{{ path('admin_index') }}" class="adm-panel-action">View All →</a>
+        </div>
+        <div class="adm-panel-body" style="padding:0;">
+            <table class="adm-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recentUsers is defined and recentUsers %}
+                        {% for user in recentUsers|slice(0,5) %}
+                        <tr>
+                            <td>
+                                <div class="adm-cell">
+                                    <div class="adm-avatar" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">
+                                        {{ user.email|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="adm-cell-name">{{ user.email|split('@')|first }}</div>
+                                        <div class="adm-cell-sub">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% for role in user.roles %}
+                                    <span class="adm-badge adm-badge-active" style="font-size:0.65rem;">
+                                        {{ role|replace({'ROLE_': ''}) }}
+                                    </span>
+                                {% endfor %}
+                            </td>
+                            <td><span class="adm-badge adm-badge-active">Active</span></td>
+                            <td>
+                                <a href="{{ path('admin_edit', {id: user.id}) }}" class="adm-btn adm-btn-ghost" style="padding:5px 12px;font-size:0.72rem;">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td colspan="4" style="text-align:center;padding:32px;color:rgba(255,255,255,0.2);">
+                            <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.2;"></i>
+                            No users found
+                        </td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="adm-panel">
+        <div class="adm-panel-header">
+            <div class="adm-panel-title"><i class="fas fa-server"></i> System Status</div>
+            <span class="live-indicator" style="font-size:0.65rem;padding:3px 8px;"><span class="live-dot"></span>All Systems</span>
+        </div>
+        <div class="adm-panel-body">
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">Database</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">MySQL · localhost</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Operational</span>
+            </div>
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">Web Server</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Apache · XAMPP</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Operational</span>
+            </div>
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">Email Service</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Mailer · SMTP</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Operational</span>
+            </div>
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">AI Health Bot</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">WebLLM · Browser GPU</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Ready</span>
+            </div>
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">2FA Service</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">Google Authenticator</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Active</span>
+            </div>
+            <div class="sys-status-item">
+                <div class="sys-status-left">
+                    <div class="sys-dot ok"></div>
+                    <div>
+                        <div class="sys-name">Face Recognition</div>
+                        <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);">face-api.js</div>
+                    </div>
+                </div>
+                <span class="sys-status-label" style="color:#4ade80;">Active</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activity Chart
+    const ctx = document.getElementById('activityChart');
+    if (!ctx) return;
+
+    const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const data1 = [12, 19, 14, 22, 18, 28, 24];
+    const data2 = [8,  13, 9,  16, 14, 20, 17];
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Appointments',
+                data: data1,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.08)',
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointBackgroundColor: '#3b82f6',
+                tension: 0.4, fill: true,
+            }, {
+                label: 'Registrations',
+                data: data2,
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139,92,246,0.06)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#8b5cf6',
+                tension: 0.4, fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: 'rgba(255,255,255,0.5)', font: { size: 11 } } },
+                tooltip: {
+                    backgroundColor: 'rgba(4,12,30,0.95)',
+                    borderColor: 'rgba(59,130,246,0.3)',
+                    borderWidth: 1,
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255,255,255,0.7)',
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

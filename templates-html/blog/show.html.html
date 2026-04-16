@@ -1,0 +1,323 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->__TWIG_EXPR__ â€” PinkShield Blog<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    /* â”€â”€ Blog Post Styling â€“ Dark Futuristic Theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    
+    .blog-container { padding: 40px 0; }
+
+    /* Breadcrumbs */
+    .breadcrumb { background: transparent; padding: 0; margin-bottom: 25px; }
+    .breadcrumb-item a { color: #ff6ba8; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    .breadcrumb-item.active { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+    .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.2); }
+
+    /* Post Card */
+    .post-detail-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        overflow: hidden;
+        backdrop-filter: blur(12px);
+        margin-bottom: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .post-hero-img {
+        width: 100%;
+        max-height: 450px;
+        object-fit: cover;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .post-content-wrap { padding: 40px; }
+
+    .post-header-top {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 24px; gap: 16px;
+    }
+    
+    .post-title-main {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.2rem; font-weight: 900;
+        color: #fff; line-height: 1.2;
+        text-shadow: 0 0 30px rgba(192,57,107,0.3);
+    }
+
+    .post-meta-details {
+        display: flex; align-items: center; gap: 20px;
+        flex-wrap: wrap; margin-bottom: 32px;
+        color: rgba(255,255,255,0.4); font-size: 0.88rem;
+    }
+    .post-meta-details i { color: #ff6ba8; margin-right: 6px; }
+    .author-badge {
+        background: rgba(192,57,107,0.15);
+        color: #ff6ba8; padding: 3px 12px;
+        border-radius: 20px; font-weight: 700;
+        font-size: 0.75rem; border: 1px solid rgba(192,57,107,0.25);
+    }
+
+    .post-main-text {
+        color: rgba(255,255,255,0.7);
+        font-size: 1.05rem; line-height: 1.8;
+        white-space: pre-wrap; margin-bottom: 40px;
+    }
+
+    /* Comments Section */
+    .comments-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.4rem; font-weight: 800;
+        color: #fff; margin-bottom: 30px;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .comments-title i { color: #ff6ba8; }
+
+    .comment-item {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 16px; padding: 24px;
+        margin-bottom: 20px; transition: all 0.2s;
+    }
+    .comment-item:hover { background: rgba(255,255,255,0.04); border-color: rgba(192,57,107,0.2); }
+
+    .comment-header {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .comment-author { color: #ff6ba8; font-weight: 700; font-size: 0.95rem; }
+    .comment-date { color: rgba(255,255,255,0.3); font-size: 0.78rem; display: block; margin-top: 2px; }
+
+    .comment-text { color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6; }
+
+    /* Replies */
+    .replies-wrap {
+        margin-top: 15px; padding-left: 20px;
+        border-left: 2px solid rgba(192,57,107,0.15);
+    }
+    .reply-item {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        padding: 14px 18px; border-radius: 12px; margin-top: 12px;
+    }
+    .reply-item .comment-text { font-size: 0.88rem; }
+
+    /* Comment Form */
+    .comment-form-box {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px; padding: 30px; margin-top: 50px;
+    }
+    .comment-form-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.2rem; font-weight: 800; color: #fff;
+        margin-bottom: 20px;
+    }
+
+    .form-control-blog {
+        background: rgba(0,0,0,0.2) !important;
+        border: 1px solid rgba(192,57,107,0.3) !important;
+        color: #fff !important; border-radius: 12px;
+        padding: 15px; font-size: 0.95rem;
+    }
+    .form-control-blog:focus {
+        border-color: #ff6ba8 !important;
+        box-shadow: 0 0 15px rgba(192,57,107,0.2) !important;
+        background: rgba(0,0,0,0.3) !important;
+    }
+
+    .btn-submit-blog {
+        background: linear-gradient(135deg, #c0396b, #ff6ba8);
+        border: none; color: #fff; font-weight: 700;
+        padding: 12px 28px; border-radius: 10px;
+        transition: all 0.22s; font-size: 0.9rem;
+    }
+    .btn-submit-blog:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(192,57,107,0.4);
+    }
+
+    .reply-alert {
+        background: rgba(59,130,246,0.1) !important;
+        border: 1px solid rgba(59,130,246,0.2) !important;
+        color: #60a5fa !important; border-radius: 10px;
+    }
+
+    .btn-actions-sm {
+        display: flex; gap: 8px;
+    }
+    .btn-blog-outline {
+        padding: 4px 12px; font-size: 0.75rem; font-weight: 600;
+        border-radius: 8px; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-blog-repl { border: 1px solid rgba(192,57,107,0.3); color: #ff6ba8; }
+    .btn-blog-repl:hover { background: rgba(192,57,107,0.15); }
+    .btn-blog-edit { border: 1px solid rgba(255,255,255,0.15); color: #fff; }
+    .btn-blog-edit:hover { background: rgba(255,255,255,0.1); }
+    .btn-blog-del { border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .btn-blog-del:hover { background: rgba(239,68,68,0.15); }
+
+    .pagination .page-link {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.5);
+    }
+    .pagination .page-item.active .page-link { background: #c0396b; border-color: #c0396b; color: #fff; }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="blog-container">
+    
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="__TWIG_EXPR__">Blog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">__TWIG_EXPR__...</li>
+        </ol>
+    </nav>
+
+    
+    <div class="post-detail-card">
+        <!-- TWIG: {%%} -->
+            <img src="__TWIG_EXPR__" alt="__TWIG_EXPR__" class="post-hero-img">
+        <!-- TWIG: {%%} -->
+
+        <div class="post-content-wrap">
+            <div class="post-header-top">
+                <h1 class="post-title-main">__TWIG_EXPR__</h1>
+                <!-- TWIG: {%%} -->
+                    <div class="btn-actions-sm">
+                        <a href="__TWIG_EXPR__" class="btn-blog-outline btn-blog-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="__TWIG_EXPR__" class="btn-blog-outline btn-blog-del" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                <!-- TWIG: {%%} -->
+            </div>
+            
+            <div class="post-meta-details">
+                <span><i class="fas fa-user-circle"></i> __TWIG_EXPR__</span>
+                <span><i class="fas fa-calendar-alt"></i> __TWIG_EXPR__</span>
+                <span class="author-badge text-uppercase">__TWIG_EXPR__</span>
+            </div>
+
+            <div class="post-main-text">
+                __TWIG_EXPR__
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.08); margin: 40px 0;">
+
+            
+            <h3 class="comments-title">
+                <i class="fas fa-comments"></i> 
+                Discussion (__TWIG_EXPR__)
+            </h3>
+            
+            <!-- TWIG: {%%} -->
+                <div class="alert alert-danger" style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.2); color: #f87171;">
+                    <i class="fas fa-exclamation-circle me-2"></i>__TWIG_EXPR__
+                </div>
+            <!-- TWIG: {%%} -->
+            
+            <div class="comments-list">
+                <!-- TWIG: {%%} -->
+                    <div class="comment-item" id="comment-__TWIG_EXPR__">
+                        <div class="comment-header">
+                            <div>
+                                <span class="comment-author">__TWIG_EXPR__</span>
+                                <span class="comment-date">__TWIG_EXPR__</span>
+                            </div>
+                            <div class="btn-actions-sm">
+                                <!-- TWIG: {%%} -->
+                                    <button class="btn-blog-outline btn-blog-repl" onclick="setReplyTo(__TWIG_EXPR__, '__TWIG_EXPR__')">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </button>
+                                <!-- TWIG: {%%} -->
+                                <!-- TWIG: {%%} -->
+                                    <a href="__TWIG_EXPR__" class="btn-blog-outline btn-blog-edit">Edit</a>
+                                    <a href="__TWIG_EXPR__" class="btn-blog-outline btn-blog-del" onclick="return confirm('Delete this comment?')">Delete</a>
+                                <!-- TWIG: {%%} -->
+                            </div>
+                        </div>
+                        <p class="comment-text mb-0">__TWIG_EXPR__</p>
+
+                        
+                        <!-- TWIG: {%%} -->
+                            <div class="replies-wrap">
+                                <!-- TWIG: {%%} -->
+                                    <div class="reply-item">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <span class="comment-author" style="font-size:0.85rem;">__TWIG_EXPR__</span>
+                                                <span class="comment-date" style="font-size:0.7rem;">__TWIG_EXPR__</span>
+                                            </div>
+                                            <!-- TWIG: {%%} -->
+                                                <a href="__TWIG_EXPR__" class="text-danger small opacity-50" onclick="return confirm('Delete?')"><i class="fas fa-trash"></i></a>
+                                            <!-- TWIG: {%%} -->
+                                        </div>
+                                        <p class="comment-text mb-0">__TWIG_EXPR__</p>
+                                    </div>
+                                <!-- TWIG: {%%} -->
+                            </div>
+                        <!-- TWIG: {%%} -->
+                    </div>
+                <!-- TWIG: {%%} -->
+                    <p class="text-center opacity-25 py-4">No comments yet. Share your thoughts below!</p>
+                <!-- TWIG: {%%} -->
+
+                <div class="d-flex justify-content-center mt-4">
+                    __TWIG_EXPR__
+                </div>
+            </div>
+
+            
+            <!-- TWIG: {%%} -->
+                <div class="comment-form-box" id="comment-form-section">
+                    <h4 class="comment-form-title" id="form-title">Join the Conversation</h4>
+                    
+                    <div id="reply-info" class="reply-alert d-none d-flex justify-content-between align-items-center mb-3 p-3">
+                        <span><i class="fas fa-reply me-2"></i>Replying to <strong id="reply-to-name"></strong></span>
+                        <button class="btn-close btn-close-white" onclick="cancelReply()"></button>
+                    </div>
+
+                    <form method="post">
+                        <input type="hidden" name="parent_comment_id" id="parent_comment_id">
+                        <div class="mb-3">
+                            <textarea name="comment" id="comment-textarea" class="form-control-blog" rows="4" placeholder="Share your perspective..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit-blog">
+                            Submit Comment <i class="fas fa-paper-plane ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            <!-- TWIG: {%%} -->
+                <div class="comment-form-box text-center">
+                    <p class="opacity-50 mb-3">Login to participate in the discussion</p>
+                    <a href="__TWIG_EXPR__" class="btn-submit-blog d-inline-block" style="text-decoration:none;">Login Now</a>
+                </div>
+            <!-- TWIG: {%%} -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function setReplyTo(id, name) {
+        document.getElementById('parent_comment_id').value = id;
+        document.getElementById('reply-to-name').innerText = name;
+        document.getElementById('reply-info').classList.remove('d-none');
+        document.getElementById('form-title').innerText = 'Reply to ' + name;
+        document.querySelector('#comment-form-section').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('comment-textarea').focus();
+    }
+
+    function cancelReply() {
+        document.getElementById('parent_comment_id').value = '';
+        document.getElementById('reply-info').classList.add('d-none');
+        document.getElementById('form-title').innerText = 'Join the Conversation';
+    }
+</script>
+<!-- TWIG: {%%} -->
+

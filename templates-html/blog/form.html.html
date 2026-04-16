@@ -1,0 +1,45 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->__TWIG_EXPR__ Post<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0 h4">__TWIG_EXPR__ Blog Post</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" name="title" id="title" class="form-control" value="__TWIG_EXPR__">
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea name="content" id="content" class="form-control" rows="10">__TWIG_EXPR__</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Featured Image</label>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                            <small class="text-muted">Supported formats: JPG, PNG, GIF, WebP (Max 5MB)</small>
+                            <!-- TWIG: {%%} -->
+                                <div class="mt-2">
+                                    <img src="__TWIG_EXPR__" alt="Current image" style="max-height: 150px; border-radius: 5px;">
+                                    <p class="text-muted mt-2"><small>Current image</small></p>
+                                </div>
+                            <!-- TWIG: {%%} -->
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="__TWIG_EXPR__" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-danger">__TWIG_EXPR__ Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- TWIG: {%%} -->
+

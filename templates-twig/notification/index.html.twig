@@ -1,0 +1,580 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Notifications - PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Page Header ─────────────────────────────────────── */
+    .notif-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .notif-page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .notif-page-header h1 i { color: var(--primary); }
+
+    .notif-page-header .header-subtitle {
+        color: #6b7280;
+        font-size: 0.95rem;
+        margin-top: 4px;
+    }
+
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-action {
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.25s cubic-bezier(.4,0,.2,1);
+    }
+
+    .btn-action:disabled {
+        opacity: 0.5;
+        cursor: default;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .btn-primary-action {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .btn-primary-action:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(76,175,135,0.3);
+    }
+
+    /* ── Stats Strip ─────────────────────────────────────── */
+    .notif-stats {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 130px;
+        padding: 16px 20px;
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        transform: translateY(-1px);
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .stat-icon.total   { background: #ede9fe; color: #7c3aed; }
+    .stat-icon.unread  { background: #fee2e2; color: #dc2626; }
+    .stat-icon.read    { background: #dcfce7; color: #16a34a; }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1f2937;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    /* ── Filter Tabs ─────────────────────────────────────── */
+    .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        border-bottom: 2px solid #f3f4f6;
+        padding-bottom: 12px;
+    }
+
+    .filter-tab {
+        padding: 7px 16px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-tab:hover { background: #f3f4f6; color: #374151; }
+    .filter-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .filter-tab .tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        background: rgba(0,0,0,0.08);
+        padding: 0 6px;
+    }
+
+    .filter-tab.active .tab-count {
+        background: rgba(255,255,255,0.3);
+    }
+
+    /* ── Notification List ────────────────────────────────── */
+    .notif-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .notif-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px 22px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        transition: all 0.3s cubic-bezier(.4,0,.2,1);
+        position: relative;
+        overflow: hidden;
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .notif-card:hover {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        border-color: var(--primary);
+    }
+
+    .notif-card.unread {
+        background: linear-gradient(135deg, rgba(76,175,135,0.04), rgba(76,175,135,0.01));
+        border-left: 4px solid var(--primary);
+    }
+
+    .notif-card.unread::before {
+        content: '';
+        position: absolute;
+        top: 18px;
+        left: 10px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%      { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .notif-card.removing {
+        animation: slideOut 0.3s ease forwards;
+    }
+
+    @keyframes slideOut {
+        to { opacity: 0; transform: translateX(40px); height: 0; padding: 0; margin: 0; border: 0; }
+    }
+
+    /* ── Notification Icon ────────────────────────────────── */
+    .notif-icon-wrap {
+        width: 46px;
+        height: 46px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .notif-icon-wrap.info    { background: #dbeafe; color: #2563eb; }
+    .notif-icon-wrap.success { background: #dcfce7; color: #16a34a; }
+    .notif-icon-wrap.warning { background: #fef3c7; color: #d97706; }
+    .notif-icon-wrap.danger  { background: #fee2e2; color: #dc2626; }
+
+    /* ── Notification Content ─────────────────────────────── */
+    .notif-body { flex: 1; min-width: 0; }
+
+    .notif-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+    }
+
+    .notif-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .type-pill {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .type-pill.info    { background: #dbeafe; color: #1e40af; }
+    .type-pill.success { background: #dcfce7; color: #15803d; }
+    .type-pill.warning { background: #fef3c7; color: #92400e; }
+    .type-pill.danger  { background: #fee2e2; color: #991b1b; }
+
+    .notif-msg {
+        color: #6b7280;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin: 0 0 6px 0;
+    }
+
+    .notif-time {
+        font-size: 0.78rem;
+        color: #9ca3af;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* ── Notification Actions ─────────────────────────────── */
+    .notif-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .btn-sm {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-view     { background: #dbeafe; color: #1e40af; }
+    .btn-view:hover { background: #bfdbfe; color: #1e3a8a; }
+
+    .btn-read     { background: var(--primary); color: #fff; }
+    .btn-read:hover { background: var(--primary-dark); }
+    .btn-read.done { background: #d1d5db; color: #6b7280; cursor: default; }
+
+    .btn-del      { background: #fee2e2; color: #dc2626; }
+    .btn-del:hover { background: #fecaca; color: #991b1b; }
+
+    /* ── Empty State ──────────────────────────────────────── */
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: #fff;
+        border-radius: 14px;
+        border: 2px dashed var(--border);
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+
+    .empty-state-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+        color: #9ca3af;
+        font-size: 0.95rem;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+        .notif-page-header { flex-direction: column; align-items: stretch; }
+        .notif-page-header h1 { font-size: 1.5rem; }
+        .notif-stats { flex-direction: column; }
+        .notif-card { flex-direction: column; gap: 10px; }
+        .notif-card.unread::before { display: none; }
+        .notif-actions { width: 100%; }
+        .btn-sm { flex: 1; justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+{# ── Header ──────────────────────────────────────────────── #}
+<div class="notif-page-header">
+    <div>
+        <h1><i class="fas fa-bell"></i> Notifications</h1>
+        <p class="header-subtitle">Stay updated with the latest activity on your platform</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-action btn-primary-action" id="markAllBtn" onclick="markAllRead()"
+                {% if unreadCount == 0 %}disabled{% endif %}>
+            <i class="fas fa-check-double"></i> Mark All Read
+        </button>
+    </div>
+</div>
+
+{# ── Stats ───────────────────────────────────────────────── #}
+<div class="notif-stats">
+    <div class="stat-card">
+        <div class="stat-icon total"><i class="fas fa-bell"></i></div>
+        <div>
+            <div class="stat-value">{{ typeCounts.all }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon unread"><i class="fas fa-envelope"></i></div>
+        <div>
+            <div class="stat-value" id="unreadStat">{{ unreadCount }}</div>
+            <div class="stat-label">Unread</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon read"><i class="fas fa-envelope-open"></i></div>
+        <div>
+            <div class="stat-value">{{ typeCounts.all - unreadCount }}</div>
+            <div class="stat-label">Read</div>
+        </div>
+    </div>
+</div>
+
+{# ── Filter Tabs ─────────────────────────────────────────── #}
+<div class="filter-tabs" id="filterTabs">
+    <button class="filter-tab active" data-filter="all" onclick="filterNotifs('all', this)">
+        <i class="fas fa-globe"></i> All <span class="tab-count">{{ typeCounts.all }}</span>
+    </button>
+    {% if typeCounts.info > 0 %}
+    <button class="filter-tab" data-filter="info" onclick="filterNotifs('info', this)">
+        <i class="fas fa-info-circle"></i> Info <span class="tab-count">{{ typeCounts.info }}</span>
+    </button>
+    {% endif %}
+    {% if typeCounts.success > 0 %}
+    <button class="filter-tab" data-filter="success" onclick="filterNotifs('success', this)">
+        <i class="fas fa-check-circle"></i> Success <span class="tab-count">{{ typeCounts.success }}</span>
+    </button>
+    {% endif %}
+    {% if typeCounts.warning > 0 %}
+    <button class="filter-tab" data-filter="warning" onclick="filterNotifs('warning', this)">
+        <i class="fas fa-exclamation-triangle"></i> Warning <span class="tab-count">{{ typeCounts.warning }}</span>
+    </button>
+    {% endif %}
+    {% if typeCounts.danger > 0 %}
+    <button class="filter-tab" data-filter="danger" onclick="filterNotifs('danger', this)">
+        <i class="fas fa-exclamation-circle"></i> Danger <span class="tab-count">{{ typeCounts.danger }}</span>
+    </button>
+    {% endif %}
+</div>
+
+{# ── Notification List ───────────────────────────────────── #}
+{% if notifications|length > 0 %}
+<div class="notif-list" id="notifList">
+    {% for notification in notifications %}
+    <div class="notif-card {% if not notification.isRead %}unread{% endif %}"
+         data-id="{{ notification.id }}"
+         data-type="{{ notification.type }}"
+         style="animation-delay: {{ loop.index0 * 0.04 }}s">
+        <div class="notif-icon-wrap {{ notification.type }}">
+            <i class="{{ notification.icon }}"></i>
+        </div>
+        <div class="notif-body">
+            <div class="notif-title-row">
+                <h3 class="notif-title">{{ notification.title }}</h3>
+                <span class="type-pill {{ notification.type }}">{{ notification.type }}</span>
+            </div>
+            <p class="notif-msg">{{ notification.message }}</p>
+            <span class="notif-time">
+                <i class="far fa-clock"></i>
+                <time datetime="{{ notification.createdAt|date('c') }}" class="timeago">
+                    {{ notification.createdAt|date('M d, Y H:i') }}
+                </time>
+            </span>
+        </div>
+        <div class="notif-actions">
+            <a href="{{ path('notification_show', {id: notification.id}) }}" class="btn-sm btn-view">
+                <i class="fas fa-eye"></i> View
+            </a>
+            {% if not notification.isRead %}
+            <button class="btn-sm btn-read" onclick="markRead(this, {{ notification.id }})">
+                <i class="fas fa-check"></i>
+            </button>
+            {% endif %}
+            <button class="btn-sm btn-del" onclick="deleteNotif(this, {{ notification.id }})">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon"><i class="fas fa-bell-slash"></i></div>
+    <h3 class="empty-state-title">All Caught Up!</h3>
+    <p class="empty-state-text">You don't have any notifications at the moment.</p>
+</div>
+{% endif %}
+
+<script>
+/* ── Time Ago ────────────────────────────────────────────── */
+function timeAgo(date) {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    const intervals = [
+        { label: 'year',   secs: 31536000 },
+        { label: 'month',  secs: 2592000 },
+        { label: 'week',   secs: 604800 },
+        { label: 'day',    secs: 86400 },
+        { label: 'hour',   secs: 3600 },
+        { label: 'minute', secs: 60 },
+    ];
+    for (const i of intervals) {
+        const count = Math.floor(seconds / i.secs);
+        if (count >= 1) return `${count} ${i.label}${count > 1 ? 's' : ''} ago`;
+    }
+    return 'Just now';
+}
+
+document.querySelectorAll('.timeago').forEach(el => {
+    const d = new Date(el.getAttribute('datetime'));
+    if (!isNaN(d)) el.textContent = timeAgo(d);
+});
+
+/* ── Filter ──────────────────────────────────────────────── */
+function filterNotifs(type, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.notif-card').forEach(card => {
+        card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
+    });
+}
+
+/* ── Mark Single Read ────────────────────────────────────── */
+function markRead(btn, id) {
+    if (btn.classList.contains('done')) return;
+    fetch('{{ path("notification_mark_read", {id: 0}) }}'.replace('0', id), {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const card = btn.closest('.notif-card');
+            card.classList.remove('unread');
+            btn.classList.add('done');
+            btn.innerHTML = '<i class="fas fa-check-circle"></i>';
+            btn.disabled = true;
+            updateUnreadStat(-1);
+        }
+    });
+}
+
+/* ── Mark All Read ───────────────────────────────────────── */
+function markAllRead() {
+    const btn = document.getElementById('markAllBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+
+    fetch('{{ path("notification_mark_all_read") }}', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelectorAll('.notif-card.unread').forEach(c => c.classList.remove('unread'));
+            document.querySelectorAll('.btn-read').forEach(b => {
+                b.classList.add('done');
+                b.innerHTML = '<i class="fas fa-check-circle"></i>';
+                b.disabled = true;
+            });
+            btn.innerHTML = '<i class="fas fa-check-double"></i> All Done!';
+            document.getElementById('unreadStat').textContent = '0';
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-double"></i> Mark All Read';
+    });
+}
+
+/* ── Delete ───────────────────────────────────────────────── */
+function deleteNotif(btn, id) {
+    if (!confirm('Delete this notification?')) return;
+    const card = btn.closest('.notif-card');
+    card.classList.add('removing');
+
+    fetch('{{ path("notification_delete", {id: 0}) }}'.replace('0', id), {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            setTimeout(() => card.remove(), 300);
+            if (card.classList.contains('unread')) updateUnreadStat(-1);
+        }
+    });
+}
+
+/* ── Helpers ──────────────────────────────────────────────── */
+function updateUnreadStat(delta) {
+    const el = document.getElementById('unreadStat');
+    if (el) el.textContent = Math.max(0, parseInt(el.textContent || '0') + delta);
+}
+</script>
+{% endblock %}

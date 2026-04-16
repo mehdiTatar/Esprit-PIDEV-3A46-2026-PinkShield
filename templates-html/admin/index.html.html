@@ -1,0 +1,42 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->Admins - PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Admins Management</h1>
+        <a href="__TWIG_EXPR__" class="btn btn-primary mb-3">Add New Admin</a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- TWIG: {%%} -->
+                <tr>
+                    <td>__TWIG_EXPR__</td>
+                    <td>__TWIG_EXPR__</td>
+                    <td>
+                        <a href="__TWIG_EXPR__" class="btn btn-sm btn-info">View</a>
+                        <a href="__TWIG_EXPR__" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="__TWIG_EXPR__" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            <!-- TWIG: {%%} -->
+                <tr>
+                    <td colspan="3" class="text-center">No admins found</td>
+                </tr>
+            <!-- TWIG: {%%} -->
+        </tbody>
+    </table>
+</div>
+<!-- TWIG: {%%} -->
+

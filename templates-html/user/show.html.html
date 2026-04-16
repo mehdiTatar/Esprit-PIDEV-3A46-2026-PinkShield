@@ -1,0 +1,235 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->Patient #__TWIG_EXPR__ â€” PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    body { background: #f8fafc !important; }
+
+    .profile-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+    .profile-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #fff; border-radius: 16px; padding: 30px 36px;
+        display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+        box-shadow: 0 8px 32px rgba(30,41,59,0.22);
+        position: relative; overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute; inset: 0;
+        background-image:
+            linear-gradient(rgba(59,130,246,0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+    }
+
+    .profile-header > * { position: relative; z-index: 1; }
+
+    .profile-big-avatar {
+        width: 70px; height: 70px; border-radius: 50%;
+        background: rgba(59,130,246,0.2); color: #93c5fd;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem; font-weight: 800; flex-shrink: 0;
+        border: 2px solid rgba(59,130,246,0.4);
+    }
+
+    .profile-meta h1 { font-size: 1.5rem; font-weight: 800; margin: 0 0 4px; }
+    .profile-meta p  { margin: 0; opacity: 0.65; font-size: 0.87rem; }
+
+    .profile-header-actions { margin-left: auto; display: flex; gap: 10px; }
+
+    .ph-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 18px; border-radius: 10px;
+        font-weight: 600; font-size: 0.87rem; text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .ph-btn-edit { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .ph-btn-edit:hover { background: #f59e0b; color: #fff; }
+
+    .ph-btn-back { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+    .ph-btn-back:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* â”€â”€ Info card â”€â”€ */
+    .info-card {
+        background: #fff; border-radius: 14px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden;
+    }
+
+    .info-card-header {
+        background: #1e293b; color: #fff;
+        padding: 14px 22px; display: flex; align-items: center;
+        gap: 9px; font-weight: 700; font-size: 0.9rem;
+    }
+
+    .info-card-header i { color: #3b82f6; }
+
+    .info-card-body { padding: 22px; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+    }
+
+    .info-field label {
+        display: block; font-size: 0.7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        color: #94a3b8; margin-bottom: 4px;
+    }
+
+    .info-field .field-value {
+        font-size: 0.92rem; font-weight: 600;
+        color: #1e293b;
+    }
+
+    .field-value.muted { color: #94a3b8; font-weight: 400; font-style: italic; }
+
+    .status-pill {
+        display: inline-block; padding: 4px 12px;
+        border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+    }
+
+    .pill-active    { background: rgba(34,197,94,0.12);  color: #15803d; }
+    .pill-inactive  { background: rgba(245,158,11,0.12); color: #92400e; }
+    .pill-suspended { background: rgba(239,68,68,0.12);  color: #991b1b; }
+
+    /* â”€â”€ Danger zone â”€â”€ */
+    .danger-zone {
+        background: rgba(239,68,68,0.04);
+        border: 1px solid rgba(239,68,68,0.15);
+        border-radius: 14px; padding: 20px 24px;
+        display: flex; align-items: center;
+        justify-content: space-between; flex-wrap: wrap; gap: 14px;
+    }
+
+    .danger-zone h3 { font-size: 0.95rem; font-weight: 700; color: #dc2626; margin: 0 0 4px; }
+    .danger-zone p  { font-size: 0.82rem; color: #94a3b8; margin: 0; }
+
+    .btn-danger-del {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 20px; background: #ef4444; color: #fff;
+        border-radius: 10px; font-weight: 700; font-size: 0.87rem;
+        border: none; cursor: pointer; transition: background 0.2s;
+    }
+
+    .btn-danger-del:hover { background: #dc2626; }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="profile-wrap">
+
+    
+    <div class="profile-header">
+        <div class="profile-big-avatar">
+            __TWIG_EXPR__
+        </div>
+        <div class="profile-meta">
+            <h1>__TWIG_EXPR__ __TWIG_EXPR__</h1>
+            <p>Patient Â· #__TWIG_EXPR__ Â· __TWIG_EXPR__</p>
+        </div>
+        <div class="profile-header-actions">
+            <a href="__TWIG_EXPR__" class="ph-btn ph-btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a href="__TWIG_EXPR__" class="ph-btn ph-btn-edit">
+                <i class="fas fa-pen"></i> Edit
+            </a>
+        </div>
+    </div>
+
+    
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-id-card"></i> Personal Information
+        </div>
+        <div class="info-card-body">
+            <div class="info-grid">
+                <div class="info-field">
+                    <label>First Name</label>
+                    <div class="field-value">__TWIG_EXPR__</div>
+                </div>
+                <div class="info-field">
+                    <label>Last Name</label>
+                    <div class="field-value">__TWIG_EXPR__</div>
+                </div>
+                <div class="info-field">
+                    <label>Email</label>
+                    <div class="field-value">__TWIG_EXPR__</div>
+                </div>
+                <div class="info-field">
+                    <label>Phone</label>
+                    <div class="field-value __TWIG_EXPR__">
+                        __TWIG_EXPR__
+                    </div>
+                </div>
+                <div class="info-field">
+                    <label>Address</label>
+                    <div class="field-value __TWIG_EXPR__">
+                        __TWIG_EXPR__
+                    </div>
+                </div>
+                <div class="info-field">
+                    <label>Account Status</label>
+                    <div class="field-value">
+                        <span class="status-pill pill-__TWIG_EXPR__">
+                            __TWIG_EXPR__
+                        </span>
+                    </div>
+                </div>
+                <div class="info-field">
+                    <label>Roles</label>
+                    <div class="field-value">__TWIG_EXPR__</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-sliders-h"></i> Account Actions
+        </div>
+        <div class="info-card-body" style="display:flex; gap:10px; flex-wrap:wrap;">
+
+            <!-- TWIG: {%%} -->
+                <button type="button" class="action-btn"
+                    style="padding:9px 18px; background:rgba(34,197,94,0.1); color:#16a34a; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
+                    onclick="postAction('__TWIG_EXPR__', 'Activate this account?', '__TWIG_EXPR__')">
+                    <i class="fas fa-check me-1"></i> Activate Account
+                </button>
+            <!-- TWIG: {%%} -->
+                <button type="button"
+                    style="padding:9px 18px; background:rgba(245,158,11,0.1); color:#d97706; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:0.88rem;"
+                    onclick="postAction('__TWIG_EXPR__', 'Deactivate this account?', '__TWIG_EXPR__')">
+                    <i class="fas fa-ban me-1"></i> Deactivate Account
+                </button>
+            <!-- TWIG: {%%} -->
+
+            <a href="__TWIG_EXPR__"
+               style="padding:9px 18px; background:rgba(59,130,246,0.1); color:#3b82f6; border-radius:10px; font-weight:600; text-decoration:none; font-size:0.88rem;">
+                <i class="fas fa-pen me-1"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+
+    
+    <div class="danger-zone">
+        <div>
+            <h3><i class="fas fa-exclamation-triangle me-1"></i> Danger Zone</h3>
+            <p>Permanently delete this patient account and all associated data. This action cannot be undone.</p>
+        </div>
+        <button type="button" class="btn-danger-del"
+            onclick="postAction('__TWIG_EXPR__', 'Permanently delete patient __TWIG_EXPR__? This CANNOT be undone.', '__TWIG_EXPR__')">
+            <i class="fas fa-trash"></i> Delete Patient
+        </button>
+    </div>
+
+</div>
+<!-- TWIG: {%%} -->
+

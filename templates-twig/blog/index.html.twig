@@ -1,0 +1,384 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Medical Blog & Forum — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Blog Page – Dark Futuristic Theme ─────────────────────── */
+
+    /* Hero banner */
+    .blog-hero {
+        background: linear-gradient(135deg, rgba(192,57,107,0.25) 0%, rgba(168,85,247,0.15) 100%);
+        border: 1px solid rgba(192,57,107,0.25);
+        border-radius: 18px;
+        padding: 36px 40px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 0 60px rgba(192,57,107,0.06);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(8px);
+    }
+    .blog-hero::before {
+        content: '';
+        position: absolute; top: -60px; right: -60px;
+        width: 240px; height: 240px; border-radius: 50%;
+        background: rgba(192,57,107,0.1);
+    }
+    .blog-hero::after {
+        content: '✚';
+        position: absolute; right: 160px; top: 10px;
+        font-size: 7rem; color: rgba(192,57,107,0.06);
+        letter-spacing: -4px;
+    }
+    .blog-hero h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.6rem; font-weight: 900;
+        margin: 0 0 6px; letter-spacing: 0.3px;
+        text-shadow: 0 0 30px rgba(192,57,107,0.4);
+        position: relative; z-index: 1;
+    }
+    .blog-hero p { margin: 0; color: rgba(255,255,255,0.5); font-size: 0.9rem; position: relative; z-index: 1; }
+    .blog-hero-actions { position: relative; z-index: 1; }
+
+    /* Toolbar */
+    .blog-toolbar {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 14px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+        backdrop-filter: blur(12px);
+    }
+
+    /* Search input – High contrast */
+    .blog-toolbar .form-control {
+        background: rgba(0,0,0,0.2) !important;
+        border: 1px solid rgba(192,57,107,0.3) !important;
+        color: #fff !important;
+        border-radius: 10px;
+        height: 44px;
+        font-weight: 500;
+    }
+    .blog-toolbar .form-control:focus {
+        border-color: #ff6ba8 !important;
+        background: rgba(0,0,0,0.3) !important;
+        box-shadow: 0 0 15px rgba(192,57,107,0.2) !important;
+    }
+    .blog-toolbar .form-control::placeholder { color: rgba(255,255,255,0.4) !important; }
+
+    /* Select box – Fix repeating icons */
+    .blog-toolbar .form-select {
+        background-color: rgba(0,0,0,0.2) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ff6ba8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 0.75rem center !important;
+        background-size: 16px 12px !important;
+        border: 1px solid rgba(192,57,107,0.3) !important;
+        color: #fff !important;
+        border-radius: 10px;
+        height: 44px;
+        padding-right: 2.5rem;
+    }
+    .blog-toolbar .form-select:focus {
+        border-color: #ff6ba8 !important;
+        box-shadow: 0 0 15px rgba(192,57,107,0.2) !important;
+    }
+    .blog-toolbar .form-select option { background: #0a1525; color: #fff; }
+
+    .blog-toolbar .btn-primary {
+        height: 44px; padding: 0 22px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #c0396b, #ff6ba8);
+        border: none; color: #fff; font-weight: 700;
+        display: flex; align-items: center; gap: 8px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .blog-toolbar .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(192,57,107,0.45);
+    }
+    .blog-toolbar .btn-secondary {
+        height: 42px; padding: 0 14px;
+        border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+        display: flex; align-items: center; transition: all 0.2s;
+    }
+    .blog-toolbar .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .search-wrap { flex: 1; min-width: 220px; display: flex; gap: 8px; }
+    .sort-wrap    { display: flex; gap: 8px; min-width: 200px; }
+
+    /* Results bar */
+    .results-bar {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 20px; font-size: 0.88rem;
+        color: rgba(255,255,255,0.4);
+    }
+    .results-bar .results-count {
+        background: rgba(192,57,107,0.15);
+        color: #ff6ba8;
+        border: 1px solid rgba(192,57,107,0.25);
+        padding: 3px 12px; border-radius: 20px; font-weight: 700;
+    }
+
+    /* Post Cards */
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .post-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.24s ease;
+        display: flex; flex-direction: column;
+    }
+    .post-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(192,57,107,0.25);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(192,57,107,0.1);
+    }
+
+    /* Thumbnail */
+    .post-thumb {
+        height: 185px; overflow: hidden;
+        position: relative;
+        background: linear-gradient(135deg, rgba(192,57,107,0.12) 0%, rgba(168,85,247,0.08) 100%);
+    }
+    .post-thumb img {
+        width: 100%; height: 100%;
+        object-fit: cover; transition: transform 0.36s ease;
+    }
+    .post-card:hover .post-thumb img { transform: scale(1.05); }
+    .post-thumb-placeholder {
+        width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; color: rgba(192,57,107,0.3);
+    }
+
+    /* Card Body */
+    .post-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+
+    .post-meta {
+        display: flex; align-items: center; gap: 7px;
+        flex-wrap: wrap; font-size: 0.73rem;
+        color: rgba(255,255,255,0.3); margin-bottom: 10px;
+    }
+    .post-meta .author-chip {
+        background: rgba(192,57,107,0.12);
+        color: #ff6ba8;
+        border: 1px solid rgba(192,57,107,0.2);
+        padding: 2px 9px; border-radius: 12px; font-weight: 600;
+    }
+
+    .post-title {
+        font-size: 1rem; font-weight: 700; color: #fff;
+        margin: 0 0 10px; line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .post-excerpt {
+        font-size: 0.83rem; color: rgba(255,255,255,0.4);
+        line-height: 1.65; flex: 1; margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .post-footer {
+        display: flex; align-items: center;
+        justify-content: space-between;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .post-read-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 16px; border-radius: 9px;
+        background: linear-gradient(135deg, #c0396b, #e8557a);
+        color: #fff; font-size: 0.8rem; font-weight: 600;
+        text-decoration: none; transition: all 0.22s;
+        border: none;
+    }
+    .post-read-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(192,57,107,0.45);
+        color: #fff;
+    }
+
+    .comment-count {
+        display: flex; align-items: center; gap: 5px;
+        font-size: 0.78rem; color: rgba(255,255,255,0.25);
+    }
+    .comment-count i { color: rgba(192,57,107,0.5); }
+
+    /* Pagination override */
+    .pagination .page-link {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.5);
+    }
+    .pagination .page-link:hover { background: rgba(192,57,107,0.12); color: #ff6ba8; border-color: rgba(192,57,107,0.2); }
+    .pagination .page-item.active .page-link { background: #c0396b; border-color: #c0396b; color: #fff; }
+    .pagination .page-item.disabled .page-link { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.15); }
+
+    /* Empty state */
+    .blog-empty {
+        text-align: center; padding: 72px 0;
+        color: rgba(255,255,255,0.25);
+    }
+    .blog-empty i { font-size: 4rem; margin-bottom: 20px; display: block; color: rgba(192,57,107,0.25); }
+    .blog-empty h5 { color: rgba(255,255,255,0.5); font-size: 1.15rem; margin-bottom: 8px; }
+
+    /* New post button */
+    .btn-new-post {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 20px; border-radius: 10px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff; font-weight: 600; font-size: 0.88rem;
+        text-decoration: none; transition: all 0.22s;
+        backdrop-filter: blur(4px);
+    }
+    .btn-new-post:hover {
+        background: rgba(255,255,255,0.18);
+        border-color: rgba(255,255,255,0.35);
+        color: #fff; transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div>
+    {# ── Hero ─────────────────────────────────────────── #}
+    <div class="blog-hero">
+        <div>
+            <h1><i class="fas fa-newspaper me-2" style="opacity:0.7;"></i>Medical Blog &amp; Forum</h1>
+            <p>Share knowledge, ask questions, and connect with the healthcare community</p>
+        </div>
+        <div class="blog-hero-actions">
+            {% if app.user %}
+                <a href="{{ path('blog_new') }}" class="btn-new-post">
+                    <i class="fas fa-plus"></i> New Post
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Toolbar ───────────────────────────────────────── #}
+    <div class="blog-toolbar">
+        <div class="search-wrap">
+            <form method="GET" class="d-flex gap-2 w-100" id="searchForm">
+                <input type="text" name="q" class="form-control"
+                       placeholder="🔍  Search posts, topics, authors…" value="{{ q }}">
+                <input type="hidden" name="sortBy" value="{{ sortBy }}">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+                {% if q %}
+                    <a href="{{ path('blog_index', {'sortBy': sortBy}) }}" class="btn-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="sort-wrap">
+            <form method="GET" class="w-100">
+                <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                    <option value="date_newest" {% if sortBy == 'date_newest' %}selected{% endif %}>🕒 Newest First</option>
+                    <option value="date_oldest" {% if sortBy == 'date_oldest' %}selected{% endif %}>🕐 Oldest First</option>
+                    <option value="title_asc"   {% if sortBy == 'title_asc'   %}selected{% endif %}>🔤 Title A–Z</option>
+                    <option value="title_desc"  {% if sortBy == 'title_desc'  %}selected{% endif %}>🔤 Title Z–A</option>
+                    <option value="author"      {% if sortBy == 'author'      %}selected{% endif %}>👤 Author</option>
+                </select>
+                <input type="hidden" name="q" value="{{ q }}">
+            </form>
+        </div>
+    </div>
+
+    {# ── Results bar ───────────────────────────────────── #}
+    <div class="results-bar">
+        <span class="results-count">
+            {{ pagination.totalItemCount }} post{{ pagination.totalItemCount != 1 ? 's' : '' }}
+        </span>
+        {% if q %}
+            <span>matching "<strong style="color:rgba(255,255,255,0.6);">{{ q }}</strong>"</span>
+        {% endif %}
+    </div>
+
+    {# ── Post Grid ─────────────────────────────────────── #}
+    {% if pagination|length > 0 %}
+        <div class="blog-grid">
+            {% for post in pagination %}
+                <div class="post-card">
+                    <div class="post-thumb">
+                        {% if post.imagePath %}
+                            <img src="{{ post.imagePath }}" alt="{{ post.title }}">
+                        {% else %}
+                            <div class="post-thumb-placeholder">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="post-body">
+                        <div class="post-meta">
+                            <span class="author-chip">{{ post.authorName }}</span>
+                            <span>·</span>
+                            <span>{{ post.authorRole }}</span>
+                            <span>·</span>
+                            <i class="far fa-calendar-alt"></i>
+                            <span>{{ post.createdAt|date('M d, Y') }}</span>
+                        </div>
+                        <h5 class="post-title">{{ post.title }}</h5>
+                        <p class="post-excerpt">{{ post.content|slice(0, 160) }}</p>
+                        <div class="post-footer">
+                            <a href="{{ path('blog_show', {'id': post.id}) }}" class="post-read-btn">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <div class="comment-count">
+                                <i class="far fa-comment-alt"></i>
+                                {{ post.comments|length }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-center mt-5">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+
+    {% else %}
+        <div class="blog-empty">
+            <i class="fas fa-newspaper"></i>
+            {% if q %}
+                <h5>No posts found for "{{ q }}"</h5>
+                <p>Try a different search term or <a href="{{ path('blog_index') }}" style="color:#ff6ba8;">browse all posts</a>.</p>
+            {% else %}
+                <h5>No posts yet</h5>
+                <p style="color:rgba(255,255,255,0.25);">Be the first to share something with the community!</p>
+                {% if app.user %}
+                    <a href="{{ path('blog_new') }}" class="post-read-btn mt-3" style="display:inline-flex;">
+                        <i class="fas fa-plus"></i> Write a Post
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

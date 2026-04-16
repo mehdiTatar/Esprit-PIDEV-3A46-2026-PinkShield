@@ -1,0 +1,550 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->My Appointments â€” PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css' rel='stylesheet' />
+<style>
+    .appt-hero {
+        background: linear-gradient(135deg, #1e1b34 0%, #2d1b3d 100%);
+        border-radius: 16px;
+        padding: 32px 40px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 30px rgba(30,27,52,0.28);
+    }
+
+    .appt-hero h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 4px; letter-spacing: -0.3px; }
+    .appt-hero p  { margin: 0; opacity: 0.7; font-size: 0.9rem; }
+
+    /* â”€â”€â”€ Tabs â”€â”€â”€ */
+    .view-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+    .view-tab {
+        padding: 10px 22px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .view-tab:hover { border-color: var(--primary); color: var(--primary); }
+    .view-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* â”€â”€â”€ Panel â”€â”€â”€ */
+    .appt-panel {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .appt-panel-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
+    }
+
+    .appt-panel-header h6 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    /* â”€â”€â”€ Table â”€â”€â”€ */
+    .appt-table { width: 100%; border-collapse: collapse; }
+
+    .appt-table thead th {
+        background: #fafafa;
+        padding: 13px 18px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .appt-table tbody td {
+        padding: 14px 18px;
+        border-bottom: 1px solid #f8f4f6;
+        font-size: 0.88rem;
+        color: var(--text-dark);
+        vertical-align: middle;
+    }
+
+    .appt-table tbody tr:last-child td { border-bottom: none; }
+    .appt-table tbody tr:hover { background: #fff5f8; }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.77rem;
+        font-weight: 700;
+    }
+
+    .status-confirmed { background: #dcfce7; color: #166534; }
+    .status-pending   { background: #fef3c7; color: #92400e; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
+
+    .appt-empty {
+        text-align: center;
+        padding: 60px 0;
+        color: var(--text-muted);
+    }
+
+    .appt-empty i { font-size: 3rem; color: var(--primary); opacity: 0.3; margin-bottom: 16px; display: block; }
+    .appt-empty h5 { color: var(--text-dark); }
+    .appt-empty p  { font-size: 0.88rem; }
+
+    .date-cell .date-main { font-weight: 700; font-size: 0.9rem; }
+    .date-cell .date-time { font-size: 0.77rem; color: var(--text-muted); }
+
+    /* â”€â”€â”€ Calendar â”€â”€â”€ */
+    .calendar-container {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+    .calendar-container h6 {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+    }
+    #fullCalendar {
+        min-height: 500px;
+    }
+    .fc .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 700; }
+    .fc .fc-button-primary {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        font-size: 0.8rem !important;
+    }
+    .fc .fc-button-primary:hover { opacity: 0.85; }
+    .fc .fc-daygrid-event { border-radius: 6px; padding: 2px 6px; font-size: 0.75rem; }
+
+    /* â”€â”€â”€ AI Suggestions â”€â”€â”€ */
+    .ai-section {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+    .ai-section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .ai-section-header h6 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+    .ai-badge {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .ai-card {
+        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+        border: 1px solid #ddd6fe;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .ai-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+    }
+    .ai-card-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #4338ca;
+        margin-bottom: 6px;
+    }
+    .ai-card-appt {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+    }
+    .ai-product {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: #fff;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        border: 1px solid #e9e5f5;
+    }
+    .ai-product-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    .ai-product-name { font-weight: 600; font-size: 0.85rem; color: var(--text-dark); }
+    .ai-product-desc { font-size: 0.75rem; color: var(--text-muted); }
+    .ai-product-price {
+        margin-left: auto;
+        font-weight: 700;
+        color: #6366f1;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .ai-product-buy {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+    }
+    .ai-product-buy:hover { opacity: 0.85; }
+    .ai-empty {
+        text-align: center;
+        padding: 30px;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+    }
+    .ai-empty i { font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 10px; color: #6366f1; }
+
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* Ensure action buttons are always clickable */
+    .appt-table td .d-flex { position: relative; z-index: 2; }
+    .appt-table td a.btn { position: relative; z-index: 3; pointer-events: auto; }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div>
+    
+    <div class="appt-hero">
+        <div>
+            <h1><i class="fas fa-calendar-check me-2" style="opacity:0.8;"></i>
+                <!-- TWIG: {%%} -->All Appointments
+                <!-- TWIG: {%%} -->My Patient Appointments
+                <!-- TWIG: {%%} -->My Appointments<!-- TWIG: {%%} -->
+            </h1>
+            <p>Manage and track your medical consultations</p>
+        </div>
+        <!-- TWIG: {%%} -->
+            <a href="__TWIG_EXPR__" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="fas fa-calendar-plus"></i> Book Appointment
+            </a>
+        <!-- TWIG: {%%} -->
+    </div>
+
+    
+    <div class="view-tabs">
+        <button class="view-tab active" data-target="list-view">
+            <i class="fas fa-list me-1"></i> List View
+        </button>
+        <button class="view-tab" data-target="calendar-view">
+            <i class="fas fa-calendar-alt me-1"></i> Calendar View
+        </button>
+        <!-- TWIG: {%%} -->
+        <button class="view-tab" data-target="ai-view">
+            <i class="fas fa-brain me-1"></i> AI Suggestions
+        </button>
+        <!-- TWIG: {%%} -->
+    </div>
+
+    
+    <div id="list-view" class="view-section active">
+        <div class="appt-panel">
+            <div class="appt-panel-header">
+                <h6><i class="fas fa-list me-2" style="color:var(--primary);"></i>Appointment List</h6>
+                <span style="font-size:0.8rem;color:var(--text-muted);">__TWIG_EXPR__ record(s)</span>
+            </div>
+
+            <!-- TWIG: {%%} -->
+                <div class="table-responsive">
+                    <table class="appt-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <!-- TWIG: {%%} --><th>Patient</th><!-- TWIG: {%%} -->
+                                <!-- TWIG: {%%} --><th>Doctor</th><!-- TWIG: {%%} -->
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- TWIG: {%%} -->
+                                <tr>
+                                    <td class="date-cell">
+                                        <div class="date-main">__TWIG_EXPR__</div>
+                                        <div class="date-time"><i class="far fa-clock me-1"></i>__TWIG_EXPR__</div>
+                                    </td>
+                                    <!-- TWIG: {%%} -->
+                                        <td><i class="fas fa-user-injured me-1" style="color:var(--primary);opacity:0.7;"></i>__TWIG_EXPR__</td>
+                                    <!-- TWIG: {%%} -->
+                                    <!-- TWIG: {%%} -->
+                                        <td><i class="fas fa-user-md me-1" style="color:var(--primary);opacity:0.7;"></i>__TWIG_EXPR__</td>
+                                    <!-- TWIG: {%%} -->
+                                    <td>
+                                        <span class="status-pill status-__TWIG_EXPR__">
+                                            <!-- TWIG: {%%} --><i class="fas fa-check-circle"></i>
+                                            <!-- TWIG: {%%} --><i class="fas fa-hourglass-half"></i>
+                                            <!-- TWIG: {%%} --><i class="fas fa-clipboard-check"></i>
+                                            <!-- TWIG: {%%} --><i class="fas fa-times-circle"></i><!-- TWIG: {%%} -->
+                                            __TWIG_EXPR__
+                                        </span>
+                                    </td>
+                                    <td style="color:var(--text-muted);font-style:__TWIG_EXPR__;">
+                                        __TWIG_EXPR__<!-- TWIG: {%%} -->â€¦<!-- TWIG: {%%} -->
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <a href="__TWIG_EXPR__"
+                                               class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                                                <i class="fas fa-file-pdf"></i> PDF
+                                            </a>
+                                            <!-- TWIG: {%%} -->
+                                                <!-- TWIG: {%%} -->
+                                                    <a href="__TWIG_EXPR__"
+                                                       class="btn btn-sm btn-success d-flex align-items-center gap-1">
+                                                        <i class="fas fa-check"></i> Confirm
+                                                    </a>
+                                                <!-- TWIG: {%%} -->
+                                                <a href="__TWIG_EXPR__"
+                                                   class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                                   onclick="return confirm('Cancel this appointment?')">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </a>
+                                            <!-- TWIG: {%%} -->
+                                                <a href="__TWIG_EXPR__"
+                                                   class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                                   onclick="return confirm('Cancel this appointment?')">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </a>
+                                            <!-- TWIG: {%%} -->
+                                            <!-- TWIG: {%%} -->
+                                                <a href="__TWIG_EXPR__"
+                                                   class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+                                                    <i class="fas fa-file-invoice"></i> Invoice
+                                                </a>
+                                            <!-- TWIG: {%%} -->
+                                        </div>
+                                    </td>
+                                </tr>
+                            <!-- TWIG: {%%} -->
+                        </tbody>
+                    </table>
+                </div>
+            <!-- TWIG: {%%} -->
+                <div class="appt-empty">
+                    <i class="fas fa-calendar-times"></i>
+                    <h5>No appointments found</h5>
+                    <p>
+                        <!-- TWIG: {%%} -->
+                            Ready to see a doctor?
+                        <!-- TWIG: {%%} -->
+                            No appointments scheduled yet.
+                        <!-- TWIG: {%%} -->
+                    </p>
+                    <!-- TWIG: {%%} -->
+                        <a href="__TWIG_EXPR__" class="btn btn-primary mt-2">
+                            <i class="fas fa-calendar-plus me-2"></i>Book an Appointment
+                        </a>
+                    <!-- TWIG: {%%} -->
+                </div>
+            <!-- TWIG: {%%} -->
+        </div>
+    </div>
+
+    
+    <div id="calendar-view" class="view-section">
+        <div class="calendar-container">
+            <h6><i class="fas fa-calendar-alt me-2" style="color:var(--primary);"></i>Appointment Calendar</h6>
+            <div id="fullCalendar"></div>
+        </div>
+    </div>
+
+    
+    <!-- TWIG: {%%} -->
+    <div id="ai-view" class="view-section">
+        <div class="ai-section">
+            <div class="ai-section-header">
+                <h6><i class="fas fa-brain me-2" style="color:#6366f1;"></i>AI Pharmacist Suggestions</h6>
+                <span class="ai-badge"><i class="fas fa-sparkles me-1"></i>AI Powered</span>
+            </div>
+
+            <!-- TWIG: {%%} -->
+                <!-- TWIG: {%%} -->
+                    <!-- TWIG: {%%} -->
+                    <!-- TWIG: {%%} -->
+                        <!-- TWIG: {%%} -->
+                            <!-- TWIG: {%%} -->
+                        <!-- TWIG: {%%} -->
+                    <!-- TWIG: {%%} -->
+                    <div class="ai-card">
+                        <div class="ai-card-title">
+                            <i class="fas fa-notes-medical me-1"></i>
+                            Suggestions for Appointment #__TWIG_EXPR__
+                        </div>
+                        <!-- TWIG: {%%} -->
+                        <div class="ai-card-appt">
+                            <i class="fas fa-user-md me-1"></i> Dr. __TWIG_EXPR__ â€”
+                            <i class="far fa-calendar me-1"></i> __TWIG_EXPR__
+                            <!-- TWIG: {%%} -->
+                                â€” <em>"__TWIG_EXPR__<!-- TWIG: {%%} -->â€¦<!-- TWIG: {%%} -->"</em>
+                            <!-- TWIG: {%%} -->
+                        </div>
+                        <!-- TWIG: {%%} -->
+
+                        <!-- TWIG: {%%} -->
+                        <div class="ai-product">
+                            <div class="ai-product-icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <div>
+                                <div class="ai-product-name">__TWIG_EXPR__</div>
+                                <div class="ai-product-desc">__TWIG_EXPR__</div>
+                            </div>
+                            <!-- TWIG: {%%} -->
+                            <span class="ai-product-price">$__TWIG_EXPR__</span>
+                            <!-- TWIG: {%%} -->
+                            <button class="ai-product-buy" onclick="buyProduct('__TWIG_EXPR__')">
+                                <i class="fas fa-shopping-cart me-1"></i> Buy
+                            </button>
+                        </div>
+                        <!-- TWIG: {%%} -->
+                    </div>
+                <!-- TWIG: {%%} -->
+            <!-- TWIG: {%%} -->
+                <div class="ai-empty">
+                    <i class="fas fa-robot"></i>
+                    <p>No AI suggestions available yet.<br>
+                    <small>Suggestions appear when your appointments have doctor notes.</small></p>
+                </div>
+            <!-- TWIG: {%%} -->
+        </div>
+    </div>
+    <!-- TWIG: {%%} -->
+</div>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // â”€â”€â”€ Tab Switching â”€â”€â”€
+    document.querySelectorAll('.view-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(this.dataset.target).classList.add('active');
+
+            // Initialize calendar when shown (FullCalendar needs visible container)
+            if (this.dataset.target === 'calendar-view' && !window._calendarInitialized) {
+                initCalendar();
+                window._calendarInitialized = true;
+            }
+        });
+    });
+
+    // â”€â”€â”€ FullCalendar â”€â”€â”€
+    function initCalendar() {
+        var calendarEl = document.getElementById('fullCalendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            height: 'auto',
+            navLinks: true,
+            editable: false,
+            selectable: false,
+            eventClick: function(info) {
+                window.location.href = '/appointment/' + info.event.id;
+            },
+            events: function(fetchInfo, successCallback, failureCallback) {
+                fetch('__TWIG_EXPR__')
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) { successCallback(data); })
+                    .catch(function(error) {
+                        console.error('Error loading events:', error);
+                        failureCallback(error);
+                    });
+            }
+        });
+        calendar.render();
+    }
+});
+
+// â”€â”€â”€ Buy Product (Stripe checkout) â”€â”€â”€
+function buyProduct(productName) {
+    if (!confirm('Purchase ' + productName + '?')) return;
+
+    fetch('__TWIG_EXPR__', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productName: productName })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.checkoutUrl) {
+            window.location.href = data.checkoutUrl;
+        } else {
+            alert(data.error || 'Could not start checkout.');
+        }
+    })
+    .catch(function(e) {
+        alert('Error: ' + e.message);
+    });
+}
+</script>
+<!-- TWIG: {%%} -->
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ProductListController" alignment="TOP_CENTER" maxWidth="1160" spacing="20" styleClass="content-area">
+    <padding>
+        <Insets top="0" right="40" bottom="20" left="0"/>
+    </padding>
+
+    <!-- Header -->
+    <VBox styleClass="hero-banner">
+        <Label text="Parapharmacy Store" styleClass="hero-title" />
+        <Label text="Premium wellness and health products delivered to your doorstep." styleClass="hero-subtitle" />
+    </VBox>
+
+    <!-- Search / Filter -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Search products..." prefWidth="300" styleClass="text-field" />
+        <ComboBox fx:id="categoryFilter" promptText="Category" prefWidth="150" styleClass="combo-box" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="manageProductsBtn" text="Manage Products" onAction="#handleManageProducts" styleClass="button, secondary" visible="false" managed="false" />
+    </HBox>
+
+    <!-- Product Grid -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-control-inner-background: transparent;" VBox.vgrow="ALWAYS">
+        <FlowPane fx:id="productsContainer" hgap="20" vgap="20" styleClass="card-grid">
+            <!-- Product cards will be injected here -->
+        </FlowPane>
+    </ScrollPane>
+</VBox>

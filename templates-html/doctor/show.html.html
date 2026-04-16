@@ -1,0 +1,59 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->Doctor Details - PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="mb-4">Doctor Details</h2>
+                
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID:</strong></label>
+                    <p>__TWIG_EXPR__</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Email:</strong></label>
+                    <p>__TWIG_EXPR__</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Full Name:</strong></label>
+                    <p>__TWIG_EXPR__</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Speciality:</strong></label>
+                    <p>__TWIG_EXPR__</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-4">
+                    <a href="__TWIG_EXPR__" class="btn btn-warning">Edit Profile</a>
+                    
+                    <!-- TWIG: {%%} -->
+                        <button type="button" class="btn btn-outline-warning"
+                                onclick="postAction('__TWIG_EXPR__', 'Deactivate this doctor?', '__TWIG_EXPR__')">
+                            <i class="fas fa-ban me-1"></i> Deactivate
+                        </button>
+                    <!-- TWIG: {%%} -->
+                        <button type="button" class="btn btn-outline-success"
+                                onclick="postAction('__TWIG_EXPR__', 'Activate this doctor?', '__TWIG_EXPR__')">
+                            <i class="fas fa-check me-1"></i> Activate
+                        </button>
+                    <!-- TWIG: {%%} -->
+                    
+                    <button type="button" class="btn btn-outline-danger"
+                            onclick="postAction('__TWIG_EXPR__', 'Permanently delete this doctor? This cannot be undone.', '__TWIG_EXPR__')">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </button>
+                    
+                    <a href="__TWIG_EXPR__" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- TWIG: {%%} -->
+

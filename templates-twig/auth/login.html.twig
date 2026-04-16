@@ -1,0 +1,1060 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Sign In — PinkShield{% endblock %}
+
+{% block stylesheets %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap');
+
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #050d1a;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+.navbar { display: none !important; }
+aside.sidebar, .sidebar-toggle-btn { display: none !important; }
+footer, .site-footer { display: none !important; }
+main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+.container-desktop { max-width: 100% !important; padding: 0 !important; }
+
+/* ── Animated starfield background ── */
+#starfield {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 20% 50%, #0a1628 0%, #050d1a 60%, #000 100%);
+}
+
+.particle {
+    position: absolute; border-radius: 50%;
+    animation: floatParticle linear infinite;
+    opacity: 0;
+}
+
+@keyframes floatParticle {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}
+
+/* ── Grid lines overlay ── */
+.grid-overlay {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+        linear-gradient(rgba(192,57,107,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(192,57,107,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridPulse 4s ease-in-out infinite;
+}
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+}
+
+/* ── Main layout ── */
+.login-page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+}
+
+.login-layout {
+    display: grid;
+    grid-template-columns: 1fr 480px;
+    gap: 60px;
+    max-width: 1200px;
+    width: 100%;
+    align-items: center;
+}
+
+/* ── Hero / SVG side ── */
+.hero-side {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+}
+
+.brand-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff4b8d, #c0396b, #ff6ba8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(192,57,107,0.6)); }
+    50%       { filter: drop-shadow(0 0 28px rgba(255,75,141,0.9)); }
+}
+
+.brand-tagline {
+    font-size: 1rem; color: #7ca3c8; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 40px;
+    animation: fadeSlideUp 1s ease 0.3s both;
+}
+
+/* ── Animated Heart SVG Container ── */
+.heart-container {
+    position: relative;
+    width: 420px; height: 420px;
+    animation: floatHeart 6s ease-in-out infinite;
+}
+@keyframes floatHeart {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    25%       { transform: translateY(-18px) rotate(1deg); }
+    75%       { transform: translateY(10px) rotate(-3deg); }
+}
+
+/* Orbiting rings */
+.orbit-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(192,57,107,0.25);
+    top: 50%; left: 50%;
+    transform-origin: center center;
+}
+.orbit-ring-1 { width: 380px; height: 380px; margin: -190px 0 0 -190px; animation: orbitSpin 12s linear infinite; }
+.orbit-ring-2 { width: 460px; height: 460px; margin: -230px 0 0 -230px; animation: orbitSpin 20s linear infinite reverse; border-color: rgba(100,200,255,0.15); border-style: dashed; }
+.orbit-ring-3 { width: 320px; height: 320px; margin: -160px 0 0 -160px; animation: orbitSpin 8s linear infinite; border-color: rgba(192,57,107,0.15); }
+
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
+
+/* Orbiting dots */
+.orbit-dot {
+    position: absolute; border-radius: 50%;
+    top: 50%; left: 50%;
+    transform-origin: 0 0;
+}
+.orbit-dot::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #c0396b;
+    box-shadow: 0 0 14px #ff4b8d;
+    top: -5px; left: -5px;
+}
+.orbit-dot-1 { animation: dotOrbit1 5s linear infinite; }
+.orbit-dot-2 { animation: dotOrbit2 8s linear infinite; }
+.orbit-dot-2::after { background: #64c8ff; box-shadow: 0 0 14px #64c8ff; width: 7px; height: 7px; }
+
+@keyframes dotOrbit1 {
+    from { transform: rotate(0deg) translateX(190px); }
+    to   { transform: rotate(360deg) translateX(190px); }
+}
+@keyframes dotOrbit2 {
+    from { transform: rotate(90deg) translateX(230px); }
+    to   { transform: rotate(450deg) translateX(230px); }
+}
+
+/* ── The actual SVG heart ── */
+.heart-svg-wrap {
+    position: absolute;
+    inset: 0; display: flex; align-items: center; justify-content: center;
+}
+#heartSvg {
+    width: 280px; height: 280px;
+    filter: drop-shadow(0 0 30px rgba(192,57,107,0.7)) drop-shadow(0 0 60px rgba(255,75,141,0.4));
+}
+
+/* Heart beat animation */
+.heart-main {
+    animation: heartBeat 1.2s ease-in-out infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes heartBeat {
+    0%   { transform: scale(1); }
+    14%  { transform: scale(1.08); }
+    28%  { transform: scale(1); }
+    42%  { transform: scale(1.05); }
+    70%  { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+/* Vein pulse */
+.vein-path {
+    stroke-dashoffset: 0;
+    animation: veinFlow 2s ease-in-out infinite;
+}
+@keyframes veinFlow {
+    0%   { opacity: 0.4; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+/* EKG line */
+.ekg-container {
+    position: absolute;
+    bottom: -20px; left: 50%; transform: translateX(-50%);
+    width: 340px;
+}
+.ekg-svg { width: 100%; height: 60px; }
+.ekg-path {
+    stroke-dasharray: 800;
+    stroke-dashoffset: 800;
+    animation: ekgDraw 2s ease-in-out infinite;
+}
+@keyframes ekgDraw {
+    0%   { stroke-dashoffset: 800; opacity: 0; }
+    10%  { opacity: 1; }
+    60%  { stroke-dashoffset: 0; }
+    90%  { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Floating health pills */
+.floating-pills {
+    position: absolute; inset: 0; pointer-events: none;
+}
+.pill {
+    position: absolute;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(192,57,107,0.3);
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #c0396b;
+    display: flex; align-items: center; gap: 6px;
+    backdrop-filter: blur(8px);
+    animation: pillFloat linear infinite;
+    white-space: nowrap;
+}
+.pill i { font-size: 0.8rem; }
+
+.pill-1 { top: 10%; left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
+.pill-2 { top: 20%; right: 0%; animation-duration: 9s;  animation-delay: 1s; }
+.pill-3 { top: 70%; left: 0%;  animation-duration: 8s;  animation-delay: 2s; }
+.pill-4 { top: 80%; right: 5%; animation-duration: 10s; animation-delay: 0.5s; }
+.pill-5 { top: 50%; left: -2%; animation-duration: 6s;  animation-delay: 3s; }
+
+@keyframes pillFloat {
+    0%   { transform: translateY(0) rotate(-2deg); }
+    33%  { transform: translateY(-12px) rotate(2deg); }
+    66%  { transform: translateY(6px) rotate(-1deg); }
+    100% { transform: translateY(0) rotate(-2deg); }
+}
+
+/* ── Form side ── */
+.form-side {
+    position: relative;
+    animation: fadeSlideUp 0.8s ease 0.2s both;
+}
+
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.glass-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(192,57,107,0.2);
+    border-radius: 28px;
+    padding: 48px 44px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+        0 0 0 1px rgba(192,57,107,0.1),
+        0 30px 80px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative; overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 0 0 1px rgba(192,57,107,0.25),
+        0 40px 100px rgba(0,0,0,0.6),
+        0 0 60px rgba(192,57,107,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Glow corners */
+.glass-card::before {
+    content: '';
+    position: absolute; top: -1px; left: -1px; right: -1px; height: 1px;
+    background: linear-gradient(90deg, transparent, #c0396b, transparent);
+    animation: borderGlow 3s ease-in-out infinite;
+}
+@keyframes borderGlow {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+}
+
+.card-header-row {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 8px;
+}
+.card-icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: linear-gradient(135deg, #c0396b, #9b2553);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #fff;
+    box-shadow: 0 8px 20px rgba(192,57,107,0.4);
+    animation: iconPulse 2s ease-in-out infinite;
+}
+@keyframes iconPulse {
+    0%, 100% { box-shadow: 0 8px 20px rgba(192,57,107,0.4); }
+    50%       { box-shadow: 0 8px 32px rgba(192,57,107,0.7); }
+}
+
+.card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    background: linear-gradient(135deg, #fff, #f3a0c0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.card-subtitle {
+    color: #526a82; font-size: 0.85rem;
+    margin-bottom: 34px; letter-spacing: 0.3px;
+}
+
+/* Status line */
+.status-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px; padding: 10px 14px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+}
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: statusBlink 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+.status-text { font-size: 0.78rem; color: #10b981; font-weight: 500; }
+
+/* ── Alert ── */
+.alert-danger-custom {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(220,53,69,0.08);
+    border: 1px solid rgba(220,53,69,0.3);
+    border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 24px; color: #ff6b6b; font-size: 0.85rem;
+}
+.alert-dismiss {
+    margin-left: auto; background: none; border: none;
+    color: #ff6b6b; cursor: pointer; font-size: 1rem; opacity: 0.7;
+}
+.alert-dismiss:hover { opacity: 1; }
+
+/* ── Form fields ── */
+.field-group { margin-bottom: 18px; position: relative; }
+
+.field-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 600;
+    color: #7ca3c8; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+.field-label i { color: #c0396b; font-size: 0.75rem; }
+
+.field-input-wrap { position: relative; }
+
+.field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 48px 14px 18px;
+    font-size: 0.92rem; color: #fff;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+}
+.field-input::placeholder { color: rgba(255,255,255,0.2); }
+.field-input:hover { border-color: rgba(192,57,107,0.3); background: rgba(255,255,255,0.04); }
+.field-input:focus {
+    border-color: #c0396b;
+    background: rgba(192,57,107,0.05);
+    box-shadow: 0 0 0 3px rgba(192,57,107,0.12), 0 0 20px rgba(192,57,107,0.08);
+}
+.field-input.is-invalid { border-color: #ff4444; }
+
+.field-icon {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    color: rgba(255,255,255,0.2); font-size: 0.9rem; pointer-events: none;
+    transition: color 0.3s ease;
+}
+.field-input:focus ~ .field-icon { color: #c0396b; }
+
+.toggle-pw {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(255,255,255,0.2);
+    cursor: pointer; font-size: 0.9rem; padding: 0;
+    transition: color 0.3s ease;
+}
+.toggle-pw:hover { color: #c0396b; }
+
+/* Captcha wrapper */
+.captcha-wrap {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; justify-content: center;
+}
+
+/* ── Actions row ── */
+.actions-row {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin: 4px 0 24px;
+}
+.forgot-link {
+    font-size: 0.82rem; color: #c0396b; font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.forgot-link:hover { color: #ff6ba8; text-shadow: 0 0 12px rgba(255,107,168,0.5); }
+
+/* ── Submit button ── */
+.btn-signin {
+    width: 100%;
+    background: linear-gradient(135deg, #c0396b 0%, #9b2553 60%, #c0396b 100%);
+    background-size: 200% 100%;
+    border: none; border-radius: 14px;
+    color: #fff; font-size: 1rem; font-weight: 700;
+    padding: 16px 24px;
+    cursor: pointer; letter-spacing: 0.5px;
+    font-family: 'Inter', sans-serif;
+    position: relative; overflow: hidden;
+    transition: all 0.35s ease;
+    box-shadow: 0 8px 28px rgba(192,57,107,0.4);
+}
+.btn-signin:hover {
+    background-position: right center;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(192,57,107,0.55);
+}
+.btn-signin:active { transform: translateY(0); }
+
+/* Shimmer on button */
+.btn-signin::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+    background-size: 200% 100%;
+    animation: btnShimmer 2.5s ease infinite;
+}
+@keyframes btnShimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ── OR divider ── */
+.or-divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 24px 0 20px;
+    color: rgba(255,255,255,0.2); font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+.or-divider::before, .or-divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,57,107,0.2), transparent);
+}
+
+/* ── Face login section ── */
+.face-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(192,57,107,0.15);
+    border-radius: 18px; padding: 20px;
+    position: relative; overflow: hidden;
+}
+.face-section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,57,107,0.5), transparent);
+}
+.face-header {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.88rem; font-weight: 700; color: #c0396b;
+    margin-bottom: 16px;
+}
+.face-badge {
+    margin-left: auto;
+    background: rgba(192,57,107,0.15);
+    border: 1px solid rgba(192,57,107,0.3);
+    color: #ff6ba8; font-size: 0.62rem; font-weight: 800;
+    padding: 3px 10px; border-radius: 30px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.face-preview-row { display: flex; gap: 14px; }
+
+.webcam-box {
+    flex: 1; border-radius: 12px; overflow: hidden;
+    background: #000; aspect-ratio: 4/3;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+}
+#loginWebcamVideo, #loginCapturedCanvas {
+    width: 100%; display: block; object-fit: cover;
+}
+#loginCapturedCanvas { display: none; }
+
+.face-controls { display: flex; flex-direction: column; gap: 8px; width: 130px; flex-shrink: 0; }
+
+.btn-face {
+    padding: 9px 12px; border-radius: 10px; border: none;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s ease; width: 100%; font-family: 'Inter', sans-serif;
+}
+.btn-face-open    { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+.btn-face-open:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+.btn-face-capture { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.btn-face-capture:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-face-capture:not(:disabled):hover { background: rgba(34,197,94,0.25); transform: translateY(-1px); }
+.btn-face-retake  { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.btn-face-retake:hover { background: rgba(245,158,11,0.25); }
+.btn-face-upload  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
+.btn-face-upload:hover { border-color: rgba(192,57,107,0.4); color: #c0396b; }
+
+.face-feedback {
+    margin-top: 12px; font-size: 0.8rem; font-weight: 600;
+    padding: 10px 14px; border-radius: 10px; display: none;
+    animation: fadeSlideUp 0.3s ease;
+}
+.face-feedback.captured { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.face-feedback.scanning { display: flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.1); color: #60a5fa; border: 1px solid rgba(37,99,235,0.2); }
+.face-feedback.error    { display: flex; align-items: center; gap: 8px; background: rgba(220,53,69,0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.2); }
+.face-feedback.success  { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+
+.btn-face-login {
+    width: 100%; margin-top: 14px; padding: 13px;
+    background: linear-gradient(135deg, rgba(192,57,107,0.2), rgba(155,37,83,0.2));
+    color: #ff6ba8; border: 1px solid rgba(192,57,107,0.3); border-radius: 12px;
+    font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+}
+.btn-face-login:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(192,57,107,0.35), rgba(155,37,83,0.35));
+    box-shadow: 0 8px 24px rgba(192,57,107,0.3);
+    transform: translateY(-2px);
+}
+.btn-face-login:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Register section ── */
+.register-row {
+    margin-top: 28px; text-align: center;
+    font-size: 0.85rem; color: rgba(255,255,255,0.3);
+}
+.register-row a {
+    color: #c0396b; font-weight: 700; text-decoration: none;
+    margin-left: 6px; transition: all 0.2s ease;
+}
+.register-row a:hover { color: #ff6ba8; text-shadow: 0 0 10px rgba(255,107,168,0.4); }
+
+/* ── AJAX error ── */
+.ajax-error { display: none; color: #ff6b6b; font-size: 0.78rem; margin-top: 5px; font-weight: 500; }
+.ajax-error.d-block { display: block !important; }
+.invalid-feedback { display: none !important; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .login-layout { grid-template-columns: 1fr; }
+    .hero-side { display: none; }
+    .glass-card { padding: 36px 28px; }
+}
+@media (max-width: 480px) {
+    .glass-card { padding: 28px 20px; border-radius: 20px; }
+    .card-title { font-size: 1.25rem; }
+    .face-preview-row { flex-direction: column; }
+    .face-controls { width: 100%; flex-direction: row; flex-wrap: wrap; }
+    .btn-face { width: calc(50% - 4px); }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<!-- Background -->
+<div id="starfield"></div>
+<div class="grid-overlay"></div>
+
+<div class="login-page">
+    <div class="login-layout">
+
+        <!-- ── LEFT: Animated Hero ── -->
+        <div class="hero-side" data-aos="fade-right">
+            <div class="brand-title">PinkShield</div>
+            <p class="brand-tagline">Advanced Health Intelligence</p>
+
+            <div class="heart-container">
+                <!-- Orbit rings -->
+                <div class="orbit-ring orbit-ring-1"></div>
+                <div class="orbit-ring orbit-ring-2"></div>
+                <div class="orbit-ring orbit-ring-3"></div>
+
+                <!-- Orbiting energy dots -->
+                <div class="orbit-dot orbit-dot-1"></div>
+                <div class="orbit-dot orbit-dot-2"></div>
+
+                <!-- Heart SVG -->
+                <div class="heart-svg-wrap">
+                    <svg id="heartSvg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="heartGrad" cx="40%" cy="35%" r="65%">
+                                <stop offset="0%"   stop-color="#ff6ba8"/>
+                                <stop offset="45%"  stop-color="#c0396b"/>
+                                <stop offset="100%" stop-color="#7b1137"/>
+                            </radialGradient>
+                            <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%"   stop-color="#ff4b8d" stop-opacity="0.6"/>
+                                <stop offset="100%" stop-color="#c0396b" stop-opacity="0"/>
+                            </radialGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="softGlow">
+                                <feGaussianBlur stdDeviation="6" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Glow halo -->
+                        <ellipse cx="100" cy="105" rx="70" ry="60" fill="url(#heartGlow)" opacity="0.5"/>
+
+                        <!-- Main heart shape -->
+                        <g class="heart-main" filter="url(#glow)">
+                            <path d="M100 160
+                                     C100 160 35 115 35 72
+                                     C35 50 50 38 65 38
+                                     C78 38 90 47 100 60
+                                     C110 47 122 38 135 38
+                                     C150 38 165 50 165 72
+                                     C165 115 100 160 100 160Z"
+                                  fill="url(#heartGrad)" />
+
+                            <!-- Highlight -->
+                            <path d="M68 50 C62 60 60 72 64 82 C67 68 74 58 84 52 C78 50 73 50 68 50Z"
+                                  fill="rgba(255,255,255,0.18)" />
+                        </g>
+
+                        <!-- Veins / arteries on left -->
+                        <g filter="url(#glow)">
+                            <!-- Aorta up -->
+                            <path class="vein-path" d="M100 38 C100 38 102 20 108 12 C114 4 118 2 122 6"
+                                  stroke="#ff6ba8" stroke-width="3.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0s"/>
+                            <!-- Left branch from aorta -->
+                            <path class="vein-path" d="M106 22 C100 18 90 16 82 18 C74 20 68 26 66 34"
+                                  stroke="#ff4b8d" stroke-width="2.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.2s"/>
+                            <!-- Right branch -->
+                            <path class="vein-path" d="M110 16 C116 14 124 14 130 18 C136 22 138 28 136 36"
+                                  stroke="#ff4b8d" stroke-width="2.5" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.3s"/>
+                            <!-- Pulmonary left -->
+                            <path class="vein-path" d="M60 55 C48 50 38 46 28 48 C18 50 12 56 14 64 C16 70 24 72 32 70"
+                                  stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.4s"/>
+                            <!-- Pulmonary right -->
+                            <path class="vein-path" d="M140 55 C152 50 162 46 172 48 C182 50 188 56 186 64 C184 70 176 72 168 70"
+                                  stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.5s"/>
+                            <!-- Bottom vena cava -->
+                            <path class="vein-path" d="M95 158 C90 168 88 178 90 186 C92 192 96 196 100 196"
+                                  stroke="#60a5fa" stroke-width="3" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.1s"/>
+                            <!-- Left side vessel -->
+                            <path class="vein-path" d="M44 100 C30 105 18 112 12 122 C8 130 10 138 18 142"
+                                  stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.6s"/>
+                            <!-- Right side vessel -->
+                            <path class="vein-path" d="M156 100 C170 105 182 112 188 122 C192 130 190 138 182 142"
+                                  stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"
+                                  style="animation-delay:0.7s"/>
+
+                            <!-- Blood flow particles on aorta -->
+                            <circle r="3" fill="#ff6ba8" opacity="0.9">
+                                <animateMotion dur="1.5s" repeatCount="indefinite"
+                                    path="M100 38 C100 38 102 20 108 12 C114 4 118 2 122 6"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle r="2.5" fill="#60a5fa" opacity="0.9">
+                                <animateMotion dur="2s" repeatCount="indefinite"
+                                    path="M95 158 C90 168 88 178 90 186 C92 192 96 196 100 196"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle r="2" fill="#c084fc" opacity="0.9">
+                                <animateMotion dur="2.5s" repeatCount="indefinite"
+                                    path="M60 55 C48 50 38 46 28 48 C18 50 12 56 14 64 C16 70 24 72 32 70"/>
+                                <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite"/>
+                            </circle>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- EKG / heartbeat line below heart -->
+                <div class="ekg-container">
+                    <svg class="ekg-svg" viewBox="0 0 340 60" xmlns="http://www.w3.org/2000/svg">
+                        <path class="ekg-path"
+                              d="M0 30 L60 30 L70 30 L82 5 L90 55 L98 15 L106 30 L200 30 L210 30 L222 5 L230 55 L238 15 L246 30 L340 30"
+                              stroke="#c0396b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Glow duplicate -->
+                        <path d="M0 30 L60 30 L70 30 L82 5 L90 55 L98 15 L106 30 L200 30 L210 30 L222 5 L230 55 L238 15 L246 30 L340 30"
+                              stroke="#ff4b8d" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.2"/>
+                    </svg>
+                </div>
+
+                <!-- Floating health pills -->
+                <div class="floating-pills">
+                    <div class="pill pill-1"><i class="fas fa-heartbeat"></i> 72 BPM</div>
+                    <div class="pill pill-2"><i class="fas fa-tint"></i> O₂ 98%</div>
+                    <div class="pill pill-3"><i class="fas fa-thermometer-half"></i> 36.8°C</div>
+                    <div class="pill pill-4"><i class="fas fa-brain"></i>  AI Active</div>
+                    <div class="pill pill-5"><i class="fas fa-shield-alt"></i> Protected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIGHT: Login Form ── -->
+        <div class="form-side">
+            <div class="glass-card">
+
+                <div class="card-header-row">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <div class="card-title">Secure Access</div>
+                    </div>
+                </div>
+                <p class="card-subtitle">Sign in to your health intelligence dashboard</p>
+
+                <div class="status-bar">
+                    <div class="status-dot"></div>
+                    <span class="status-text">All systems operational &nbsp;·&nbsp; End-to-end encrypted</span>
+                </div>
+
+                {% if error %}
+                <div class="alert-danger-custom">
+                    <i class="fas fa-exclamation-circle" style="flex-shrink:0; margin-top:2px;"></i>
+                    <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                    <button class="alert-dismiss" onclick="this.parentElement.remove()">✕</button>
+                </div>
+                {% endif %}
+
+                <form method="post" name="login" novalidate id="loginForm">
+
+                    <div class="field-group">
+                        <label class="field-label" for="inputUsername">
+                            <i class="fas fa-at"></i> Email Address
+                        </label>
+                        <div class="field-input-wrap">
+                            <input type="email" name="_username" id="inputUsername"
+                                   class="field-input"
+                                   value="{{ last_username }}"
+                                   placeholder="your@email.com"
+                                   autocomplete="email"
+                                   data-ajax-validate="email" required>
+                            <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label" for="inputPassword">
+                            <i class="fas fa-key"></i> Password
+                        </label>
+                        <div class="field-input-wrap">
+                            <input type="password" name="_password" id="inputPassword"
+                                   class="field-input"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password" required>
+                            <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">
+                                <i class="fas fa-eye" id="togglePwIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="captcha-wrap">
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                        </div>
+                        {% if captcha_error %}
+                        <small style="color:#ff6b6b; font-size:0.78rem; display:block; margin-top:6px;">
+                            <i class="fas fa-exclamation-circle"></i> {{ captcha_error }}
+                        </small>
+                        {% endif %}
+                    </div>
+
+                    <div class="actions-row">
+                        <a href="{{ path('forgot_password') }}" class="forgot-link">
+                            <i class="fas fa-unlock-alt" style="font-size:0.75rem; margin-right:4px;"></i>Forgot password?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn-signin" id="signinBtn">
+                        <i class="fas fa-shield-alt" style="margin-right:8px;"></i>
+                        Authenticate &amp; Enter
+                    </button>
+                </form>
+
+                <!-- OR divider -->
+                <div class="or-divider">or sign in with face</div>
+
+                <!-- Face Recognition -->
+                <div class="face-section">
+                    <div class="face-header">
+                        <i class="fas fa-camera"></i>
+                        Face Recognition
+                        <span class="face-badge">BIOMETRIC</span>
+                    </div>
+                    <div class="face-preview-row">
+                        <div class="webcam-box">
+                            <video id="loginWebcamVideo" autoplay playsinline muted></video>
+                            <canvas id="loginCapturedCanvas"></canvas>
+                        </div>
+                        <div class="face-controls">
+                            <button type="button" class="btn-face btn-face-open" id="loginBtnOpen">
+                                <i class="fas fa-video"></i> Open
+                            </button>
+                            <button type="button" class="btn-face btn-face-capture" id="loginBtnCapture" disabled>
+                                <i class="fas fa-circle"></i> Capture
+                            </button>
+                            <button type="button" class="btn-face btn-face-retake" id="loginBtnRetake" style="display:none">
+                                <i class="fas fa-redo"></i> Retake
+                            </button>
+                            <label class="btn-face btn-face-upload">
+                                <i class="fas fa-upload"></i> Upload
+                                <input type="file" id="loginFaceFileInput" accept="image/*" style="display:none">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="face-feedback" id="loginFaceFeedback">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="loginFaceMsg">Photo captured</span>
+                    </div>
+                    <button type="button" class="btn-face-login" id="btnFaceLogin" disabled>
+                        <i class="fas fa-user-check"></i> Sign In with Face
+                    </button>
+                </div>
+
+                <div class="register-row">
+                    Don't have an account?
+                    <a href="{{ path('register') }}">
+                        <i class="fas fa-user-plus" style="font-size:0.75rem;"></i> Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Starfield particles ──────────────────────────────────────────
+    const sf = document.getElementById('starfield');
+    for (let i = 0; i < 50; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%;
+            background:${Math.random()>0.7 ? '#c0396b' : Math.random()>0.5 ? '#60a5fa' : '#fff'};
+            animation-duration:${Math.random()*15+8}s;
+            animation-delay:${Math.random()*10}s;
+            box-shadow:0 0 ${size*3}px currentColor;
+        `;
+        sf.appendChild(p);
+    }
+
+    // ── Password toggle ──────────────────────────────────────────────
+    const togglePw   = document.getElementById('togglePw');
+    const pwInput    = document.getElementById('inputPassword');
+    const toggleIcon = document.getElementById('togglePwIcon');
+    if (togglePw) {
+        togglePw.addEventListener('click', () => {
+            const isPass = pwInput.type === 'password';
+            pwInput.type = isPass ? 'text' : 'password';
+            toggleIcon.className = isPass ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+    }
+
+    // ── Standard AJAX validation ─────────────────────────────────────
+    const form = document.getElementById('loginForm');
+    if (form && typeof AjaxValidator !== 'undefined') {
+        AjaxValidator.attachBlur(form);
+        AjaxValidator.attachSubmit(form, null, function () {
+            form.removeEventListener('submit', null);
+            form.submit();
+        });
+    }
+
+    // ── 3D tilt on glass card ────────────────────────────────────────
+    const card = document.querySelector('.glass-card');
+    if (card) {
+        card.addEventListener('mousemove', (e) => {
+            const r  = card.getBoundingClientRect();
+            const x  = (e.clientX - r.left) / r.width  - 0.5;
+            const y  = (e.clientY - r.top)  / r.height - 0.5;
+            card.style.transform = `perspective(800px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateY(-4px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    }
+
+    // ── Face Recognition ─────────────────────────────────────────────
+    const video        = document.getElementById('loginWebcamVideo');
+    const canvas       = document.getElementById('loginCapturedCanvas');
+    const btnOpen      = document.getElementById('loginBtnOpen');
+    const btnCapture   = document.getElementById('loginBtnCapture');
+    const btnRetake    = document.getElementById('loginBtnRetake');
+    const fileInput    = document.getElementById('loginFaceFileInput');
+    const btnFaceLogin = document.getElementById('btnFaceLogin');
+    const feedback     = document.getElementById('loginFaceFeedback');
+    const feedbackMsg  = document.getElementById('loginFaceMsg');
+    const emailInput   = document.getElementById('inputUsername');
+
+    let stream = null, capturedBlob = null;
+
+    function setFeedback(type, msg, icon='') {
+        feedback.className = 'face-feedback ' + type;
+        feedbackMsg.textContent = msg;
+        if (icon) feedback.querySelector('i').className = icon;
+    }
+    function stopStream() {
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    }
+    function showCanvas() {
+        video.style.display='none'; canvas.style.display='block';
+        btnCapture.style.display='none'; btnRetake.style.display='inline-flex'; btnOpen.style.display='none';
+        stopStream();
+    }
+    function showVideo() {
+        video.style.display='block'; canvas.style.display='none';
+        btnCapture.style.display='inline-flex'; btnRetake.style.display='none';
+    }
+
+    btnOpen.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            btnCapture.disabled = false;
+            btnOpen.innerHTML = '<i class="fas fa-video"></i> On';
+            btnOpen.style.opacity = '0.5';
+        } catch (err) {
+            alert('Camera denied: ' + err.message + '\n\nUse Upload Photo instead.');
+        }
+    });
+
+    btnCapture.addEventListener('click', () => {
+        canvas.width = video.videoWidth || 320;
+        canvas.height = video.videoHeight || 240;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        showCanvas();
+        canvas.toBlob(b => {
+            capturedBlob = b;
+            btnFaceLogin.disabled = false;
+            setFeedback('captured', 'Photo captured — ready to sign in', 'fas fa-check-circle');
+        }, 'image/jpeg', 0.92);
+    });
+
+    btnRetake.addEventListener('click', async () => {
+        capturedBlob = null;
+        btnFaceLogin.disabled = true;
+        feedback.className = 'face-feedback';
+        showVideo();
+        btnCapture.disabled = true;
+        btnOpen.innerHTML = '<i class="fas fa-video"></i> Open';
+        btnOpen.style.opacity = '';
+        btnOpen.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (!fileInput.files.length) return;
+        capturedBlob = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                showCanvas();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(capturedBlob);
+        btnFaceLogin.disabled = false;
+        setFeedback('captured', 'Photo loaded — ready to sign in', 'fas fa-check-circle');
+    });
+
+    btnFaceLogin.addEventListener('click', async () => {
+        const email = emailInput ? emailInput.value.trim() : '';
+        if (!email) {
+            setFeedback('error', 'Enter your email address above first.', 'fas fa-exclamation-circle');
+            emailInput && emailInput.focus(); return;
+        }
+        if (!capturedBlob) {
+            setFeedback('error', 'Capture or upload a photo first.', 'fas fa-exclamation-circle'); return;
+        }
+        setFeedback('scanning', 'Scanning face, please wait…', 'fas fa-spinner fa-spin');
+        btnFaceLogin.disabled = true;
+
+        const fd = new FormData();
+        fd.append('email', email);
+        fd.append('face_photo', capturedBlob instanceof File
+            ? capturedBlob
+            : new File([capturedBlob], 'face_login.jpg', { type: 'image/jpeg' }));
+
+        try {
+            const res  = await fetch('/face-login', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.success) {
+                setFeedback('success', 'Face verified! Redirecting…', 'fas fa-check-circle');
+                setTimeout(() => { window.location.href = data.redirect || '/'; }, 800);
+            } else {
+                setFeedback('error', data.message || 'Face not recognized.', 'fas fa-times-circle');
+                btnFaceLogin.disabled = false;
+            }
+        } catch (err) {
+            setFeedback('error', 'Network error. Please try again.', 'fas fa-times-circle');
+            btnFaceLogin.disabled = false;
+        }
+    });
+
+    // ── Scroll reveal ────────────────────────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.style.opacity = '1';
+                e.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.field-group, .btn-signin, .or-divider, .face-section, .register-row').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

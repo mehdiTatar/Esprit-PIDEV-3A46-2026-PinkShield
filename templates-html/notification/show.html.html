@@ -1,0 +1,324 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->__TWIG_EXPR__ - PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    /* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .notif-show-wrap { max-width: 740px; margin: 0 auto; }
+
+    .breadcrumb-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 22px;
+        font-size: 0.88rem;
+    }
+
+    .breadcrumb-bar a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb-bar a:hover { color: var(--primary-dark); text-decoration: underline; }
+    .breadcrumb-bar .sep { color: #d1d5db; }
+    .breadcrumb-bar .current { color: #6b7280; font-weight: 500; }
+
+    /* â”€â”€ Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .detail-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        animation: fadeUp 0.35s ease;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* â”€â”€ Card Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .detail-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 28px 32px 24px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .detail-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .detail-icon.info    { background: #dbeafe; color: #2563eb; }
+    .detail-icon.success { background: #dcfce7; color: #16a34a; }
+    .detail-icon.warning { background: #fef3c7; color: #d97706; }
+    .detail-icon.danger  { background: #fee2e2; color: #dc2626; }
+
+    .detail-info { flex: 1; }
+
+    .detail-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+    }
+
+    .detail-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .badge-pill.info    { background: #dbeafe; color: #1e40af; }
+    .badge-pill.success { background: #dcfce7; color: #15803d; }
+    .badge-pill.warning { background: #fef3c7; color: #92400e; }
+    .badge-pill.danger  { background: #fee2e2; color: #991b1b; }
+
+    .badge-pill.is-read   { background: #dcfce7; color: #16a34a; }
+    .badge-pill.is-unread { background: #fee2e2; color: #dc2626; }
+
+    .detail-time {
+        font-size: 0.82rem;
+        color: #9ca3af;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* â”€â”€ Card Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .detail-body {
+        padding: 28px 32px;
+    }
+
+    .detail-message {
+        font-size: 1rem;
+        line-height: 1.9;
+        color: #374151;
+        padding: 22px 26px;
+        background: #f9fafb;
+        border-radius: 12px;
+        border: 1px solid #f3f4f6;
+    }
+
+    /* â”€â”€ Card Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .detail-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 32px;
+        background: #fafbfc;
+        border-top: 1px solid #f3f4f6;
+        flex-wrap: wrap;
+    }
+
+    .detail-footer .btn {
+        padding: 9px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.2s;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-back {
+        background: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+    }
+
+    .btn-back:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+
+    .btn-mark {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .btn-mark:hover { background: var(--primary-dark); }
+
+    .btn-mark.done {
+        background: #dcfce7;
+        color: #16a34a;
+        cursor: default;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .btn-delete:hover { background: #fecaca; color: #991b1b; }
+
+    .footer-left, .footer-right { display: flex; gap: 8px; }
+
+    /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    @media (max-width: 768px) {
+        .detail-header { flex-direction: column; align-items: center; text-align: center; padding: 22px 20px 18px; }
+        .detail-badges { justify-content: center; }
+        .detail-body { padding: 20px; }
+        .detail-title { font-size: 1.15rem; }
+        .detail-footer { flex-direction: column; padding: 16px 20px; }
+        .footer-left, .footer-right { width: 100%; }
+        .detail-footer .btn { flex: 1; justify-content: center; }
+    }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<div class="notif-show-wrap">
+
+    
+    <div class="breadcrumb-bar">
+        <a href="__TWIG_EXPR__"><i class="fas fa-bell me-1"></i> Notifications</a>
+        <span class="sep">/</span>
+        <span class="current">__TWIG_EXPR__</span>
+    </div>
+
+    
+    <div class="detail-card">
+        <div class="detail-header">
+            <div class="detail-icon __TWIG_EXPR__">
+                <i class="__TWIG_EXPR__"></i>
+            </div>
+            <div class="detail-info">
+                <h1 class="detail-title">__TWIG_EXPR__</h1>
+                <div class="detail-badges">
+                    <span class="badge-pill __TWIG_EXPR__">__TWIG_EXPR__</span>
+                    <span class="badge-pill <!-- TWIG: {%%} -->is-read<!-- TWIG: {%%} -->is-unread<!-- TWIG: {%%} -->" id="readBadge">
+                        <!-- TWIG: {%%} -->
+                            <i class="fas fa-check-circle"></i> Read
+                        <!-- TWIG: {%%} -->
+                            <i class="fas fa-circle"></i> Unread
+                        <!-- TWIG: {%%} -->
+                    </span>
+                    <span class="detail-time">
+                        <i class="far fa-clock"></i>
+                        <time datetime="__TWIG_EXPR__" class="timeago">
+                            __TWIG_EXPR__
+                        </time>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-body">
+            <div class="detail-message">
+                __TWIG_EXPR__
+            </div>
+        </div>
+
+        <div class="detail-footer">
+            <div class="footer-left">
+                <a href="__TWIG_EXPR__" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> All Notifications
+                </a>
+            </div>
+            <div class="footer-right">
+                <!-- TWIG: {%%} -->
+                <button class="btn btn-mark" id="markBtn" onclick="markThisRead()">
+                    <i class="fas fa-check"></i> Mark as Read
+                </button>
+                <!-- TWIG: {%%} -->
+                <button class="btn btn-delete" onclick="deleteThis()">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* â”€â”€ Time Ago â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+(function() {
+    function timeAgo(date) {
+        const secs = Math.floor((Date.now() - date.getTime()) / 1000);
+        const intervals = [
+            { l: 'year',  s: 31536000 }, { l: 'month', s: 2592000 },
+            { l: 'week',  s: 604800 },   { l: 'day',   s: 86400 },
+            { l: 'hour',  s: 3600 },     { l: 'minute',s: 60 },
+        ];
+        for (const i of intervals) {
+            const c = Math.floor(secs / i.s);
+            if (c >= 1) return `${c} ${i.l}${c > 1 ? 's' : ''} ago`;
+        }
+        return 'Just now';
+    }
+    document.querySelectorAll('.timeago').forEach(el => {
+        const d = new Date(el.getAttribute('datetime'));
+        if (!isNaN(d)) el.textContent = timeAgo(d);
+    });
+})();
+
+<!-- TWIG: {%%} -->
+/* â”€â”€ Mark Read â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function markThisRead() {
+    const btn = document.getElementById('markBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+
+    fetch('__TWIG_EXPR__', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            btn.className = 'btn btn-mark done';
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Read';
+            const badge = document.getElementById('readBadge');
+            badge.className = 'badge-pill is-read';
+            badge.innerHTML = '<i class="fas fa-check-circle"></i> Read';
+        }
+    });
+}
+<!-- TWIG: {%%} -->
+
+/* â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function deleteThis() {
+    if (!confirm('Delete this notification permanently?')) return;
+
+    fetch('__TWIG_EXPR__', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) window.location.href = '__TWIG_EXPR__';
+    });
+}
+</script>
+<!-- TWIG: {%%} -->
+

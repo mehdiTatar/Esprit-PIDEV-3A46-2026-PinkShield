@@ -1,0 +1,459 @@
+﻿<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->My Health Portal Â· PinkShield<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<style>
+    /* â”€â”€â”€ Patient Portal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    :root {
+        --pat-pink:   #c0396b;
+        --pat-rose:   #ff6ba8;
+        --pat-purple: #a855f7;
+        --pat-violet: #7c3aed;
+        --pat-orange: #f97316;
+        --pat-teal:   #14b8a6;
+    }
+
+    body {
+        background: #0c0612 !important;
+        background-image:
+            radial-gradient(ellipse at 15% 0%, rgba(192,57,107,0.1) 0%, transparent 55%),
+            radial-gradient(ellipse at 85% 100%, rgba(168,85,247,0.07) 0%, transparent 50%) !important;
+    }
+
+    [data-sidebar-role='user'] .sidebar {
+        background: linear-gradient(180deg, #0c0612 0%, #120818 100%);
+        border-right-color: rgba(192,57,107,0.12);
+    }
+
+    /* â”€â”€â”€ Heartbeat watermark â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-watermark {
+        position: fixed; left: -40px; bottom: -40px;
+        font-size: 24rem; color: rgba(192,57,107,0.025);
+        pointer-events: none !important; z-index: -1;
+        transform: rotate(10deg);
+    }
+
+    /* â”€â”€â”€ Welcome Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-hero {
+        background: linear-gradient(135deg, rgba(192,57,107,0.15) 0%, rgba(168,85,247,0.1) 100%);
+        border: 1px solid rgba(192,57,107,0.2);
+        border-radius: 20px; padding: 32px 36px;
+        margin-bottom: 28px; position: relative;
+        overflow: hidden; z-index: 1;
+    }
+    .pat-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(120deg, rgba(192,57,107,0.05) 0%, transparent 70%);
+    }
+    .pat-hero::after {
+        content: 'â¤';
+        position: absolute; right: 36px; top: 50%;
+        transform: translateY(-50%);
+        font-size: 6rem; opacity: 0.07;
+        filter: drop-shadow(0 0 20px #c0396b);
+        animation: heartBeat 1.5s ease-in-out infinite;
+    }
+    @keyframes heartBeat {
+        0%, 100% { transform: translateY(-50%) scale(1); }
+        14%       { transform: translateY(-50%) scale(1.15); }
+        28%       { transform: translateY(-50%) scale(1); }
+        42%       { transform: translateY(-50%) scale(1.1); }
+        70%       { transform: translateY(-50%) scale(1); }
+    }
+    .pat-hero-tag {
+        font-size: 0.7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2px;
+        color: var(--pat-rose); margin-bottom: 6px;
+    }
+    .pat-hero-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.75rem; font-weight: 900; color: #fff;
+        line-height: 1.2; margin-bottom: 8px;
+        text-shadow: 0 0 40px rgba(192,57,107,0.3);
+    }
+    .pat-hero-title span { color: var(--pat-rose); }
+    .pat-hero-sub {
+        color: rgba(255,255,255,0.45); font-size: 0.9rem; margin-bottom: 20px;
+    }
+    .pat-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pat-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 20px; border-radius: 10px;
+        font-weight: 600; font-size: 0.84rem;
+        cursor: pointer; transition: all 0.22s;
+        text-decoration: none; border: none;
+    }
+    .pat-btn-primary {
+        background: linear-gradient(135deg, #c0396b, #e8557a);
+        color: #fff; box-shadow: 0 4px 16px rgba(192,57,107,0.4);
+    }
+    .pat-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,57,107,0.55); color: #fff; }
+    .pat-btn-ghost {
+        background: rgba(192,57,107,0.1);
+        border: 1px solid rgba(192,57,107,0.25);
+        color: var(--pat-rose);
+    }
+    .pat-btn-ghost:hover { background: rgba(192,57,107,0.2); color: #fff; }
+
+    /* â”€â”€â”€ Health Vitals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .vitals-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px; margin-bottom: 26px;
+        position: relative; z-index: 1;
+    }
+    .vital-card {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px; padding: 18px 16px;
+        text-align: center; transition: all 0.25s;
+        position: relative; overflow: hidden;
+    }
+    .vital-card::before {
+        content: ''; position: absolute;
+        bottom: 0; left: 0; right: 0; height: 2px;
+    }
+    .vital-card.pink::before   { background: linear-gradient(90deg, #c0396b, #ff6ba8); }
+    .vital-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+    .vital-card.teal::before   { background: linear-gradient(90deg, #0d9488, #14b8a6); }
+    .vital-card.orange::before { background: linear-gradient(90deg, #ea580c, #f97316); }
+    .vital-card:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.4); }
+
+    .vital-icon {
+        font-size: 1.4rem; margin-bottom: 8px;
+    }
+    .vital-card.pink   .vital-icon { color: var(--pat-rose); }
+    .vital-card.purple .vital-icon { color: var(--pat-purple); }
+    .vital-card.teal   .vital-icon { color: var(--pat-teal); }
+    .vital-card.orange .vital-icon { color: var(--pat-orange); }
+    .vital-val { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 900; color: #fff; }
+    .vital-unit { font-size: 0.68rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; }
+    .vital-status { font-size: 0.68rem; font-weight: 700; margin-top: 6px; padding: 2px 8px; border-radius: 8px; display: inline-block; }
+    .vital-status.normal { background: rgba(34,197,94,0.12); color: #4ade80; }
+    .vital-status.warn   { background: rgba(245,158,11,0.12); color: #fbbf24; }
+
+    /* â”€â”€â”€ Main Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; position: relative; z-index: 1; }
+    .pat-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; position: relative; z-index: 1; }
+
+    /* â”€â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-panel {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px; overflow: hidden;
+    }
+    .pat-panel-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px 20px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        background: rgba(192,57,107,0.04);
+    }
+    .pat-panel-title {
+        font-size: 0.84rem; font-weight: 700; color: #fff;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .pat-panel-title i { color: var(--pat-rose); }
+    .pat-panel-action {
+        font-size: 0.74rem; color: var(--pat-rose); text-decoration: none;
+        font-weight: 600; padding: 4px 10px;
+        background: rgba(192,57,107,0.1); border-radius: 6px;
+        transition: all 0.2s;
+    }
+    .pat-panel-action:hover { background: rgba(192,57,107,0.2); color: #fff; }
+    .pat-panel-body { padding: 18px 20px; }
+
+    /* â”€â”€â”€ Upcoming Appointments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .upco-item {
+        display: flex; align-items: center; gap: 14px;
+        padding: 13px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .upco-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .upco-date {
+        min-width: 46px; text-align: center;
+        background: rgba(192,57,107,0.1); border-radius: 10px; padding: 8px 6px;
+        flex-shrink: 0;
+    }
+    .upco-day { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--pat-rose); line-height: 1; }
+    .upco-month { font-size: 0.58rem; text-transform: uppercase; color: rgba(255,255,255,0.35); letter-spacing: 0.8px; margin-top: 2px; }
+    .upco-info { flex: 1; min-width: 0; }
+    .upco-doc { font-weight: 600; color: #fff; font-size: 0.84rem; }
+    .upco-spec { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+    .upco-tag {
+        font-size: 0.68rem; font-weight: 700;
+        padding: 3px 9px; border-radius: 10px;
+    }
+    .upco-tag.confirmed { background: rgba(192,57,107,0.12); color: var(--pat-rose); }
+    .upco-tag.pending   { background: rgba(245,158,11,0.12); color: #fbbf24; }
+
+    /* â”€â”€â”€ Quick Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-action {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 10px; padding: 22px 16px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 16px; text-decoration: none;
+        text-align: center; transition: all 0.25s;
+    }
+    .pat-action:hover {
+        transform: translateY(-4px);
+        border-color: rgba(192,57,107,0.3);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        background: rgba(192,57,107,0.07);
+    }
+    .pat-action-icon {
+        width: 52px; height: 52px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+    }
+    .pat-action-title { font-weight: 700; color: #fff; font-size: 0.84rem; }
+    .pat-action-desc  { font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+
+    /* â”€â”€â”€ Tracking Timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .track-item {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .track-item:last-child { border-bottom: none; }
+    .track-dot-wrap {
+        display: flex; flex-direction: column; align-items: center; gap: 0;
+        flex-shrink: 0; padding-top: 4px;
+    }
+    .track-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--pat-pink);
+        box-shadow: 0 0 10px rgba(192,57,107,0.5);
+        flex-shrink: 0;
+    }
+    .track-line { width: 1px; background: rgba(192,57,107,0.15); flex: 1; min-height: 20px; }
+    .track-label { font-weight: 600; color: rgba(255,255,255,0.8); font-size: 0.82rem; }
+    .track-value { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+    /* â”€â”€â”€ Wishlist / Blog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pat-badge-count {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 20px; height: 20px; border-radius: 50%;
+        background: linear-gradient(135deg, #c0396b, #e8557a);
+        color: #fff; font-size: 0.65rem; font-weight: 700;
+        position: absolute; top: 8px; right: 8px;
+    }
+
+    /* â”€â”€â”€ Pulse anim â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .pulse-ring {
+        position: absolute; inset: 0;
+        border-radius: 14px;
+        animation: ringPulse 2.5s ease-out infinite;
+        border: 1px solid rgba(192,57,107,0.3);
+        pointer-events: none; opacity: 0;
+    }
+    @keyframes ringPulse { 0%{transform:scale(1);opacity:0.5;} 100%{transform:scale(1.06);opacity:0;} }
+
+    @media (max-width: 1100px) { .vitals-row { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 900px)  { .pat-grid, .pat-grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 600px)  { .vitals-row { grid-template-columns: 1fr; } }
+</style>
+<!-- TWIG: {%%} -->
+
+<!-- TWIG: {%%} -->
+<!-- Watermark -->
+<div class="pat-watermark"><i class="fas fa-heartbeat"></i></div>
+
+<!-- â”€â”€ Hero Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="pat-hero">
+    <div class="pat-hero-tag">ðŸ’Š Patient Portal Â· Your health dashboard</div>
+    <h1 class="pat-hero-title">
+        Welcome back, <span>__TWIG_EXPR__</span> ðŸ‘‹
+    </h1>
+    <div class="pat-hero-sub">
+        __TWIG_EXPR__ Â· Your wellness data and appointments are up to date.
+    </div>
+    <div class="pat-hero-actions">
+        <a href="__TWIG_EXPR__" class="pat-btn pat-btn-primary">
+            <i class="fas fa-calendar-plus"></i> Book Appointment
+        </a>
+        <a href="__TWIG_EXPR__" class="pat-btn pat-btn-ghost">
+            <i class="fas fa-heartbeat"></i> Health Tracking
+        </a>
+        <a href="__TWIG_EXPR__" class="pat-btn pat-btn-ghost">
+            <i class="fas fa-pills"></i> Pharmacy
+        </a>
+    </div>
+</div>
+
+<!-- â”€â”€ Health Vitals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="vitals-row">
+    <div class="vital-card pink">
+        <div class="vital-icon"><i class="fas fa-heartbeat"></i></div>
+        <div class="vital-val">__TWIG_EXPR__</div>
+        <div class="vital-unit">bpm Â· Heart Rate</div>
+        <span class="vital-status normal">Normal</span>
+    </div>
+    <div class="vital-card purple">
+        <div class="vital-icon"><i class="fas fa-tint"></i></div>
+        <div class="vital-val">__TWIG_EXPR__</div>
+        <div class="vital-unit">mmHg Â· Blood Pressure</div>
+        <span class="vital-status normal">Normal</span>
+    </div>
+    <div class="vital-card teal">
+        <div class="vital-icon"><i class="fas fa-weight"></i></div>
+        <div class="vital-val">__TWIG_EXPR__</div>
+        <div class="vital-unit">kg Â· Body Weight</div>
+        <span class="vital-status normal">On Track</span>
+    </div>
+    <div class="vital-card orange">
+        <div class="vital-icon"><i class="fas fa-fire"></i></div>
+        <div class="vital-val">__TWIG_EXPR__</div>
+        <div class="vital-unit">steps Â· Daily Activity</div>
+        <span class="vital-status warn">Below Goal</span>
+    </div>
+</div>
+
+<!-- â”€â”€ Main Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="pat-grid">
+    <!-- Upcoming Appointments -->
+    <div class="pat-panel">
+        <div class="pat-panel-header">
+            <div class="pat-panel-title"><i class="fas fa-calendar-alt"></i> Upcoming Appointments</div>
+            <a href="__TWIG_EXPR__" class="pat-panel-action">View All â†’</a>
+        </div>
+        <div class="pat-panel-body">
+            <!-- TWIG: {%%} -->
+                <!-- TWIG: {%%} -->
+                <div class="upco-item">
+                    <div class="upco-date">
+                        <div class="upco-day">__TWIG_EXPR__</div>
+                        <div class="upco-month">__TWIG_EXPR__</div>
+                    </div>
+                    <div class="upco-info">
+                        <div class="upco-doc">
+                            Dr. __TWIG_EXPR__
+                        </div>
+                        <div class="upco-spec">
+                            __TWIG_EXPR__
+                            Â· __TWIG_EXPR__
+                        </div>
+                    </div>
+                    <span class="upco-tag __TWIG_EXPR__">
+                        __TWIG_EXPR__
+                    </span>
+                </div>
+                <!-- TWIG: {%%} -->
+            <!-- TWIG: {%%} -->
+                <div class="upco-item">
+                    <div class="upco-date"><div class="upco-day">15</div><div class="upco-month">Mar</div></div>
+                    <div class="upco-info"><div class="upco-doc">Dr. Khalil Amara</div><div class="upco-spec">Cardiology Â· 10:00 AM</div></div>
+                    <span class="upco-tag confirmed">Confirmed</span>
+                </div>
+                <div class="upco-item">
+                    <div class="upco-date"><div class="upco-day">22</div><div class="upco-month">Mar</div></div>
+                    <div class="upco-info"><div class="upco-doc">Dr. Leila Ben Hadj</div><div class="upco-spec">Dermatology Â· 2:30 PM</div></div>
+                    <span class="upco-tag pending">Pending</span>
+                </div>
+                <div class="upco-item" style="padding-bottom:0;">
+                    <div style="text-align:center;width:100%;padding:16px 0;color:rgba(255,255,255,0.2);">
+                        <i class="fas fa-calendar-plus" style="display:block;font-size:1.5rem;margin-bottom:6px;opacity:0.3;"></i>
+                        <a href="__TWIG_EXPR__" class="pat-btn pat-btn-primary" style="font-size:0.78rem;padding:8px 16px;">
+                            + Book new appointment
+                        </a>
+                    </div>
+                </div>
+            <!-- TWIG: {%%} -->
+        </div>
+    </div>
+
+    <!-- Health Tracking Summary -->
+    <div class="pat-panel">
+        <div class="pat-panel-header">
+            <div class="pat-panel-title"><i class="fas fa-chart-line"></i> Health Timeline</div>
+            <a href="__TWIG_EXPR__" class="pat-panel-action">Track â†’</a>
+        </div>
+        <div class="pat-panel-body">
+            <!-- TWIG: {%%} -->
+                <!-- TWIG: {%%} -->
+                <div class="track-item">
+                    <div class="track-dot-wrap">
+                        <div class="track-dot"></div>
+                        <!-- TWIG: {%%} --><div class="track-line"></div><!-- TWIG: {%%} -->
+                    </div>
+                    <div>
+                        <div class="track-label">__TWIG_EXPR__</div>
+                        <div class="track-value">__TWIG_EXPR__ Â· __TWIG_EXPR__</div>
+                    </div>
+                </div>
+                <!-- TWIG: {%%} -->
+            <!-- TWIG: {%%} -->
+                <div class="track-item">
+                    <div class="track-dot-wrap"><div class="track-dot"></div><div class="track-line"></div></div>
+                    <div><div class="track-label">Blood Pressure Logged</div><div class="track-value">120/80 mmHg Â· Today</div></div>
+                </div>
+                <div class="track-item">
+                    <div class="track-dot-wrap"><div class="track-dot"></div><div class="track-line"></div></div>
+                    <div><div class="track-label">Weight Recorded</div><div class="track-value">68.5 kg Â· Yesterday</div></div>
+                </div>
+                <div class="track-item">
+                    <div class="track-dot-wrap"><div class="track-dot"></div><div class="track-line"></div></div>
+                    <div><div class="track-label">Heart Rate</div><div class="track-value">72 bpm Â· 2 days ago</div></div>
+                </div>
+                <div class="track-item">
+                    <div class="track-dot-wrap"><div class="track-dot"></div></div>
+                    <div><div class="track-label">Steps Goal</div><div class="track-value">6,200 / 10,000 steps Â· Today</div></div>
+                </div>
+            <!-- TWIG: {%%} -->
+            <div style="margin-top:16px;text-align:center;">
+                <a href="__TWIG_EXPR__" class="pat-btn pat-btn-ghost" style="font-size:0.78rem;">
+                    <i class="fas fa-plus"></i> Log Vital
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- â”€â”€ Quick Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<div class="pat-grid-3">
+    <a href="__TWIG_EXPR__" class="pat-action" style="position:relative;">
+        <div class="pulse-ring"></div>
+        <div class="pat-action-icon" style="background:rgba(192,57,107,0.12);color:#ff6ba8;">
+            <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="pat-action-title">Health Tracking</div>
+        <div class="pat-action-desc">Log vitals & wellness metrics daily</div>
+    </a>
+    <a href="__TWIG_EXPR__" class="pat-action" style="position:relative;">
+        <div class="pat-action-icon" style="background:rgba(168,85,247,0.12);color:#a855f7;">
+            <i class="fas fa-pills"></i>
+        </div>
+        <div class="pat-action-title">Pharmacy</div>
+        <div class="pat-action-desc">Browse health products and supplements</div>
+    </a>
+    <a href="__TWIG_EXPR__" class="pat-action" style="position:relative;">
+        <div class="pat-action-icon" style="background:rgba(249,115,22,0.12);color:#f97316;">
+            <i class="fas fa-heart"></i>
+        </div>
+        <div class="pat-action-title">My Wishlist</div>
+        <div class="pat-action-desc">Saved products and health items</div>
+    </a>
+    <a href="__TWIG_EXPR__" class="pat-action">
+        <div class="pat-action-icon" style="background:rgba(20,184,166,0.12);color:#14b8a6;">
+            <i class="fas fa-book-open"></i>
+        </div>
+        <div class="pat-action-title">Health Blog</div>
+        <div class="pat-action-desc">Read articles & wellness tips</div>
+    </a>
+    <a href="__TWIG_EXPR__" class="pat-action">
+        <div class="pat-action-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa;">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="pat-action-title">Notifications</div>
+        <div class="pat-action-desc">Appointment reminders & updates</div>
+    </a>
+    <a href="__TWIG_EXPR__" class="pat-action">
+        <div class="pat-action-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;">
+            <i class="fas fa-calendar-plus"></i>
+        </div>
+        <div class="pat-action-title">Book Appointment</div>
+        <div class="pat-action-desc">Schedule a visit with a specialist</div>
+    </a>
+</div>
+<!-- TWIG: {%%} -->
+

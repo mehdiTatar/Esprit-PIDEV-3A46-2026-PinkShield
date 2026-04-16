@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controllers.DoctorDashboardController"
+            styleClass="root"
+            stylesheets="@../css/style.css">
+    <fx:define>
+        <VBox fx:id="profileEditView" spacing="20">
+            <HBox alignment="CENTER_LEFT" styleClass="hero-panel hero-panel-doctor">
+                <VBox spacing="8">
+                    <Label text="Profile Edit" styleClass="dashboard-title" />
+                    <Label text="Keep your public information, speciality, and contact details current." styleClass="dashboard-copy" wrapText="true" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="16" styleClass="panel-card profile-card">
+                <Label fx:id="feedbackLabel" text="" visible="false" managed="false" styleClass="feedback-label" />
+
+                <HBox spacing="14">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="FIRST NAME" styleClass="field-label" />
+                        <TextField fx:id="firstNameField" styleClass="text-field" />
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="LAST NAME" styleClass="field-label" />
+                        <TextField fx:id="lastNameField" styleClass="text-field" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="6">
+                    <Label text="EMAIL ADDRESS" styleClass="field-label" />
+                    <TextField fx:id="emailField" styleClass="text-field" />
+                </VBox>
+
+                <VBox spacing="6">
+                    <Label text="SPECIALITY" styleClass="field-label" />
+                    <TextField fx:id="specialityField" styleClass="text-field" />
+                </VBox>
+
+                <HBox spacing="12">
+                    <Button text="Save changes" onAction="#handleSaveProfile" styleClass="button" />
+                    <Button text="Reset" onAction="#handleResetProfile" styleClass="button secondary" />
+                </HBox>
+            </VBox>
+        </VBox>
+    </fx:define>
+
+    <left>
+        <VBox styleClass="sidebar">
+            <padding>
+                <Insets top="24" right="14" bottom="24" left="14" />
+            </padding>
+
+            <Label text="PinkShield" styleClass="brand-title" />
+            <Label text="Doctor dashboard" styleClass="subtitle" />
+
+            <Button fx:id="navDashboard" text="Dashboard" onAction="#showDashboard" styleClass="nav-button active" maxWidth="Infinity" />
+            <Button fx:id="navAppointments" text="Appointment" onAction="#showAppointments" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="navProfileEdit" text="Profile Edit" onAction="#showProfileEdit" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="navBlog" text="Blog" onAction="#showBlog" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="navProducts" text="Parapharmacie" onAction="#showProducts" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="navDailyCheckIn" text="Daily Check In" onAction="#showDailyCheckIn" styleClass="nav-button" maxWidth="Infinity" />
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Separator />
+            <Button text="Logout" onAction="#handleLogout" styleClass="nav-button logout-button" maxWidth="Infinity" />
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" styleClass="page-scroll">
+            <content>
+                <StackPane fx:id="mainContent" alignment="TOP_CENTER" styleClass="content-area">
+                    <VBox fx:id="dashboardView" maxWidth="1160" spacing="20">
+                <HBox alignment="CENTER_LEFT" styleClass="hero-panel hero-panel-doctor">
+                    <VBox spacing="8">
+                        <Label fx:id="welcomeLabel" text="Doctor workspace" styleClass="dashboard-title" />
+                        <Label fx:id="dashboardRoleLabel" text="Doctor account" styleClass="dashboard-copy" />
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16">
+                    <VBox styleClass="metric-card metric-card-doctor" HBox.hgrow="ALWAYS">
+                        <Label text="TOTAL APPOINTMENTS" styleClass="metric-label" />
+                        <Label fx:id="totalAppointmentsLabel" text="0" styleClass="metric-value" />
+                    </VBox>
+                    <VBox styleClass="metric-card metric-card-doctor" HBox.hgrow="ALWAYS">
+                        <Label text="UPCOMING" styleClass="metric-label" />
+                        <Label fx:id="upcomingAppointmentsLabel" text="0" styleClass="metric-value" />
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="16" styleClass="panel-card">
+                    <Label text="Practice Snapshot" styleClass="section-title" />
+                    <Label fx:id="doctorNameSummaryLabel" text="Doctor name" styleClass="dashboard-copy" />
+                    <Label fx:id="doctorEmailSummaryLabel" text="Doctor email" styleClass="dashboard-copy" />
+                    <Label fx:id="doctorSpecialitySummaryLabel" text="Doctor speciality" styleClass="dashboard-copy" />
+
+                    <HBox spacing="12">
+                        <Button text="Open appointments" onAction="#showAppointments" styleClass="button" />
+                        <Button text="Review check-ins" onAction="#showDailyCheckIn" styleClass="button secondary" />
+                        <Button text="Edit profile" onAction="#showProfileEdit" styleClass="button secondary" />
+                    </HBox>
+                </VBox>
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

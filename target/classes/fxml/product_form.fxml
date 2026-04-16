@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ParapharmacyController" style="-fx-background-color: #f5f5f5;">
+    <top>
+        <!-- Hero Header -->
+        <VBox style="-fx-background: linear-gradient(135deg, #c0396b 0%, #e8557a 100%); -fx-padding: 32;" spacing="5">
+            <Label text="Add Product" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: white;" />
+            <Label text="Add a new health product to our pharmacy catalog" style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 13;" />
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane style="-fx-background-color: transparent; -fx-control-inner-background: transparent;" fitToWidth="true">
+            <VBox alignment="TOP_CENTER" spacing="0" style="-fx-background-color: transparent; -fx-padding: 40;">
+                <!-- Form Card -->
+                <VBox style="-fx-background-color: white; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4); -fx-padding: 0;" spacing="0" maxWidth="700">
+                    <!-- Form Content -->
+                    <VBox spacing="20" style="-fx-padding: 36;">
+                        <!-- Product Name -->
+                        <VBox spacing="8">
+                            <Label text="PRODUCT NAME" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                            <TextField fx:id="nameField" promptText="e.g., Vitamin C Supplement" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd;" />
+                        </VBox>
+
+                        <!-- Category -->
+                        <VBox spacing="8">
+                            <Label text="CATEGORY" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                            <ComboBox fx:id="categoryCombo" promptText="Select a category..." maxWidth="Infinity" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd;">
+                                <items>
+                                    <String fx:value="Supplements" />
+                                    <String fx:value="Vitamins" />
+                                    <String fx:value="Pain Relief" />
+                                    <String fx:value="Cold & Flu" />
+                                    <String fx:value="Skincare" />
+                                    <String fx:value="First Aid" />
+                                    <String fx:value="Other" />
+                                </items>
+                            </ComboBox>
+                        </VBox>
+
+                        <!-- Description -->
+                        <VBox spacing="8">
+                            <Label text="DESCRIPTION" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                            <TextArea fx:id="descriptionField" promptText="Describe the product, its benefits, and usage..." prefHeight="120" wrapText="true" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd; -fx-control-inner-background: white;" />
+                        </VBox>
+
+                        <!-- Price and Stock -->
+                        <HBox spacing="20">
+                            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                <Label text="PRICE (TND)" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                                <TextField fx:id="priceField" promptText="0.00" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd;" />
+                            </VBox>
+                            <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                <Label text="STOCK QUANTITY" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                                <TextField fx:id="stockField" promptText="0" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd;" />
+                            </VBox>
+                        </HBox>
+
+                        <!-- Image Path -->
+                        <VBox spacing="8">
+                            <Label text="PRODUCT IMAGE (OPTIONAL)" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #333; -fx-text-transform: uppercase; -fx-letter-spacing: 0.5;" />
+                            <HBox spacing="10">
+                                <TextField fx:id="imageField" promptText="e.g., /images/products/vitamin-c.jpg" HBox.hgrow="ALWAYS" style="-fx-padding: 10; -fx-border-radius: 6; -fx-border-color: #ddd;" />
+                                <Button text="Browse" style="-fx-padding: 10 24; -fx-background-color: #e8e8e8; -fx-text-fill: #333; -fx-font-weight: bold; -fx-border-radius: 6;" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Form Actions -->
+                    <HBox spacing="12" style="-fx-padding: 22 36; -fx-border-top: 1 solid #ddd; -fx-background-color: #fafafa; -fx-border-radius: 0 0 8 8;" alignment="CENTER_LEFT">
+                        <Button text="Cancel" onAction="#handleCancel" style="-fx-padding: 10 24; -fx-background-color: #ccc; -fx-text-fill: #333; -fx-font-weight: bold; -fx-border-radius: 6;" />
+                        <Button text="Save Product" onAction="#handleSaveProduct" style="-fx-padding: 10 24; -fx-background-color: linear-gradient(135deg, #c0396b 0%, #e8557a 100%); -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 6;" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
+

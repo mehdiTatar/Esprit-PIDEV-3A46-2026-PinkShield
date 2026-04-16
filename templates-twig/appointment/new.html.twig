@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Book an Appointment{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Book an Appointment</h2>
+                </div>
+                <div class="card-body">
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'appointmentForm'}}) }}
+                        {{ form_widget(form._token) }}
+
+                        <div class="mb-3">
+                            {{ form_label(form.doctorEmail, null, {'label_attr': {'class': 'form-label'}}) }}
+                            <select name="{{ form.doctorEmail.vars.full_name }}"
+                                    id="{{ form.doctorEmail.vars.id }}"
+                                    class="form-select"
+                                    data-ajax-validate="doctorEmail">
+                                <option value="">Choose a doctor...</option>
+                                {% for choice in form.doctorEmail.vars.choices %}
+                                    <option value="{{ choice.value }}">{{ choice.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> Only active doctors are available for booking.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.appointmentDate, null, {'label_attr': {'class': 'form-label'}}) }}
+                            <input type="datetime-local"
+                                   name="{{ form.appointmentDate.vars.full_name }}"
+                                   id="{{ form.appointmentDate.vars.id }}"
+                                   class="form-control"
+                                   value="{{ form.appointmentDate.vars.value }}"
+                                   data-ajax-validate="appointmentDate">
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.notes, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'data-ajax-validate': 'notes'}}) }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Book Appointment</button>
+                            <a href="{{ path('appointment_index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    {{ form_end(form, {'render_rest': false}) }}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('appointmentForm');
+    if (!form) return;
+    AjaxValidator.attachBlur(form);
+    AjaxValidator.attachSubmit(form);
+});
+</script>
+{% endblock %}
