@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.AppointmentUserController" spacing="20" stylesheets="@style.css" style="-fx-padding: 30; -fx-background-color: #f5f6fa;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.AppointmentUserController" spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f6fa;">
 
-    <Label text="Book Your Appointment" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #e84393;"/>
-    <Label text="Schedule a consultation with our healthcare professionals" style="-fx-font-size: 14; -fx-text-fill: #666;"/>
+    <Label text="📅 Book Your Appointment" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #e84393;"/>
 
-    <!-- Booking Form -->
-    <VBox styleClass="card-pane" spacing="20">
+    <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15;">
         <Label text="Your Information" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #e84393;"/>
 
         <GridPane hgap="20" vgap="15">
@@ -21,38 +18,38 @@
                 <ColumnConstraints hgrow="ALWAYS"/>
             </columnConstraints>
 
-            <Label text="Your Name:" styleClass="label-subtitle"/>
-            <TextField fx:id="txtPatientName" promptText="Enter your full name" styleClass="text-field"/>
+            <Label text="Your Name:"/>
+            <TextField fx:id="txtPatientName" promptText="Full name" GridPane.columnIndex="1"/>
 
-            <Label text="Your Email:" GridPane.columnIndex="2" styleClass="label-subtitle"/>
-            <TextField fx:id="txtPatientEmail" GridPane.columnIndex="3" promptText="your@email.com" styleClass="text-field"/>
+            <Label text="Your Email:" GridPane.columnIndex="2"/>
+            <TextField fx:id="txtPatientEmail" promptText="email@example.com" GridPane.columnIndex="3"/>
 
-            <Label text="Preferred Doctor:" GridPane.rowIndex="1" styleClass="label-subtitle"/>
-            <TextField fx:id="txtDoctorName" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Dr. Smith or Dr. Brown" styleClass="text-field"/>
+            <Label text="Doctor:" GridPane.rowIndex="1"/>
+            <TextField fx:id="txtDoctorName" promptText="Dr. Name" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-            <Label text="Select Date:" GridPane.columnIndex="2" GridPane.rowIndex="1" styleClass="label-subtitle"/>
-            <DatePicker fx:id="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1" styleClass="date-picker"/>
+            <Label text="Select Date:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            <DatePicker fx:id="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-            <Label text="Notes:" GridPane.rowIndex="2" styleClass="label-subtitle"/>
-            <TextArea fx:id="txtNotes" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" promptText="Tell us about your health concern..." prefHeight="80" styleClass="text-area" wrapText="true"/>
+            <Label text="Select Time (HH:mm):" GridPane.rowIndex="2"/>
+            <TextField fx:id="txtHeure" promptText="Ex: 14:30" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="Notes:" GridPane.rowIndex="3"/>
+            <TextArea fx:id="txtNotes" prefHeight="80" wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3"/>
         </GridPane>
 
-        <Button text="Book Appointment" onAction="#handleAjouter" styleClass="btn-primary" style="-fx-padding: 15 40; -fx-font-size: 14;"/>
+        <HBox spacing="10">
+            <Button text="✅ Book Appointment" onAction="#handleAjouter" style="-fx-background-color: #e84393; -fx-text-fill: white; -fx-padding: 10 20;"/>
+            <Button text="✏️ Modifier" onAction="#handleModifier" style="-fx-background-color: #fdcb6e; -fx-text-fill: white; -fx-padding: 10 20;"/>
+            <Button text="🗑️ Supprimer" onAction="#handleSupprimer" style="-fx-background-color: #d63031; -fx-text-fill: white; -fx-padding: 10 20;"/>
+        </HBox>
     </VBox>
 
-    <!-- Your Appointments -->
-    <VBox styleClass="card-pane" spacing="15">
-        <Label text="Your Appointments" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #e84393;"/>
-
-        <TableView fx:id="table" VBox.vgrow="ALWAYS" styleClass="table-view" prefHeight="250">
-            <columns>
-                <TableColumn fx:id="colDate" text="Date &amp; Time" prefWidth="200"/>
-                <TableColumn fx:id="colDoctor" text="Doctor" prefWidth="150"/>
-                <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
-                <TableColumn fx:id="colNotes" text="Notes" prefWidth="250"/>
-            </columns>
-        </TableView>
-    </VBox>
-
+    <TableView fx:id="table" onMouseClicked="#handleRowSelect" VBox.vgrow="ALWAYS" prefHeight="250">
+        <columns>
+            <TableColumn fx:id="colDate" text="📅 Date &amp; Time" prefWidth="200"/>
+            <TableColumn fx:id="colDoctor" text="👨 Doctor" prefWidth="150"/>
+            <TableColumn fx:id="colStatus" text="📍 Status" prefWidth="120"/>
+            <TableColumn fx:id="colNotes" text="📝 Notes" prefWidth="250"/>
+        </columns>
+    </TableView>
 </VBox>
-

@@ -162,7 +162,7 @@ public class ParapharmacieController {
         if (!validateInput()) return;
         try {
             service.ajouter(new Parapharmacie(txtNom.getText(), Double.parseDouble(txtPrix.getText()), Integer.parseInt(txtStock.getText()), ""));
-            showInfoAlert("Success", "Product added!");
+            showInfoAlert("Success", "Product added to wishlist!");
             clearFields();
             loadProducts();
         } catch (Exception e) {
