@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -476,6 +477,36 @@ public class AppointmentUserController {
             showErrorAlert("PDF Error", "Could not generate PDF proof: " + e.getMessage());
         }
     }
+
+    @FXML
+    public void handleDownloadPDF() {
+        Appointment selected = table.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showWarningAlert("No Selection", "Please select an appointment from the table first.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Appointment Invoice");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        fileChooser.setInitialFileName("INV-" + selected.getId() + ".pdf");
+
+        Stage stage = (Stage) table.getScene().getWindow();
+        File targetFile = fileChooser.showSaveDialog(stage);
+        if (targetFile == null) {
+            return;
+        }
+
+        try {
+            appointmentPdfService.exportAppointmentInvoice(selected, targetFile);
+            showInfoAlert("PDF Created", "Invoice saved successfully:\n" + targetFile.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            showErrorAlert("PDF Error", "Could not create invoice PDF: " + String.valueOf(e));
+        } catch (Exception e) {
+            showErrorAlert("PDF Error", "Unexpected error while creating invoice PDF: " + String.valueOf(e));
+        }
+    }
+
 
     @FXML
     public void handleRowSelect() {

@@ -79,6 +79,7 @@
                     <HBox spacing="10">
                         <Button text="✏️ Modify Selected" onAction="#handleModifier" style="-fx-background-color: #fdcb6e; -fx-text-fill: white; -fx-padding: 10 20;"/>
                         <Button text="🗑️ Cancel Selected" onAction="#handleSupprimer" style="-fx-background-color: #d63031; -fx-text-fill: white; -fx-padding: 10 20;"/>
+                        <Button text="📄 Download PDF" onAction="#handleDownloadPDF" styleClass="btn-secondary"/>
                     </HBox>
                 </VBox>
             </VBox>
