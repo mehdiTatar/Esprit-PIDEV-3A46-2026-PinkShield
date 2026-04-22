@@ -5,12 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class AdminDashboardController {
 
@@ -92,6 +95,10 @@ public class AdminDashboardController {
 
     @FXML
     public void handleLogout() {
+        if (!confirmLogout()) {
+            return;
+        }
+
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/Auth.fxml"));
             Stage stage = (Stage) rootPane.getScene().getWindow();
@@ -101,6 +108,16 @@ public class AdminDashboardController {
         } catch (IOException e) {
             System.err.println("Error loading login page: " + e.getMessage());
         }
+    }
+
+    private boolean confirmLogout() {
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Logout Confirmation");
+        confirmAlert.setHeaderText("Are you sure you want to log out?");
+        confirmAlert.setContentText("You will be returned to the sign in page.");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private void applyThemeClass(Node node) {

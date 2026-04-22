@@ -8,7 +8,7 @@
 
     <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;">
         <TextField fx:id="txtNom" promptText="Nom du produit" styleClass="day-mode-input"/>
-        <TextField fx:id="txtPrix" promptText="Prix ($)" styleClass="day-mode-input"/>
+        <TextField fx:id="txtPrix" promptText="Prix (TND)" styleClass="day-mode-input"/>
         <TextField fx:id="txtStock" promptText="Stock" styleClass="day-mode-input"/>
         <Button text="➕ Ajouter / Sauver" onAction="#handleAjouter" styleClass="day-mode-primary-button"/>
         <Button text="🔄 Réinitialiser" onAction="#handleRefresh" styleClass="day-mode-secondary-button"/>

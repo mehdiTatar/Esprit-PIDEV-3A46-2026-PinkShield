@@ -129,7 +129,7 @@ public class ParapharmacieController {
         nameLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;");
         nameLabel.setWrapText(true);
 
-        Label priceLabel = new Label("💰 Price: $" + String.format("%.2f", product.getPrix()));
+        Label priceLabel = new Label("💰 Price: " + String.format("%.2f TND", product.getPrix()));
         Label stockLabel = new Label("📊 Stock: " + product.getStock());
         Label descLabel = new Label("📝 " + (product.getDescription() == null || product.getDescription().isBlank() ? "No description" : product.getDescription()));
         descLabel.setWrapText(true);

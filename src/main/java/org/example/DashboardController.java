@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -15,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 
 public class DashboardController {
 
@@ -135,6 +138,10 @@ public class DashboardController {
 
     @FXML
     public void handleLogout() {
+        if (!confirmLogout()) {
+            return;
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Auth.fxml"));
             Parent root = loader.load();
@@ -145,6 +152,16 @@ public class DashboardController {
         } catch (IOException e) {
             System.err.println("Error loading login page: " + e.getMessage());
         }
+    }
+
+    private boolean confirmLogout() {
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Logout Confirmation");
+        confirmAlert.setHeaderText("Are you sure you want to log out?");
+        confirmAlert.setContentText("You will be returned to the sign in page.");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     @FXML
