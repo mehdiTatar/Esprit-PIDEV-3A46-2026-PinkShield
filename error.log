@@ -35,55 +35,56 @@ src\main\java\org\example\DashboardController.java:7: error: package javafx.scen
 import javafx.scene.Node;
                    ^
 src\main\java\org\example\DashboardController.java:8: error: package javafx.scene.control does not exist
+import javafx.scene.control.Alert;
+                           ^
+src\main\java\org\example\DashboardController.java:9: error: package javafx.scene.control does not exist
+import javafx.scene.control.ButtonType;
+                           ^
+src\main\java\org\example\DashboardController.java:10: error: package javafx.scene.control does not exist
 import javafx.scene.control.ToggleButton;
                            ^
-src\main\java\org\example\DashboardController.java:9: error: package javafx.scene.layout does not exist
+src\main\java\org\example\DashboardController.java:11: error: package javafx.scene.layout does not exist
 import javafx.scene.layout.BorderPane;
                           ^
-src\main\java\org\example\DashboardController.java:10: error: package javafx.scene.layout does not exist
+src\main\java\org\example\DashboardController.java:12: error: package javafx.scene.layout does not exist
 import javafx.scene.layout.StackPane;
                           ^
-src\main\java\org\example\DashboardController.java:11: error: package javafx.scene.layout does not exist
+src\main\java\org\example\DashboardController.java:13: error: package javafx.scene.layout does not exist
 import javafx.scene.layout.VBox;
                           ^
-src\main\java\org\example\DashboardController.java:12: error: package javafx.scene.layout does not exist
+src\main\java\org\example\DashboardController.java:14: error: package javafx.scene.layout does not exist
 import javafx.scene.layout.HBox;
                           ^
-src\main\java\org\example\DashboardController.java:13: error: package javafx.scene.control does not exist
+src\main\java\org\example\DashboardController.java:15: error: package javafx.scene.control does not exist
 import javafx.scene.control.Label;
                            ^
-src\main\java\org\example\DashboardController.java:14: error: package javafx.stage does not exist
+src\main\java\org\example\DashboardController.java:16: error: package javafx.stage does not exist
 import javafx.stage.Stage;
                    ^
-src\main\java\org\example\DashboardController.java:24: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:27: error: cannot find symbol
     private BorderPane rootPane;
             ^
   symbol:   class BorderPane
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:27: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:30: error: cannot find symbol
     private StackPane contentArea;
             ^
   symbol:   class StackPane
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:30: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:33: error: cannot find symbol
     private ToggleButton nightModeToggle;
             ^
   symbol:   class ToggleButton
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:70: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:73: error: cannot find symbol
     private VBox createFeatureCard(String title, String description) {
             ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:156: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:175: error: cannot find symbol
     private void applyThemeClass(Node node) {
                                  ^
   symbol:   class Node
-  location: class DashboardController
-src\main\java\org\example\DashboardController.java:23: error: cannot find symbol
-    @FXML
-     ^
-  symbol:   class FXML
   location: class DashboardController
 src\main\java\org\example\DashboardController.java:26: error: cannot find symbol
     @FXML
@@ -95,42 +96,47 @@ src\main\java\org\example\DashboardController.java:29: error: cannot find symbol
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:34: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:32: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:103: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:37: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:116: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:106: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:121: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:119: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:126: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:124: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:131: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:129: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:136: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:134: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:150: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:139: error: cannot find symbol
+    @FXML
+     ^
+  symbol:   class FXML
+  location: class DashboardController
+src\main\java\org\example\DashboardController.java:169: error: cannot find symbol
     @FXML
      ^
   symbol:   class FXML
@@ -171,138 +177,161 @@ src\main\java\org\example\MainApp.java:37: error: cannot find symbol
         ^
   symbol:   method launch()
   location: class MainApp
-src\main\java\org\example\DashboardController.java:43: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:46: error: cannot find symbol
         VBox welcomeBox = new VBox(30);
         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:43: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:46: error: cannot find symbol
         VBox welcomeBox = new VBox(30);
                               ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:44: error: package javafx.geometry does not exist
+src\main\java\org\example\DashboardController.java:47: error: package javafx.geometry does not exist
         welcomeBox.setAlignment(javafx.geometry.Pos.CENTER);
                                                ^
-src\main\java\org\example\DashboardController.java:48: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:51: error: cannot find symbol
         Label titleLabel = new Label("Welcome to PinkShield");
         ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:48: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:51: error: cannot find symbol
         Label titleLabel = new Label("Welcome to PinkShield");
                                ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:51: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:54: error: cannot find symbol
         Label subtitleLabel = new Label("Your trusted healthcare companion");
         ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:51: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:54: error: cannot find symbol
         Label subtitleLabel = new Label("Your trusted healthcare companion");
                                   ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:54: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:57: error: cannot find symbol
         HBox featureBox = new HBox(20);
         ^
   symbol:   class HBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:54: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:57: error: cannot find symbol
         HBox featureBox = new HBox(20);
                               ^
   symbol:   class HBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:55: error: package javafx.geometry does not exist
+src\main\java\org\example\DashboardController.java:58: error: package javafx.geometry does not exist
         featureBox.setAlignment(javafx.geometry.Pos.CENTER);
                                                ^
-src\main\java\org\example\DashboardController.java:57: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:60: error: cannot find symbol
         VBox appointmentsCard = createFeatureCard("? Appointments", "Book and manage your healthcare appointments");
         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:58: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:61: error: cannot find symbol
         VBox parapharmacieCard = createFeatureCard("? Parapharmacie", "Browse healthcare products and add to wishlist");
         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:59: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:62: error: cannot find symbol
         VBox wishlistCard = createFeatureCard("?? Wishlist", "View your saved products");
         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:71: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:74: error: cannot find symbol
         VBox card = new VBox(10);
         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:71: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:74: error: cannot find symbol
         VBox card = new VBox(10);
                         ^
   symbol:   class VBox
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:76: error: package javafx.geometry does not exist
+src\main\java\org\example\DashboardController.java:79: error: package javafx.geometry does not exist
         card.setAlignment(javafx.geometry.Pos.TOP_LEFT);
                                          ^
-src\main\java\org\example\DashboardController.java:78: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:81: error: cannot find symbol
         Label iconLabel = new Label(title.split(" ")[0]);
         ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:78: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:81: error: cannot find symbol
         Label iconLabel = new Label(title.split(" ")[0]);
                               ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:81: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:84: error: cannot find symbol
         Label titleLabel = new Label(title);
         ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:81: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:84: error: cannot find symbol
         Label titleLabel = new Label(title);
                                ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:84: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:87: error: cannot find symbol
         Label descLabel = new Label(description);
         ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:84: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:87: error: cannot find symbol
         Label descLabel = new Label(description);
                               ^
   symbol:   class Label
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:139: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:148: error: cannot find symbol
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Auth.fxml"));
             ^
   symbol:   class FXMLLoader
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:139: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:148: error: cannot find symbol
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Auth.fxml"));
                                     ^
   symbol:   class FXMLLoader
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:140: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:149: error: cannot find symbol
             Parent root = loader.load();
             ^
   symbol:   class Parent
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:141: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:150: error: cannot find symbol
             Stage stage = (Stage) rootPane.getScene().getWindow();
             ^
   symbol:   class Stage
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:141: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:150: error: cannot find symbol
             Stage stage = (Stage) rootPane.getScene().getWindow();
                            ^
   symbol:   class Stage
   location: class DashboardController
-src\main\java\org\example\DashboardController.java:142: error: cannot find symbol
+src\main\java\org\example\DashboardController.java:151: error: cannot find symbol
             stage.setScene(new Scene(root, 1400, 800));
                                ^
   symbol:   class Scene
   location: class DashboardController
-70 errors
+src\main\java\org\example\DashboardController.java:160: error: cannot find symbol
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        ^
+  symbol:   class Alert
+  location: class DashboardController
+src\main\java\org\example\DashboardController.java:160: error: cannot find symbol
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                                 ^
+  symbol:   class Alert
+  location: class DashboardController
+src\main\java\org\example\DashboardController.java:160: error: package Alert does not exist
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                                            ^
+src\main\java\org\example\DashboardController.java:165: error: cannot find symbol
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+                 ^
+  symbol:   class ButtonType
+  location: class DashboardController
+src\main\java\org\example\DashboardController.java:166: error: cannot find symbol
+        return result.isPresent() && result.get() == ButtonType.OK;
+                                                     ^
+  symbol:   variable ButtonType
+  location: class DashboardController
+77 errors

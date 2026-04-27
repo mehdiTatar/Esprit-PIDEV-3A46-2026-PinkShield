@@ -45,6 +45,11 @@ public class AiSuggestionsController {
         NavigationManager.getInstance().showAppointments();
     }
 
+    @FXML
+    public void handleRefreshSuggestions() {
+        renderRecommendations();
+    }
+
     private void renderRecommendations() {
         if (recommendationsVBox == null) {
             return;

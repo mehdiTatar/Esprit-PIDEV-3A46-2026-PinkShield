@@ -15,8 +15,6 @@ import java.util.Map;
 
 public class WishlistUserController {
 
-    private static final int DEMO_USER_ID = 1;
-
     @FXML
     private TextField searchBar;
     @FXML
@@ -87,8 +85,17 @@ public class WishlistUserController {
 
     private void loadWishlist() {
         try {
-            ArrayList<Wishlist> wishlists = serviceWishlist.afficherAll();
-            wishlists.removeIf(w -> w.getUser_id() != DEMO_USER_ID);
+            UserSession session = UserSession.getInstance();
+            if (!session.isLoggedIn()) {
+                wishlistList = FXCollections.observableArrayList();
+                filteredList = new FilteredList<>(wishlistList, p -> true);
+                table.setItems(filteredList);
+                updateTotalPrice();
+                showWarningAlert("Authentication Required", "Please sign in to view your wishlist.");
+                return;
+            }
+
+            ArrayList<Wishlist> wishlists = serviceWishlist.getByUserId(session.getUserId());
 
             Map<Integer, Parapharmacie> productById = loadProductMap();
             ArrayList<WishlistDisplayItem> displayItems = new ArrayList<>();
@@ -172,6 +179,11 @@ public class WishlistUserController {
     }
 
     private void handleDelete(WishlistDisplayItem item) {
+        if (!UserSession.getInstance().isLoggedIn()) {
+            showWarningAlert("Authentication Required", "Please sign in to perform this action.");
+            return;
+        }
+
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Remove Item");
         confirmation.setHeaderText("Remove from Wishlist");

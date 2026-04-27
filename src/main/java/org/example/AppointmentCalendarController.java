@@ -60,7 +60,12 @@ public class AppointmentCalendarController {
         appointmentsByDate.clear();
 
         try {
-            for (Appointment appointment : service.afficherAll()) {
+            UserSession session = UserSession.getInstance();
+            if (!session.isLoggedIn()) {
+                return;
+            }
+
+            for (Appointment appointment : service.getByUserId(session.getUserId())) {
                 if (appointment.getAppointment_date() == null) {
                     continue;
                 }

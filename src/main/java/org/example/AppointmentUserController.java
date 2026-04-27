@@ -5,13 +5,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AppointmentUserController {
+    private static final int MAX_RECOMMENDATIONS = 3;
     @FXML private TextField txtPatientName, txtPatientEmail, txtHeure;
     @FXML private DatePicker bookingDatePicker, calendarPicker;
     @FXML private ComboBox<String> specialtyComboBox, doctorComboBox;
@@ -31,6 +34,7 @@ public class AppointmentUserController {
     @FXML private VBox recommendationsVBox;
     @FXML private TableView<Appointment> table;
     @FXML private TableColumn<Appointment, String> colDate, colDoctor, colStatus, colNotes;
+    @FXML private ImageView qrCodeImageView;
 
     private ServiceAppointment service = new ServiceAppointment();
     private final ServiceParapharmacie parapharmacieService = new ServiceParapharmacie();
@@ -40,6 +44,7 @@ public class AppointmentUserController {
     private final Map<LocalDate, List<String>> appointmentsByDate = new HashMap<>();
     private final Map<String, ObservableList<String>> specialtyDoctorsMap = new LinkedHashMap<>();
     private final Map<String, String> doctorToSpecialtyMap = new HashMap<>();
+    private final Map<Integer, String> appointmentInvoiceUrls = new HashMap<>();
 
     @FXML
     public void initialize() {
@@ -56,7 +61,36 @@ public class AppointmentUserController {
         setupDateSync();
         setupNotesRecommendations();
         displayRecommendations("");
+        bindSessionIdentity();
         loadAppointments();
+        
+        // Add listener for TableView selection to update QR code
+        if (table != null) {
+            table.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    updateQRCode(newVal);
+                } else {
+                    if (qrCodeImageView != null) {
+                        qrCodeImageView.setImage(null);
+                    }
+                }
+            });
+        }
+    }
+
+    private void bindSessionIdentity() {
+        UserSession session = UserSession.getInstance();
+        if (!session.isLoggedIn()) {
+            showWarningAlert("Authentication Required", "Please sign in to access your appointments.");
+            return;
+        }
+
+        if (txtPatientName != null) {
+            txtPatientName.setText(session.getName());
+        }
+        if (txtPatientEmail != null) {
+            txtPatientEmail.setText(session.getEmail());
+        }
     }
 
     private void populateSpecialtyDoctors() {
@@ -83,9 +117,17 @@ public class AppointmentUserController {
 
     private void loadAppointments() {
         try {
-            appointmentList = FXCollections.observableArrayList(service.afficherAll());
+            UserSession session = UserSession.getInstance();
+            if (!session.isLoggedIn()) {
+                appointmentList = FXCollections.observableArrayList();
+                table.setItems(appointmentList);
+                displayRecommendations("");
+                return;
+            }
+            appointmentList = FXCollections.observableArrayList(service.getByUserId(session.getUserId()));
             table.setItems(appointmentList);
             rebuildCalendarMarkers();
+            displayRecommendations(notesArea != null ? notesArea.getText() : "");
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -140,9 +182,7 @@ public class AppointmentUserController {
     }
 
     private void setupNotesRecommendations() {
-        if (notesArea != null) {
-            notesArea.textProperty().addListener((obs, oldText, newText) -> displayRecommendations(newText));
-        }
+        // Keep recommendation trigger explicit; avoid suggesting items before appointments exist.
     }
 
     @FXML
@@ -152,7 +192,23 @@ public class AppointmentUserController {
 
     @FXML
     public void handleAiAssistant() {
-        NavigationManager.getInstance().showAiSuggestions(notesArea != null ? notesArea.getText() : "");
+        if (!ensureLoggedIn()) {
+            return;
+        }
+        if (!hasBookedAppointments()) {
+            showWarningAlert("AI Assistant", "Please book at least one appointment before using AI suggestions.");
+            return;
+        }
+
+        String notes = notesArea != null ? notesArea.getText() : "";
+        if ((notes == null || notes.isBlank()) && table != null) {
+            Appointment selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                notes = selected.getNotes();
+            }
+        }
+
+        NavigationManager.getInstance().showAiSuggestions(notes == null ? "" : notes.trim());
     }
 
     @FXML
@@ -178,6 +234,13 @@ public class AppointmentUserController {
 
     @FXML
     public void handleGenerateRecommendations() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
+        if (!hasBookedAppointments()) {
+            showWarningAlert("Recommendations", "Book an appointment first to get relevant product suggestions.");
+            return;
+        }
         displayRecommendations(notesArea != null ? notesArea.getText() : "");
     }
 
@@ -188,9 +251,14 @@ public class AppointmentUserController {
 
         recommendationsVBox.getChildren().clear();
 
+        if (!hasBookedAppointments()) {
+            recommendationsVBox.getChildren().add(createRecommendationMessage("Book an appointment first, then click 'Generate Recommendations' to get AI suggestions."));
+            return;
+        }
+
         String cleanedNotes = patientNotes == null ? "" : patientNotes.trim();
         if (cleanedNotes.isEmpty()) {
-            recommendationsVBox.getChildren().add(createRecommendationMessage("Write your symptoms above to get product suggestions."));
+            recommendationsVBox.getChildren().add(createRecommendationMessage("Add clear symptoms in notes, then click 'Generate Recommendations'."));
             return;
         }
 
@@ -240,6 +308,10 @@ public class AppointmentUserController {
             for (int i = 0; i < Math.min(3, inventory.size()); i++) {
                 addUniqueRecommendation(recommendations, inventory.get(i).getNom());
             }
+        }
+
+        if (recommendations.size() > MAX_RECOMMENDATIONS) {
+            return new ArrayList<>(recommendations.subList(0, MAX_RECOMMENDATIONS));
         }
 
         return recommendations;
@@ -357,17 +429,24 @@ public class AppointmentUserController {
 
     @FXML
     public void handleAjouter() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
         if (!validateInput()) return;
 
         try {
+            UserSession session = UserSession.getInstance();
             // Fusion de la date et de l'heure
             LocalDateTime ldt = LocalDateTime.of(bookingDatePicker.getValue(), LocalTime.parse(txtHeure.getText()));
             Timestamp ts = Timestamp.valueOf(ldt);
 
             String doctorName = doctorComboBox.getValue();
+            String patientEmail = session.getEmail();
+            String patientName = session.getName();
+            
             Appointment a = new Appointment(
-                    txtPatientEmail.getText(),
-                    txtPatientName.getText(),
+                    patientEmail,
+                    patientName,
                     buildDoctorEmail(doctorName),
                     doctorName,
                     ts,
@@ -380,11 +459,59 @@ public class AppointmentUserController {
             // EVENT SUCCESS
             showInfoAlert("Appointment Booked", "Succès ! Rendez-vous enregistré pour " + txtPatientName.getText());
 
+            // 🚀 SEND SMS NOTIFICATION ASYNCHRONOUSLY (Background Thread)
+            sendAppointmentConfirmationSms(patientEmail, patientName, ts.toString());
+
             clearFields();
             loadAppointments();
         } catch (Exception e) {
             showErrorAlert("Erreur", "Format heure invalide (HH:mm) ou erreur DB.");
         }
+    }
+
+    /**
+     * Send appointment confirmation SMS asynchronously (non-blocking)
+     * Uses CompletableFuture to run on a background thread
+     */
+    private void sendAppointmentConfirmationSms(String patientEmail, String patientName, String appointmentDateTime) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                // Extract phone number from patient email or use default Tunisia format
+                String patientPhone = extractPhoneFromEmail(patientEmail);
+                
+                if (patientPhone != null && !patientPhone.isEmpty()) {
+                    // Normalize to Tunisia format if needed
+                    String normalizedPhone = smsService.normalizeTunisianPhone(patientPhone);
+                    
+                    System.out.println("📱 Sending SMS to: " + normalizedPhone);
+                    smsService.sendAppointmentConfirmation(normalizedPhone, patientName, appointmentDateTime);
+                } else {
+                    System.out.println("⚠️ No valid phone number found for SMS notification");
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Failed to send SMS: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).exceptionally(throwable -> {
+            System.err.println("❌ Async SMS Error: " + throwable.getMessage());
+            throwable.printStackTrace();
+            return null;
+        });
+    }
+
+    /**
+     * Extract phone number from patient email
+     * For now, returns null (you can implement custom logic here)
+     * In production, fetch from patient profile or database
+     */
+    private String extractPhoneFromEmail(String email) {
+        // TODO: Implement logic to get phone number from:
+        // 1. Patient profile in database
+        // 2. Additional user info stored during registration
+        // 3. A phone field in the appointment form
+        
+        // For now, return null to prevent errors
+        return null;
     }
 
     private boolean validateInput() {
@@ -425,50 +552,103 @@ public class AppointmentUserController {
 
     @FXML
     public void handleModifier() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
         Appointment s = table.getSelectionModel().getSelectedItem();
         if (s != null && validateInput()) {
             try {
+                UserSession session = UserSession.getInstance();
                 LocalDateTime ldt = LocalDateTime.of(bookingDatePicker.getValue(), LocalTime.parse(txtHeure.getText()));
-                s.setPatient_name(txtPatientName.getText());
+                s.setPatient_email(session.getEmail());
+                s.setPatient_name(session.getName());
                 s.setNotes(notesArea.getText());
                 s.setDoctor_email(buildDoctorEmail(doctorComboBox.getValue()));
                 s.setDoctor_name(doctorComboBox.getValue());
                 s.setAppointment_date(Timestamp.valueOf(ldt));
                 service.modifier(s);
+                
+                // 🚀 SEND SMS NOTIFICATION FOR UPDATE (Background Thread)
+                sendAppointmentModificationSms(session.getEmail(), session.getName(), 
+                                               s.getAppointment_date().toString());
+                
                 loadAppointments();
             } catch (Exception e) { e.printStackTrace(); }
         }
     }
 
+    /**
+     * Send appointment modification SMS asynchronously
+     */
+    private void sendAppointmentModificationSms(String patientEmail, String patientName, String newDateTime) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                String patientPhone = extractPhoneFromEmail(patientEmail);
+                if (patientPhone != null && !patientPhone.isEmpty()) {
+                    String normalizedPhone = smsService.normalizeTunisianPhone(patientPhone);
+                    System.out.println("📱 Sending appointment update SMS to: " + normalizedPhone);
+                    smsService.sendAppointmentConfirmation(normalizedPhone, patientName, newDateTime);
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Failed to send update SMS: " + e.getMessage());
+            }
+        }).exceptionally(throwable -> {
+            System.err.println("❌ Async SMS Update Error: " + throwable.getMessage());
+            return null;
+        });
+    }
+
     @FXML
     public void handleSupprimer() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
         Appointment s = table.getSelectionModel().getSelectedItem();
         if (s != null) {
             try {
+                // 🚀 SEND SMS CANCELLATION NOTIFICATION (Background Thread)
+                sendAppointmentCancellationSms(s.getPatient_email(), s.getPatient_name());
+                
                 service.supprimer(s.getId());
                 loadAppointments();
             } catch (Exception e) { e.printStackTrace(); }
         }
     }
 
+    /**
+     * Send appointment cancellation SMS asynchronously
+     */
+    private void sendAppointmentCancellationSms(String patientEmail, String patientName) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                String patientPhone = extractPhoneFromEmail(patientEmail);
+                if (patientPhone != null && !patientPhone.isEmpty()) {
+                    String normalizedPhone = smsService.normalizeTunisianPhone(patientPhone);
+                    System.out.println("📱 Sending appointment cancellation SMS to: " + normalizedPhone);
+                    smsService.sendAppointmentCancellation(normalizedPhone, patientName);
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Failed to send cancellation SMS: " + e.getMessage());
+            }
+        }).exceptionally(throwable -> {
+            System.err.println("❌ Async SMS Cancellation Error: " + throwable.getMessage());
+            return null;
+        });
+    }
+
     @FXML
     public void handleDownloadPdf() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
         Appointment selected = table.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showWarningAlert("No Selection", "Select an appointment from the table to download its proof PDF.");
             return;
         }
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Appointment Proof");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
-        fileChooser.setInitialFileName("appointment-proof-" + selected.getId() + ".pdf");
-
-        Stage stage = (Stage) table.getScene().getWindow();
-        File targetFile = fileChooser.showSaveDialog(stage);
-        if (targetFile == null) {
-            return;
-        }
+        File downloadsDir = getDownloadsDirectory();
+        File targetFile = buildUniquePdfFile(downloadsDir, "appointment-proof-" + selected.getId());
 
         try {
             appointmentPdfService.exportAppointmentProof(selected, targetFile);
@@ -480,26 +660,31 @@ public class AppointmentUserController {
 
     @FXML
     public void handleDownloadPDF() {
+        if (!ensureLoggedIn()) {
+            return;
+        }
         Appointment selected = table.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showWarningAlert("No Selection", "Please select an appointment from the table first.");
             return;
         }
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Appointment Invoice");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
-        fileChooser.setInitialFileName("INV-" + selected.getId() + ".pdf");
-
-        Stage stage = (Stage) table.getScene().getWindow();
-        File targetFile = fileChooser.showSaveDialog(stage);
-        if (targetFile == null) {
-            return;
-        }
+        File downloadsDir = getDownloadsDirectory();
+        File targetFile = buildUniquePdfFile(downloadsDir, "INV-" + selected.getId());
 
         try {
-            appointmentPdfService.exportAppointmentInvoice(selected, targetFile);
-            showInfoAlert("PDF Created", "Invoice saved successfully:\n" + targetFile.getAbsolutePath());
+            AppointmentPdfService.CloudPdfResult result = appointmentPdfService.exportAppointmentInvoiceWithCloudLink(selected, targetFile);
+            appointmentInvoiceUrls.put(selected.getId(), result.getPublicUrl());
+            updateQRCode(selected);
+
+            String mode = result.isGeneratedByCloudApi() ? "Cloud API" : "Local fallback";
+            showInfoAlert(
+                    "PDF Created",
+                    "Invoice saved successfully (" + mode + "):\n"
+                            + targetFile.getAbsolutePath()
+                            + "\n\nOnline URL for QR:\n"
+                            + result.getPublicUrl()
+            );
         } catch (FileNotFoundException e) {
             showErrorAlert("PDF Error", "Could not create invoice PDF: " + String.valueOf(e));
         } catch (Exception e) {
@@ -548,6 +733,63 @@ public class AppointmentUserController {
                 .replaceAll("^\\.+|\\.+$", "");
 
         return normalized.isBlank() ? "doctor@pinkshield.tn" : normalized + "@pinkshield.tn";
+    }
+
+    private boolean ensureLoggedIn() {
+        if (UserSession.getInstance().isLoggedIn()) {
+            return true;
+        }
+        showWarningAlert("Authentication Required", "Please sign in to perform this action.");
+        return false;
+    }
+
+    private boolean hasBookedAppointments() {
+        return appointmentList != null && !appointmentList.isEmpty();
+    }
+
+    private File getDownloadsDirectory() {
+        String userHome = System.getProperty("user.home", ".");
+        File downloads = new File(userHome, "Downloads");
+        if (downloads.exists() || downloads.mkdirs()) {
+            return downloads;
+        }
+        return new File(userHome);
+    }
+
+    private File buildUniquePdfFile(File directory, String baseName) {
+        File file = new File(directory, baseName + ".pdf");
+        int suffix = 1;
+        while (file.exists()) {
+            file = new File(directory, baseName + "-" + suffix + ".pdf");
+            suffix++;
+        }
+        return file;
+    }
+
+    private void updateQRCode(Appointment appt) {
+        if (qrCodeImageView == null) {
+            return;
+        }
+
+        try {
+            String publicPdfUrl = appointmentInvoiceUrls.get(appt.getId());
+            if (publicPdfUrl == null || publicPdfUrl.isBlank()) {
+                publicPdfUrl = appointmentPdfService.getPublicPdfUrl(appt);
+            }
+
+            String encodedData = URLEncoder.encode(publicPdfUrl, StandardCharsets.UTF_8.toString());
+
+            // Construct the QRServer API endpoint
+            String qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodedData;
+
+            // Load the image asynchronously (non-blocking)
+            Image qrImage = new Image(qrApiUrl, 150, 150, true, true);
+            qrCodeImageView.setImage(qrImage);
+
+        } catch (Exception e) {
+            System.err.println("Error generating QR code: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void showInfoAlert(String t, String c) { Alert a = new Alert(Alert.AlertType.INFORMATION); a.setTitle(t); a.setHeaderText(null); a.setContentText(c); a.showAndWait(); }

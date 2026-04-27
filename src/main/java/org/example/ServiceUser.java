@@ -98,7 +98,7 @@ public class ServiceUser {
             return null;
         }
 
-        String sql = "SELECT full_name, email, password_hash, role, specialty, medical_license_id FROM app_users WHERE email = ? LIMIT 1";
+        String sql = "SELECT id, full_name, email, password_hash, role, specialty, medical_license_id FROM app_users WHERE email = ? LIMIT 1";
         try (PreparedStatement pst = cnx.prepareStatement(sql)) {
             pst.setString(1, normalizeEmail(email));
             ResultSet rs = pst.executeQuery();
@@ -112,6 +112,7 @@ public class ServiceUser {
             }
 
             return new AuthUser(
+                    rs.getInt("id"),
                     rs.getString("full_name"),
                     rs.getString("email"),
                     storedHash,

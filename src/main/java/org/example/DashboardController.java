@@ -142,6 +142,8 @@ public class DashboardController {
             return;
         }
 
+        UserSession.getInstance().cleanUserSession();
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Auth.fxml"));
             Parent root = loader.load();

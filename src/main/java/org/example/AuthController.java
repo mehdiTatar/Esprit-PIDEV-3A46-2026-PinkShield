@@ -16,6 +16,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -35,6 +37,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.animation.Interpolator;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AuthController {
@@ -42,6 +50,8 @@ public class AuthController {
     private static final Color PATIENT_COLOR = Color.web("#e84393");
     private static final Color DOCTOR_COLOR = Color.web("#0984e3");
     private static final Duration THEME_ANIMATION_DURATION = Duration.millis(500);
+    private static final int MAX_RECENT_EMAILS = 8;
+    private static final Path RECENT_EMAILS_FILE = Path.of(System.getProperty("user.home", "."), ".pinkshield-recent-emails.txt");
 
     @FXML private StackPane authRoot;
     @FXML private StackPane logoContainer;
@@ -80,6 +90,8 @@ public class AuthController {
     private Set<Node> inputRows;
     private Set<Node> fieldIcons;
     private ParallelTransition logoHeartbeat;
+    private final ContextMenu emailSuggestionsMenu = new ContextMenu();
+    private final List<String> recentLoginEmails = new ArrayList<>();
 
     private static final java.util.List<String> SPECIALTIES = java.util.Arrays.asList(
             "Cardiology",
@@ -104,6 +116,8 @@ public class AuthController {
         registerBox.setManaged(false);
         txtLoginPasswordVisible.setVisible(false);
         txtLoginPasswordVisible.setManaged(false);
+        loadRecentLoginEmails();
+        setupLoginEmailSuggestions();
         applyRoleMode();
 
         themeProgress.addListener((obs, oldValue, newValue) ->
@@ -199,6 +213,15 @@ public class AuthController {
             return;
         }
 
+        UserSession.getInstance().setCurrentUser(
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole()
+        );
+
+        rememberLoginEmail(email);
+
         if ("ADMIN".equalsIgnoreCase(user.getRole())) {
             openScreen("/AdminDashboard.fxml", "PinkShield - Admin Dashboard");
         } else {
@@ -209,12 +232,14 @@ public class AuthController {
     @FXML
     private void handleSkipPatientLogin() {
         clearMessages();
+        UserSession.getInstance().cleanUserSession();
         openScreen("/Dashboard.fxml", "PinkShield - Dashboard");
     }
 
     @FXML
     private void handleSkipDoctorLogin() {
         clearMessages();
+        UserSession.getInstance().cleanUserSession();
         openScreen("/AdminDashboard.fxml", "PinkShield - Admin Dashboard");
     }
 
@@ -470,6 +495,98 @@ public class AuthController {
 
     private String getSelectedRole() {
         return btnDoctorMode != null && btnDoctorMode.isSelected() ? "DOCTOR" : "PATIENT";
+    }
+
+    private void setupLoginEmailSuggestions() {
+        if (txtLoginEmail == null) {
+            return;
+        }
+
+        txtLoginEmail.textProperty().addListener((obs, oldText, newText) -> showEmailSuggestions(newText));
+        txtLoginEmail.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (isFocused) {
+                showEmailSuggestions(txtLoginEmail.getText());
+            } else {
+                emailSuggestionsMenu.hide();
+            }
+        });
+    }
+
+    private void showEmailSuggestions(String query) {
+        if (txtLoginEmail == null) {
+            return;
+        }
+
+        String normalized = query == null ? "" : query.trim().toLowerCase();
+        List<String> matches = new ArrayList<>();
+
+        for (String email : recentLoginEmails) {
+            if (normalized.isEmpty() || email.toLowerCase().contains(normalized)) {
+                matches.add(email);
+            }
+        }
+
+        if (matches.isEmpty() || !txtLoginEmail.isFocused()) {
+            emailSuggestionsMenu.hide();
+            return;
+        }
+
+        emailSuggestionsMenu.getItems().clear();
+        for (String email : matches) {
+            MenuItem item = new MenuItem(email);
+            item.setOnAction(event -> {
+                txtLoginEmail.setText(email);
+                txtLoginEmail.positionCaret(email.length());
+                emailSuggestionsMenu.hide();
+            });
+            emailSuggestionsMenu.getItems().add(item);
+        }
+
+        if (!emailSuggestionsMenu.isShowing()) {
+            emailSuggestionsMenu.show(txtLoginEmail, javafx.geometry.Side.BOTTOM, 0, 0);
+        }
+    }
+
+    private void loadRecentLoginEmails() {
+        recentLoginEmails.clear();
+        try {
+            if (!Files.exists(RECENT_EMAILS_FILE)) {
+                return;
+            }
+
+            LinkedHashSet<String> dedup = new LinkedHashSet<>();
+            for (String line : Files.readAllLines(RECENT_EMAILS_FILE, StandardCharsets.UTF_8)) {
+                String email = line == null ? "" : line.trim();
+                if (!email.isEmpty()) {
+                    dedup.add(email);
+                }
+                if (dedup.size() >= MAX_RECENT_EMAILS) {
+                    break;
+                }
+            }
+            recentLoginEmails.addAll(dedup);
+        } catch (IOException ignored) {
+            // Keep login flow robust even if history file is unavailable.
+        }
+    }
+
+    private void rememberLoginEmail(String email) {
+        String normalized = email == null ? "" : email.trim().toLowerCase();
+        if (normalized.isEmpty()) {
+            return;
+        }
+
+        recentLoginEmails.removeIf(existing -> existing.equalsIgnoreCase(normalized));
+        recentLoginEmails.add(0, normalized);
+        while (recentLoginEmails.size() > MAX_RECENT_EMAILS) {
+            recentLoginEmails.remove(recentLoginEmails.size() - 1);
+        }
+
+        try {
+            Files.write(RECENT_EMAILS_FILE, recentLoginEmails, StandardCharsets.UTF_8);
+        } catch (IOException ignored) {
+            // History persistence is optional and should not block successful sign-in.
+        }
     }
 
     private void clearMessages() {

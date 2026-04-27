@@ -35,13 +35,15 @@ public class ServiceWishlist {
     }
 
     public void ajouter(Wishlist wishlist) throws SQLException {
+        if (wishlist == null || wishlist.getUser_id() <= 0) {
+            throw new SQLException("User session is required to add wishlist items.");
+        }
         String req = "INSERT INTO wishlist (user_id, parapharmacie_id, added_at) VALUES (?, ?, NOW())";
-        PreparedStatement pst = cnx.prepareStatement(req);
-
-        pst.setInt(1, wishlist.getUser_id());
-        pst.setInt(2, wishlist.getParapharmacie_id());
-
-        pst.executeUpdate();
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setInt(1, wishlist.getUser_id());
+            pst.setInt(2, wishlist.getParapharmacie_id());
+            pst.executeUpdate();
+        }
         System.out.println("Wishlist item ajoute avec succes !");
     }
 
@@ -60,9 +62,9 @@ public class ServiceWishlist {
             return false;
         }
 
-        int demoUserId = 1;
-        if (!wishlistItemExists(demoUserId, dbProduct.getId())) {
-            ajouter(new Wishlist(demoUserId, dbProduct.getId()));
+        int currentUserId = getCurrentUserIdOrThrow();
+        if (!wishlistItemExists(currentUserId, dbProduct.getId())) {
+            ajouter(new Wishlist(currentUserId, dbProduct.getId()));
         }
 
         return true;
@@ -117,13 +119,40 @@ public class ServiceWishlist {
     }
 
     public void supprimer(int id) throws SQLException {
-        String req = "DELETE FROM wishlist WHERE id = ?";
-        PreparedStatement pst = cnx.prepareStatement(req);
-
-        pst.setInt(1, id);
-
-        pst.executeUpdate();
+        UserSession session = UserSession.getInstance();
+        boolean scopeToCurrentUser = session.isLoggedIn() && !session.isAdmin();
+        String req = "DELETE FROM wishlist WHERE id = ?" + (scopeToCurrentUser ? " AND user_id = ?" : "");
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setInt(1, id);
+            if (scopeToCurrentUser) {
+                pst.setInt(2, session.getUserId());
+            }
+            pst.executeUpdate();
+        }
         System.out.println("Wishlist item supprime avec succes !");
+    }
+
+    public ArrayList<Wishlist> getByUserId(int userId) throws SQLException {
+        ArrayList<Wishlist> list = new ArrayList<>();
+        if (userId <= 0) {
+            return list;
+        }
+
+        String req = "SELECT * FROM wishlist WHERE user_id = ? ORDER BY added_at DESC";
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setInt(1, userId);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Wishlist(
+                            rs.getInt("id"),
+                            rs.getInt("user_id"),
+                            rs.getInt("parapharmacie_id"),
+                            rs.getTimestamp("added_at")
+                    ));
+                }
+            }
+        }
+        return list;
     }
 
     public ArrayList<Wishlist> afficherAll() throws SQLException {
@@ -143,6 +172,14 @@ public class ServiceWishlist {
             list.add(wishlist);
         }
         return list;
+    }
+
+    private int getCurrentUserIdOrThrow() throws SQLException {
+        UserSession session = UserSession.getInstance();
+        if (!session.isLoggedIn()) {
+            throw new SQLException("No active user session.");
+        }
+        return session.getUserId();
     }
 }
 

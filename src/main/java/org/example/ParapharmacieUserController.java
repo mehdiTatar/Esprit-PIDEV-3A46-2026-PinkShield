@@ -130,11 +130,17 @@ public class ParapharmacieUserController {
 
     private void addToWishlist(Parapharmacie product) {
         try {
-            if (wishlistService.wishlistItemExists(1, product.getId())) {
+            UserSession session = UserSession.getInstance();
+            if (!session.isLoggedIn()) {
+                showWarningAlert("Authentication Required", "Please sign in to add items to wishlist.");
+                return;
+            }
+
+            if (wishlistService.wishlistItemExists(session.getUserId(), product.getId())) {
                 showWarningAlert("Already in Wishlist", "This product is already in your wishlist.");
                 return;
             }
-            wishlistService.ajouter(new Wishlist(1, product.getId()));
+            wishlistService.ajouter(new Wishlist(session.getUserId(), product.getId()));
             showInfoAlert("Success", "Product added to wishlist!");
         } catch (SQLException e) {
             showErrorAlert("Error", e.getMessage());

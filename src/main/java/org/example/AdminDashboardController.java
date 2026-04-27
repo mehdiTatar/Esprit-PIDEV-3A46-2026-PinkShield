@@ -99,6 +99,8 @@ public class AdminDashboardController {
             return;
         }
 
+        UserSession.getInstance().cleanUserSession();
+
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/Auth.fxml"));
             Stage stage = (Stage) rootPane.getScene().getWindow();
