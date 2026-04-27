@@ -121,13 +121,30 @@ public class AirQualityService {
         try {
             JsonObject rootObject = JsonParser.parseString(jsonResponse).getAsJsonObject();
             
-            if (!rootObject.has("list") || rootObject.getAsJsonArray("list").isEmpty()) {
+            if (!rootObject.has("list")) {
+                System.out.println("⚠️ No 'list' field in air quality response");
+                return null;
+            }
+
+            var listArray = rootObject.getAsJsonArray("list");
+            if (listArray == null || listArray.isEmpty()) {
                 System.out.println("⚠️ No air quality data available for Tunis");
                 return null;
             }
 
-            JsonObject listItem = rootObject.getAsJsonArray("list").get(0).getAsJsonObject();
+            JsonObject listItem = listArray.get(0).getAsJsonObject();
+            
+            if (!listItem.has("main")) {
+                System.out.println("⚠️ No 'main' field in air quality data");
+                return null;
+            }
+
             JsonObject main = listItem.getAsJsonObject("main");
+            if (!main.has("aqi")) {
+                System.out.println("⚠️ No 'aqi' field in main object");
+                return null;
+            }
+
             int aqi = main.get("aqi").getAsInt();
 
             // Extract component data if available
