@@ -124,7 +124,16 @@ public class StaticMapService {
      * Format: https://maps.geoapify.com/v1/staticmap?...
      */
     private static String buildGeoapifyUrl(int width, int height, int zoom) {
-        // Geoapify free static maps (limited but works well)
+        // Geoapify static maps. If an API key is provided via GEOAPIFY_API_KEY or
+        // geoapify.api.key system property, include it. Otherwise fall back to OSM
+        // tiles to avoid returning a non-authorized 403 image URL.
+        String apiKey = getConfigValue("GEOAPIFY_API_KEY", "geoapify.api.key");
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.out.println("⚠️ Geoapify API key not set; falling back to OpenStreetMap tiles.");
+            return buildOpenStreetMapUrl(width, height, zoom);
+        }
+
+        // Build Geoapify URL with provided API key
         return "https://maps.geoapify.com/v1/staticmap?" +
                 "style=osm-bright" +
                 "&width=" + width +
@@ -132,7 +141,8 @@ public class StaticMapService {
                 "&center=lonlat:" + CLINIC_LONGITUDE + "," + CLINIC_LATITUDE +
                 "&zoom=" + zoom +
                 "&marker=lonlat:" + CLINIC_LONGITUDE + "," + CLINIC_LATITUDE +
-                ";color:%23ff0000;size:medium";
+                ";color:%23ff0000;size:medium" +
+                "&apiKey=" + apiKey;
     }
 
     /**
