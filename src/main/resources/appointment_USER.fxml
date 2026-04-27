@@ -88,6 +88,13 @@
                     <Label text="📱 Scan for e-Ticket" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-alignment: center;"/>
                     <ImageView fx:id="qrCodeImageView" fitWidth="150" fitHeight="150" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 5);"/>
                 </VBox>
+
+                <VBox spacing="10" styleClass="card-pane" style="-fx-padding: 20; -fx-background-radius: 15; -fx-alignment: center;">
+                    <Label text="🗺️ Clinic Location" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-alignment: center;"/>
+                    <Label text="Centre Urbain Nord, Tunis" style="-fx-font-size: 12; -fx-text-fill: #666666;"/>
+                    <ImageView fx:id="clinicMapView" fitWidth="400" fitHeight="200" preserveRatio="false"
+                               style="-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3); -fx-border-radius: 8;"/>
+                </VBox>
             </VBox>
         </Tab>
     </TabPane>

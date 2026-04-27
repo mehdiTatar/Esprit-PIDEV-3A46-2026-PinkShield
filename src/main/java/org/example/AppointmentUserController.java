@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class AppointmentUserController {
     private static final int MAX_RECOMMENDATIONS = 3;
@@ -35,6 +37,7 @@ public class AppointmentUserController {
     @FXML private TableView<Appointment> table;
     @FXML private TableColumn<Appointment, String> colDate, colDoctor, colStatus, colNotes;
     @FXML private ImageView qrCodeImageView;
+    @FXML private ImageView clinicMapView;
 
     private ServiceAppointment service = new ServiceAppointment();
     private final ServiceParapharmacie parapharmacieService = new ServiceParapharmacie();
@@ -63,6 +66,9 @@ public class AppointmentUserController {
         displayRecommendations("");
         bindSessionIdentity();
         loadAppointments();
+        
+        // Load clinic map
+        loadClinicMap();
         
         // Add listener for TableView selection to update QR code
         if (table != null) {
@@ -789,6 +795,64 @@ public class AppointmentUserController {
         } catch (Exception e) {
             System.err.println("Error generating QR code: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load clinic location map asynchronously
+     * Fetches static map image from API and displays it in ImageView
+     * Handles errors gracefully with fallback UI
+     */
+    private void loadClinicMap() {
+        if (clinicMapView == null) {
+            System.out.println("⚠️ Clinic map view not found in FXML");
+            return;
+        }
+
+        // Set placeholder while loading
+        clinicMapView.setStyle("-fx-opacity: 0.7;");
+        
+        // Fetch map asynchronously (non-blocking)
+        StaticMapService.fetchClinicMapAsync()
+                .thenAccept(mapImage -> {
+                    // Update UI on JavaFX thread
+                    Platform.runLater(() -> {
+                        if (mapImage != null) {
+                            try {
+                                clinicMapView.setImage(mapImage);
+                                clinicMapView.setStyle("-fx-opacity: 1.0; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);");
+                                System.out.println("✅ Clinic map displayed successfully");
+                            } catch (Exception e) {
+                                System.err.println("❌ Error setting clinic map image: " + e.getMessage());
+                                handleMapLoadError();
+                            }
+                        } else {
+                            handleMapLoadError();
+                        }
+                    });
+                })
+                .exceptionally(throwable -> {
+                    System.err.println("❌ Error in async map loading: " + throwable.getMessage());
+                    Platform.runLater(this::handleMapLoadError);
+                    return null;
+                });
+    }
+
+    /**
+     * Handle clinic map loading errors
+     * Shows error message and hides the map view gracefully
+     */
+    private void handleMapLoadError() {
+        try {
+            // Set a light gray background to indicate error
+            clinicMapView.setStyle(
+                "-fx-background-color: #f0f0f0; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3); " +
+                "-fx-opacity: 0.5;"
+            );
+            System.out.println("⚠️ Clinic map failed to load - showing placeholder");
+        } catch (Exception e) {
+            System.err.println("❌ Error handling map load error: " + e.getMessage());
         }
     }
 
