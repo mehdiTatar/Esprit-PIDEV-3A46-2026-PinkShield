@@ -13,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -32,7 +33,14 @@ public class DashboardController {
     @FXML
     private ToggleButton nightModeToggle;
 
+    @FXML
+    private HBox weatherWarningBox;
+
+    @FXML
+    private Label weatherLabel;
+
     private boolean darkModeEnabled;
+    private final AirQualityService airQualityService = new AirQualityService();
 
     @FXML
     public void initialize() {
@@ -40,6 +48,98 @@ public class DashboardController {
         NavigationManager.getInstance().setDarkMode(darkModeEnabled);
         loadWelcomeDashboard();
         applyThemeClass(rootPane);
+        
+        // Initialize air quality widget
+        loadAirQualityWidget();
+    }
+
+    /**
+     * Load air quality widget asynchronously
+     * Fetches data from OpenWeatherMap API and updates UI on success
+     */
+    private void loadAirQualityWidget() {
+        if (weatherLabel == null || weatherWarningBox == null) {
+            System.out.println("⚠️ Weather widget elements not found in FXML");
+            return;
+        }
+
+        // Set default message while loading
+        weatherLabel.setText("🌍 Loading air quality data...");
+        weatherWarningBox.setStyle("-fx-background-color: #e2e3e5; -fx-border-color: #6c757d; -fx-border-radius: 5; -fx-padding: 15;");
+
+        // Fetch air quality asynchronously (non-blocking)
+        airQualityService.fetchAirQualityAsync()
+                .thenAccept(airQualityData -> {
+                    // Update UI on JavaFX thread
+                    Platform.runLater(() -> {
+                        if (airQualityData != null) {
+                            updateWeatherWidget(airQualityData);
+                        } else {
+                            handleAirQualityError();
+                        }
+                    });
+                })
+                .exceptionally(throwable -> {
+                    System.err.println("❌ Error in air quality async call: " + throwable.getMessage());
+                    Platform.runLater(this::handleAirQualityError);
+                    return null;
+                });
+    }
+
+    /**
+     * Update weather widget with air quality data
+     */
+    private void updateWeatherWidget(AirQualityService.AirQualityData data) {
+        try {
+            // Get health warning message and colors based on AQI
+            String message = airQualityService.getHealthWarning(data.aqi);
+            String boxStyle = airQualityService.getWarningBoxColor(data.aqi);
+            String textStyle = airQualityService.getWarningTextColor(data.aqi);
+
+            // Add border radius and padding to the style
+            boxStyle += " -fx-border-radius: 5; -fx-padding: 15;";
+
+            // Add emoji based on AQI level
+            String emoji = getAqiEmoji(data.aqi);
+            String fullMessage = emoji + " " + message;
+
+            // Update label
+            weatherLabel.setText(fullMessage);
+            weatherLabel.setStyle(textStyle);
+
+            // Update box background
+            weatherWarningBox.setStyle(boxStyle);
+
+            System.out.println("✅ Weather widget updated: " + data);
+        } catch (Exception e) {
+            System.err.println("❌ Error updating weather widget: " + e.getMessage());
+            handleAirQualityError();
+        }
+    }
+
+    /**
+     * Handle air quality service errors
+     */
+    private void handleAirQualityError() {
+        try {
+            weatherLabel.setText("⚠️ Unable to fetch air quality data. Please try again later.");
+            weatherWarningBox.setStyle("-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-radius: 5; -fx-padding: 15;");
+            weatherLabel.setStyle("-fx-text-fill: #856404;");
+        } catch (Exception e) {
+            System.err.println("❌ Error handling air quality error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get emoji representation of AQI level
+     */
+    private String getAqiEmoji(int aqi) {
+        return switch (aqi) {
+            case 1, 2 -> "😊"; // Good/Fair
+            case 3 -> "😐"; // Moderate
+            case 4, 5 -> "😷"; // Poor/Hazardous
+            default -> "🌍";
+        };
     }
     
     private void loadWelcomeDashboard() {
